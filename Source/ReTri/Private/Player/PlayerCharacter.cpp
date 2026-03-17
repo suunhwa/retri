@@ -22,7 +22,7 @@ APlayerCharacter::APlayerCharacter()
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
 	}
 	
-	ConstructorHelpers::FClassFinder<UAnimInstance> AnimBP(TEXT("/Script/Engine.AnimBlueprint'/Game/Player/Animations/ABP_Player.ABP_Player_C'")); 
+	ConstructorHelpers::FClassFinder<UAnimInstance> AnimBP(TEXT("/Game/Player/Animations/ABP_Player.ABP_Player_C")); 
 	if (AnimBP.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(AnimBP.Class);
