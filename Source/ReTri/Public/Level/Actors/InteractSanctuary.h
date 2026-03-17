@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NZW/Actors/InteractableBase.h"
+#include "Level/Actors/InteractableBase.h"
 #include "InteractSanctuary.generated.h"
 
 /**

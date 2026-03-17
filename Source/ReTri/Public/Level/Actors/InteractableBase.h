@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "NZW/Data/InteractableData.h"
-#include "NZW/Interfaces/InteractableInterface.h"
+#include "Level/Data/InteractableData.h"
+#include "Level/Interfaces/InteractableInterface.h"
 
 #include "InteractableBase.generated.h"
 
