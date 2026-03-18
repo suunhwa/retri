@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -30,15 +31,21 @@ APlayerCharacter::APlayerCharacter()
 	
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 60.0f));
-	SpringArmComp->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-	SpringArmComp->TargetArmLength = 1800.f;   
-	SpringArmComp->bUsePawnControlRotation = false;
+	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 80.0f));
+	SpringArmComp->SetRelativeRotation(FRotator(-50.f, 0.f, 0.f));
+	SpringArmComp->TargetArmLength = 1200.f;   
+	SpringArmComp->bUsePawnControlRotation = false; // 카메라 고정
+	SpringArmComp->bInheritPitch = false;
+	SpringArmComp->bInheritYaw = false;
+	SpringArmComp->bInheritRoll = false;
 	SpringArmComp->bDoCollisionTest = false;  
+	bUseControllerRotationYaw = false; // 캐릭터 컨트롤러 안 따라감
+	GetCharacterMovement()->bOrientRotationToMovement = true; // 이동 방향 회전 
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
 	
 	CamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CamComp"));
 	CamComp->SetupAttachment(SpringArmComp);
-	CamComp->SetFieldOfView(60.f);
+	CamComp->SetFieldOfView(75.f);
 	
 	ConstructorHelpers::FObjectFinder<UInputAction> TempMoveInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Move.IA_Move'"));
 	if (TempMoveInput.Succeeded())
