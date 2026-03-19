@@ -14,4 +14,7 @@ class RETRI_API ADarkMoon : public AEnemyBase
 {
 	GENERATED_BODY()
 	
+public:
+	ADarkMoon();
 };
+

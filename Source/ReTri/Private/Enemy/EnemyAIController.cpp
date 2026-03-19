@@ -3,11 +3,11 @@
 
 #include "Enemy/EnemyAIController.h"
 
+
 AEnemyAIController::AEnemyAIController()
 {
 	MyPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("MyPerceptionComponent"));
 	MyStateTreeComponent = CreateDefaultSubobject<UStateTreeComponent>(TEXT("MyStateTreeComponent"));
-	
 	
 	
 }
