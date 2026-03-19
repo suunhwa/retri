@@ -36,13 +36,41 @@ public:
 	class UCameraComponent* CamComp;
 	
 public:
-	UPROPERTY(EditDefaultsOnly, Category=Input)
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Movement")
 	class UInputAction* ia_Move;
 	
-	UPROPERTY(EditDefaultsOnly, Category=Input)
+	// 기본 공격 (mouse left btn)
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Attack")
+	class UInputAction* ia_Attack;
+	
+	// 패시브 공격 (mouse right btn)
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Attack")
+	class UInputAction* ia_Secondary;
+	
+	// 스킬 (Q)
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
+	class UInputAction* ia_SkillQ;
+	
+	// 스킬 (E)
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
+	class UInputAction* ia_SkillE;
+	
+	// 스킬 (R)
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
+	class UInputAction* ia_SkillR;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Inputs")
 	class UInputMappingContext* imc_Player;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> AttackMontage;
+	
 	void OnMove(const struct FInputActionValue& inputValue);
+	void OnAttack(const struct FInputActionValue& inputValue);
+	void OnSecondary(const struct FInputActionValue& inputValue);
+	void OnSkillQ(const struct FInputActionValue& inputValue);
+	void OnSkillE(const struct FInputActionValue& inputValue);
+	void OnSkillR(const struct FInputActionValue& inputValue);
 	
 	FVector direction;
 	

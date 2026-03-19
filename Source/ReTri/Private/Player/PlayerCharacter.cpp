@@ -53,6 +53,36 @@ APlayerCharacter::APlayerCharacter()
 		ia_Move = TempMoveInput.Object;
 	}
 	
+	ConstructorHelpers::FObjectFinder<UInputAction> TempAttackInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Attack.IA_Attack'"));
+	if (TempAttackInput.Succeeded())
+	{
+		ia_Attack = TempAttackInput.Object;
+	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> TempSecondaryInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Secondary.IA_Secondary'"));
+	if (TempSecondaryInput.Succeeded())
+	{
+		ia_Secondary = TempSecondaryInput.Object;
+	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> TempSkillQInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_SkillQ.IA_SkillQ'"));
+	if (TempSkillQInput.Succeeded())
+	{
+		ia_SkillQ = TempSkillQInput.Object;
+	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> TempSkillEInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_SkillE.IA_SkillE'"));
+	if (TempSkillEInput.Succeeded())
+	{
+		ia_SkillE = TempSkillEInput.Object;
+	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> TempSkillRInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_SkillR.IA_SkillR'"));
+	if (TempSkillRInput.Succeeded())
+	{
+		ia_SkillR = TempSkillRInput.Object;
+	}
+	
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> TempIMC(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Inputs/IMC_Player.IMC_Player'"));
 	if (TempIMC.Succeeded())
 	{
@@ -97,6 +127,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if (playerInput)
 		{
 			playerInput->BindAction(ia_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMove);
+			playerInput->BindAction(ia_Attack, ETriggerEvent::Triggered, this, &APlayerCharacter::OnAttack);
+			playerInput->BindAction(ia_Secondary, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSecondary);
+			playerInput->BindAction(ia_SkillQ, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillQ);
+			playerInput->BindAction(ia_SkillE, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillE);
+			playerInput->BindAction(ia_SkillR, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillR);
 		}
 	}
 }
@@ -110,3 +145,34 @@ void APlayerCharacter::OnMove(const struct FInputActionValue& inputValue)
 	direction.Y = value.Y;*/
 }
 
+void APlayerCharacter::OnAttack(const struct FInputActionValue& inputValue)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (!AttackMontage || !AnimInstance)
+	{
+		return;
+	}
+
+	AnimInstance->Montage_Play(AttackMontage);
+}
+
+void APlayerCharacter::OnSecondary(const struct FInputActionValue& inputValue)
+{
+	
+}
+
+void APlayerCharacter::OnSkillQ(const struct FInputActionValue& inputValue)
+{
+	
+}
+
+void APlayerCharacter::OnSkillE(const struct FInputActionValue& inputValue)
+{
+	
+}
+
+void APlayerCharacter::OnSkillR(const struct FInputActionValue& inputValue)
+{
+	
+}
