@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Bullet.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -76,4 +77,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category=PlayerStats)
 	float speed = 600;
+	
+	UPROPERTY(EditAnywhere, Category=Attack)
+	TSubclassOf<ABullet> BulletClass;
 };

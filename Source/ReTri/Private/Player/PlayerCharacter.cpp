@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Player/ReTriPlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -155,6 +156,28 @@ void APlayerCharacter::OnAttack(const struct FInputActionValue& inputValue)
 	}
 
 	AnimInstance->Montage_Play(AttackMontage);
+	
+	if (!BulletClass) return;
+
+	AReTriPlayerController* PC = Cast<AReTriPlayerController>(Controller);
+	if (!PC) return;
+
+	FVector TargetPoint;
+	if (!PC->GetMouseWorldPosition(TargetPoint)) return;
+
+	FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
+	FVector Direction = (TargetPoint - MuzzleLocation);
+	Direction.Z = 0.f;
+	Direction.Normalize();
+
+	// 캐릭터 커서 방향으로 회전
+	SetActorRotation(FRotator(0.f, Direction.Rotation().Yaw, 0.f));
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	GetWorld()->SpawnActor<ABullet>(BulletClass, MuzzleLocation, Direction.Rotation(), SpawnParams);
 }
 
 void APlayerCharacter::OnSecondary(const struct FInputActionValue& inputValue)
