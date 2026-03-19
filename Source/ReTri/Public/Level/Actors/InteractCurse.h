@@ -4,27 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Level/Actors/InteractableBase.h"
-#include "InteractSanctuary.generated.h"
+#include "InteractCurse.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RETRI_API AInteractSanctuary : public AInteractableBase
+class RETRI_API AInteractCurse : public AInteractableBase
 {
 	GENERATED_BODY()
 public:
-	AInteractSanctuary();
-	
+	AInteractCurse();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
 	virtual void Interact_Implementation() override;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HealHP = 100;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Cost = 30;
 };

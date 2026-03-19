@@ -9,14 +9,12 @@
 UENUM(BlueprintType)
 enum class EInteractableType : uint8
 {
-	None		UMETA(DisplayName = "None"),
 	Sanctuary	UMETA(DisplayName = "Sanctuary"),   // 성소
 	Well		UMETA(DisplayName = "Well"),        // 우물
 	Chaos		UMETA(DisplayName = "Chaos"),       // 혼돈
 	Curse		UMETA(DisplayName = "Curse"),       // 저주
 	Remnants	UMETA(DisplayName = "Remnants")     // 기억의 잔재
 };
-
 
 USTRUCT(BlueprintType)
 struct FInteractableData : public FTableRowBase
@@ -25,17 +23,11 @@ struct FInteractableData : public FTableRowBase
 	
 public:
 	UPROPERTY(BlueprintReadWrite)
-	FString Name;
-	UPROPERTY(BlueprintReadWrite)
-	FString KName;
+	FString InteractName;
 	UPROPERTY(BlueprintReadWrite)
 	EInteractableType InteractableType;
 	UPROPERTY(BlueprintReadWrite)
-	int32 Probability;
-	UPROPERTY(BlueprintReadWrite)
-	TSoftObjectPtr<UTexture2D> Icon;
-	UPROPERTY(BlueprintReadWrite)
-	TSoftObjectPtr<UStaticMesh> StaticMesh;
+	TSoftClassPtr<class AInteractableBase> InteractableClass;
 	UPROPERTY(BlueprintReadWrite)
 	FString Description;
 };

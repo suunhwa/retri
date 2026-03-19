@@ -17,6 +17,8 @@ class RETRI_API UReTriGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	
+	UFUNCTION()
+	UDataTable* GetInteractionData() const { return InteractionData; }
 	
 //! 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NZW|Interaction")
