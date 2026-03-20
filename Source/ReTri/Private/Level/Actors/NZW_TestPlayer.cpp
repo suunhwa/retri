@@ -1,11 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "ReTriGameData.h"
 #include "Level/Actors/NZW_TestPlayer.h"
 #include "Level/Actors/InteractableBase.h"
-#include "Level/UI/InteractableInfoUI.h"
 
-#include "Components/TextBlock.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
@@ -13,7 +12,8 @@ ANZW_TestPlayer::ANZW_TestPlayer()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
+	GD = CreateDefaultSubobject<UReTriGameData>(TEXT("GameData"));
 }
 
 // Called when the game starts or when spawned
@@ -21,20 +21,22 @@ void ANZW_TestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Gold = 100;
-	HP = 100;
-	AttackDamage = 1000;
-	AbilityPower = 200;
-	Armor = 300;
-	AttackSpeed = 100;
-	CriticalChance = 5;
-	CriticalPower = 200;
-	MemoryHaste = 400;
-	MoveSpeed = 600;
-	ElemPower = 100;
-	FireDamage = 50;
-	FrozenDamage = 50;
-	exp = 0;
+	// Gold = 100;
+	// HP = 100;
+	// AttackDamage = 1000;
+	// AbilityPower = 200;
+	// Armor = 300;
+	// AttackSpeed = 100;
+	// CriticalChance = 5;
+	// CriticalPower = 200;
+	// MemoryHaste = 400;
+	// MoveSpeed = 600;
+	// ElemPower = 100;
+	// FireDamage = 50;
+	// FrozenDamage = 50;
+	// exp = 0;
+	
+	GD->DebugStat();
 }
 
 // Called every frame
@@ -91,15 +93,7 @@ void ANZW_TestPlayer::Interaction()
 		{
 			IInteractableInterface::Execute_Interact(Interact);
 			
-			UE_LOG(LogTemp, Log, TEXT("==================== Player Stats ===================="));
-			// 기본 스탯
-			UE_LOG(LogTemp, Log, TEXT("[Base Stats] HP: %.2f / AD: %.2f / AP: %.2f / Armor: %.2f"), HP, AttackDamage, AbilityPower, Armor);
-			// 보조 스탯
-			UE_LOG(LogTemp, Log, TEXT("[Secondary Stats] AS: %.2f / CritChance: %.2f%% / CritPower: %.2f / MemoryHaste: %.2f"), AttackSpeed, CriticalChance, CriticalPower, MemoryHaste);
-			// 유틸리티 및 원소 스탯
-			UE_LOG(LogTemp, Log, TEXT("[Utility] MoveSpeed: %.2f / Exp: %.2f"), MoveSpeed, exp);
-			UE_LOG(LogTemp, Log, TEXT("[Elemental] ElemPower: %.2f / Fire: %.2f, Frozen: %.2f"), ElemPower, FireDamage, FrozenDamage);
-			UE_LOG(LogTemp, Log, TEXT("======================================================"));
+			GD->DebugStat();
 		}
 	}
 }

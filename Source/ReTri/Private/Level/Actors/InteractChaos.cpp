@@ -3,7 +3,6 @@
 
 #include "Level/Actors/InteractChaos.h"
 
-#include "Components/CapsuleComponent.h"
 
 AInteractChaos::AInteractChaos()
 {

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ReTriGameData.h"
 #include "Engine/GameInstance.h"
 #include "ReTriGameInstance.generated.h"
 
@@ -21,6 +22,12 @@ public:
 	UDataTable* GetInteractionData() const { return InteractionData; }
 	
 //! 변수
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NZW|Interaction")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Interaction")
 	UDataTable* InteractionData;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
+	FPlayerStats SavePlayerStats;
+	
+//! 함수
+
 };

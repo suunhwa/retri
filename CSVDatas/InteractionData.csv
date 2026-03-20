@@ -1,0 +1,11 @@
+﻿RowName,InteractName,InteractableType,InteractableClass,Description
+Sanctuary,인도의 성소,Sanctuary,/Script/Engine.Blueprint'/Game/LevelInteraction/00_Blueprints/BP_Sancturary.BP_Sancturary',"인도의 성소입니다.
+재화를 소모해 HP를 회복할 수 있습니다."
+Well,빛나는 우물,Well,/Script/Engine.Blueprint'/Game/LevelInteraction/00_Blueprints/BP_Well.BP_Well',"빛나는 우물입니다.
+별가루를 소모해 스킬을 업그레이드 할 수 있습니다."
+Chaos,혼돈,Chaos,/Script/Engine.Blueprint'/Game/LevelInteraction/00_Blueprints/BP_Chaos.BP_Chaos',"혼돈입니다.
+랜덤한 세가지 스탯을 업그레이드 합니다."
+Curse,증오의 잔재,Curse,/Script/Engine.Blueprint'/Game/LevelInteraction/00_Blueprints/BP_Curse.BP_Curse',"강력한 증오를 담은 잔재입니다.
+무작위 증오를 감내하여 보상을 획득할 수 있습니다."
+Remnants,기억의 잔재,Remnants,/Script/Engine.Blueprint'/Game/LevelInteraction/00_Blueprints/BP_Remnants.BP_Remnants',"과거의 기억이 담겨있는 잔재입니다.
+무작위 과거의 기억을 선택하여 소환합니다."

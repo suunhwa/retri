@@ -3,7 +3,6 @@
 
 #include "Level/Actors/InteractCurse.h"
 
-#include "Components/CapsuleComponent.h"
 
 AInteractCurse::AInteractCurse()
 {
@@ -23,6 +22,5 @@ void AInteractCurse::Interact_Implementation()
 	Super::Interact_Implementation();
 	
 	UE_LOG(LogTemp, Warning, TEXT("3가지 선택지 UI 띄우기 -> 저주를 받고 스텟 레벨업"));
-	
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
 }

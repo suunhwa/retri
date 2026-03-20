@@ -2,6 +2,8 @@
 
 
 #include "Level/Actors/InteractSanctuary.h"
+
+#include "ReTriGameData.h"
 #include "Level/Actors/NZW_TestPlayer.h"
 
 #include "Components/CapsuleComponent.h"
@@ -26,9 +28,9 @@ void AInteractSanctuary::Interact_Implementation()
 	Super::Interact_Implementation();
 	
 	if (!MyPlayer) return;
-	if (MyPlayer->Gold < Cost) return;
+	if (MyPlayer->GD->PlayerStats.Gold < Cost) return;
 	
-	MyPlayer->HP += HealHP;
+	MyPlayer->GD->PlayerStats.CurrentHP += HealHP;
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
 }

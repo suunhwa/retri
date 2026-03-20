@@ -26,25 +26,26 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	// 기본 스탯
-	int Gold;
-	float HP;
-	float AttackDamage;
-	float AbilityPower;
-	float Armor;
-	
-	// 보조 스탯
-	float AttackSpeed;
-	float CriticalChance;
-	float CriticalPower;
-	float MemoryHaste;
-	
-	// 유틸리티 특수 스탯
-	float MoveSpeed;
-	float ElemPower; // 화상 피해, 냉기 피해, 빛 피해 -> 원소스탯
-	float FireDamage;
-	float FrozenDamage;
-	float exp;
+	// // 기본 스탯
+	// int32 Gold;
+	// int32 DreamPowder;
+	// float HP;
+	// float AttackDamage;
+	// float AbilityPower;
+	// float Armor;
+	//
+	// // 보조 스탯
+	// float AttackSpeed;
+	// float CriticalChance;
+	// float CriticalPower;
+	// float MemoryHaste;
+	//
+	// // 유틸리티 특수 스탯
+	// float MoveSpeed;
+	// float ElemPower; // 화상 피해, 냉기 피해, 빛 피해 -> 원소스탯
+	// float FireDamage;
+	// float FrozenDamage;
+	// float exp;
 	
 	// 스킬 레벨업 -> 
 	
@@ -56,7 +57,9 @@ public:
 	// F를 눌렀을 때 실행 할 함수
 	UFUNCTION(BlueprintCallable)
 	void Interaction();
-
+	
 	//! 플레이어한테 이식할 < 변수 >
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UReTriGameData* GD;
 };
