@@ -35,4 +35,12 @@ public:
 	// 외관
 	UPROPERTY(VisibleAnywhere)  
 	class UStaticMeshComponent* bodyMesh;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Attack")
+	float Damage = 10.f;
+	
+	UFUNCTION()
+	void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
 };

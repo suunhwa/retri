@@ -4,10 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Bullet.h"
 #include "PlayerCharacter.generated.h"
+
+class USpringArmComponent;
+class UCameraComponent;
+class UHealthComponent;
+class UStatComponent;
+class UAbilityComponent;
+class ABullet;
+class UInputAction;
+class UInputMappingContext;
 
 UCLASS()
 class RETRI_API APlayerCharacter : public ACharacter
@@ -29,55 +35,79 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-public:
-	UPROPERTY(VisibleAnywhere)
-	class USpringArmComponent* SpringArmComp;
+	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent,
+		AController* EventInstigator, AActor* DamageCauser) override;
 	
-	UPROPERTY(VisibleAnywhere)
-	class UCameraComponent* CamComp;
+private:
+	// Components
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<USpringArmComponent> SpringArmComp;
 	
-public:
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UCameraComponent> CamComp;
+	
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UHealthComponent> HealthComp;
+	
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UAbilityComponent> AbilityComp;
+	
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UStatComponent> StatComp;
+	
+
+private:
+	// Input Bindings
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Movement")
-	class UInputAction* ia_Move;
+	TObjectPtr<UInputAction> ia_Move;
 	
 	// 기본 공격 (mouse left btn)
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Attack")
-	class UInputAction* ia_Attack;
+	TObjectPtr<UInputAction> ia_Attack;
 	
 	// 패시브 공격 (mouse right btn)
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Attack")
-	class UInputAction* ia_Secondary;
+	TObjectPtr<UInputAction> ia_Secondary;
 	
 	// 스킬 (Q)
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
-	class UInputAction* ia_SkillQ;
+	TObjectPtr<UInputAction> ia_SkillQ;
 	
 	// 스킬 (E)
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
-	class UInputAction* ia_SkillE;
+	TObjectPtr<UInputAction> ia_SkillE;
 	
 	// 스킬 (R)
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
-	class UInputAction* ia_SkillR;
+	TObjectPtr<UInputAction> ia_SkillR;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Inputs")
-	class UInputMappingContext* imc_Player;
+	TObjectPtr<UInputMappingContext> imc_Player;
+
+private:
+	// Attack
+	UPROPERTY(EditAnywhere, Category=Attack)
+	TSubclassOf<ABullet> BulletClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
-	
+
+private:
+	// Input Handlers
 	void OnMove(const struct FInputActionValue& inputValue);
 	void OnAttack(const struct FInputActionValue& inputValue);
 	void OnSecondary(const struct FInputActionValue& inputValue);
 	void OnSkillQ(const struct FInputActionValue& inputValue);
 	void OnSkillE(const struct FInputActionValue& inputValue);
 	void OnSkillR(const struct FInputActionValue& inputValue);
+	void OnDash(const struct FInputActionValue& inputValue);
 	
-	FVector direction;
+private:
+	UFUNCTION()
+	void HandleDash(AController* Killer);
+	
+	/*FVector direction;
 	
 	UPROPERTY(EditAnywhere, Category=PlayerStats)
-	float speed = 600;
-	
-	UPROPERTY(EditAnywhere, Category=Attack)
-	TSubclassOf<ABullet> BulletClass;
+	float speed = 600;*/
 };

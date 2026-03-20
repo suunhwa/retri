@@ -199,3 +199,11 @@ void APlayerCharacter::OnSkillR(const struct FInputActionValue& inputValue)
 {
 	
 }
+
+void APlayerCharacter::OnDash(const struct FInputActionValue& inputValue)
+{
+}
+
+void APlayerCharacter::HandleDash(AController* Killer)
+{
+}

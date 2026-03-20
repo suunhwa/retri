@@ -5,7 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -34,6 +34,7 @@ void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	collisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnOverlap);
 }
 
 // Called every frame
@@ -42,4 +43,15 @@ void ABullet::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+void ABullet::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(!OtherActor || OtherActor == GetOwner()) return;
+
+	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
+	Destroy();
+}
+
 
