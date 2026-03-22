@@ -28,9 +28,10 @@ void AInteractSanctuary::Interact_Implementation()
 	Super::Interact_Implementation();
 	
 	if (!MyPlayer) return;
-	if (MyPlayer->GD->PlayerStats.Gold < Cost) return;
+	if (MyPlayer->GD->GetGold() <= Cost) return;
 	
-	MyPlayer->GD->PlayerStats.CurrentHP += HealHP;
+	MyPlayer->GD->UpdateGold(-Cost);
+	MyPlayer->GD->UpdateHP(+HealHP);
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
 }

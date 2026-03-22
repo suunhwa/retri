@@ -53,6 +53,42 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FPlayerStats GetPlayerStats() { return PlayerStats; }
 	
+public:
+	/** --- 개별 통계 Get 함수들 --- */
+
+	// 기본 재화 및 경험치
+	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
+	int32 GetGold() const { return PlayerStats.Gold; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
+	int32 GetDreamPowder() const { return PlayerStats.DreamPowder; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
+	float GetExp() const { return PlayerStats.Exp; }
+
+	// 체력 관련
+	UFUNCTION(BlueprintCallable, Category = "Stats|Health")
+	float GetMaxHP() const { return PlayerStats.MaxHP; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Health")
+	float GetCurrentHP() const { return PlayerStats.CurrentHP; }
+
+	// 전투 스탯
+	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
+	float GetAttackPower() const { return PlayerStats.AttackPower; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
+	float GetAttackSpeed() const { return PlayerStats.AttackSpeed; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
+	float GetAbilityPower() const { return PlayerStats.AbilityPower; }
+
+	// 보조 및 유틸리티
+	UFUNCTION(BlueprintCallable, Category = "Stats|Utility")
+	float GetMoveSpeed() const { return PlayerStats.MoveSpeed; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Utility")
+	float GetCoolTime() const { return PlayerStats.CoolTime; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Elemental")
+	float GetFireDamage() const { return PlayerStats.FireDamage; }
+	
+	// 스탯 변화 함수
+	UFUNCTION(BlueprintCallable)
+	void UpdateHP(float AmountHP) { PlayerStats.CurrentHP += AmountHP; }
 	UFUNCTION(BlueprintCallable)
 	void UpdateGold(int32 AmountGold) { PlayerStats.Gold += AmountGold; }
 	UFUNCTION(BlueprintCallable)
@@ -64,7 +100,7 @@ public:
 	{
 		UE_LOG(LogTemp, Log, TEXT("==================== Player Stats ===================="));
 		// 기본 스탯
-		UE_LOG(LogTemp, Log, TEXT("[Base Stats] HP: %.2f / AD: %.2f / AP: %.2f"), PlayerStats.MaxHP, PlayerStats.AttackPower, PlayerStats.AbilityPower);
+		UE_LOG(LogTemp, Log, TEXT("[Base Stats] HP: %.2f / AD: %.2f / AP: %.2f"), PlayerStats.CurrentHP, PlayerStats.AttackPower, PlayerStats.AbilityPower);
 		UE_LOG(LogTemp, Log, TEXT("[Base Stats] Gold: %d / DreamPowder: %d / Exp: %.2f"), PlayerStats.Gold, PlayerStats.DreamPowder, PlayerStats.Exp);
 		// 보조 스탯
 		UE_LOG(LogTemp, Log, TEXT("[Secondary Stats] AS: %.2f / CoolTime: %.2f"), PlayerStats.AttackSpeed, PlayerStats.CoolTime);
