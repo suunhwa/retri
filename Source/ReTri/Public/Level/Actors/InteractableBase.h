@@ -53,10 +53,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractableType InteractableType;
 	
+	// 상호작용 중인지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
 	bool bIsInteractable = false;
+	// 마우스로 가리키고 있는지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
 	bool bIsHovering = false;
+	// 사용 했는지
+	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
+	bool bIsRun = false;
 	
 	// Interaction Object 이름과 상호작용을 띄울 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -67,6 +72,7 @@ public:
 	
 	float CurDescriptionTime = 0.f;
 	float MaxDescriptionTime = 3.f;
+	
 	
 protected:
 	UPROPERTY()
