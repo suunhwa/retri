@@ -25,7 +25,7 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+							   FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	UPROPERTY(BlueprintAssignable, Category="Health")
@@ -47,7 +47,7 @@ public:
 	float GetMaxHP() const { return MaxHP; }
 	
 	UFUNCTION(BlueprintPure, Category="Health")
-	bool IsDead() const { return IsDead; }
+	bool IsDead() const { return bIsDead; }
 	
 	// 성소/강화에서 MaxHP 올릴 때 사용
 	void SetMaxHP(float NewMaxHP, bool bHealToFull = false);

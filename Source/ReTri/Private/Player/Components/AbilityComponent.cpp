@@ -23,16 +23,17 @@ void UAbilityComponent::BeginPlay()
 	Super::BeginPlay();
 
 	RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);
+	RegisterAbility(EAbilitySlot::TravelerMemory1, TravelerMemory1Class);
 	RegisterAbility(EAbilitySlot::SkillQ, SkillQClass);
 	RegisterAbility(EAbilitySlot::SkillE, SkillEClass);
-	RegisterAbility(EAbilitySlot::SkillR, SkillRClass);
+	RegisterAbility(EAbilitySlot::TravelerMemory2, TravelerMemory2Class);
 	
 }
 
 
 // Called every frame
 void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                      FActorComponentTickFunction* ThisTickFunction)
+									  FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 

@@ -12,9 +12,10 @@ UENUM(BlueprintType)
 enum class EAbilitySlot : uint8
 {
 	Dash,
-	SkillQ,
-	SkillE,
-	SkillR,
+	TravelerMemory1,  // 우클릭 고유스킬 (핸드 캐논)
+	SkillQ,           // Q 획득스킬
+	SkillE,           // E 획득스킬
+	TravelerMemory2,  // R 고유스킬 (빠른 손)
 };
 
 UCLASS(ClassGroup=(Player), meta=(BlueprintSpawnableComponent))
@@ -33,7 +34,7 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+							   FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	// 
@@ -47,15 +48,18 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
 	TSubclassOf<UAbilityBase> DashAbilityClass;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
+	TSubclassOf<UAbilityBase> TravelerMemory1Class;  // 우클릭 고유스킬
+
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
 	TSubclassOf<UAbilityBase> SkillQClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
 	TSubclassOf<UAbilityBase> SkillEClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
-	TSubclassOf<UAbilityBase> SkillRClass;
+	TSubclassOf<UAbilityBase> TravelerMemory2Class;  // R 고유스킬
 	
 	UPROPERTY()
 	TMap<EAbilitySlot, TObjectPtr<UAbilityBase>> Abilities;

@@ -2,6 +2,7 @@
 
 
 #include "Player/Components/StatComponent.h"
+#include "Player/Components/HealthComponent.h"
 
 
 // Sets default values for this component's properties
@@ -55,9 +56,51 @@ void UStatComponent::ApplyStatModifier(EStatTypes Type, float Delta)
 			MaxHP = FMath::Max(1.0f, MaxHP + Delta);
 			newValue = MaxHP;
 			break;
+
+		case EStatTypes::FireDamage:
+			FireDamage = FMath::Max(0.f, FireDamage + Delta);
+			newValue = FireDamage;
+			break;
 	}
-	
+
 	OnStatChanged.Broadcast(Type, newValue);
+}
+
+void UStatComponent::LoadStatsForLevel(int32 Level)
+{
+	if (!StatDataTable) return;
+
+	FName RowName = FName(*FString::Printf(TEXT("Level_%d"), Level));
+	FPlayerStatRow* Row = StatDataTable->FindRow<FPlayerStatRow>(RowName, TEXT("LoadStatsForLevel"));
+	if (!Row) return;
+
+	CurrentLevel = Level;
+	MoveSpeed    = Row->MoveSpeed;
+	AttackDamage = Row->AttackDamage;
+	AttackSpeed  = Row->AttackSpeed;
+	DashCooldown = Row->DashCooldown;
+	MaxHP        = Row->MaxHP;
+
+	// HealthComponent MaxHP도 같이 업데이트
+	if (UHealthComponent* HC = GetOwner()->FindComponentByClass<UHealthComponent>())
+	{
+		HC->SetMaxHP(MaxHP, false);
+	}
+
+	OnStatChanged.Broadcast(EStatTypes::MaxHP, MaxHP);
+}
+
+FPlayerStatInfo UStatComponent::GetStatInfo() const
+{
+	FPlayerStatInfo Info;
+	Info.MoveSpeed    = MoveSpeed;
+	Info.AttackDamage = AttackDamage;
+	Info.AttackSpeed  = AttackSpeed;
+	Info.DashCooldown = DashCooldown;
+	Info.MaxHP        = MaxHP;
+	Info.FireDamage   = FireDamage;
+	Info.CurrentLevel = CurrentLevel;
+	return Info;
 }
 
 

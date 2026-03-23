@@ -10,17 +10,22 @@
 // Sets default values
 ABullet::ABullet()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
 	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	collisionComp->SetSphereRadius(15.f);
+	collisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	collisionComp->SetCollisionObjectType(ECC_GameTraceChannel1);
+	collisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	collisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	RootComponent = collisionComp;
 
 	bodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
 	bodyMesh->SetupAttachment(collisionComp);
 
 	moveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MoveComp"));
+	moveComp->SetUpdatedComponent(collisionComp);
 	moveComp->InitialSpeed = 1500.f;
 	moveComp->MaxSpeed = 1500.f;
 	moveComp->bRotationFollowsVelocity = true;
