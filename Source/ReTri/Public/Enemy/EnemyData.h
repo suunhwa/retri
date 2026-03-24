@@ -51,7 +51,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatSkills);
 	FDataTableRowHandle BasicAttackID;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat|Skills")
-	TArray<FDataTableRowHandle> BossSkills;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatSkills)
+	TArray<FDataTableRowHandle> BossSkillsID;
 	
 };

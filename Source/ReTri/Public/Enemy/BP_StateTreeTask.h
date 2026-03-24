@@ -20,8 +20,16 @@ public:
 protected:
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) override;
 	
+	virtual EStateTreeRunStatus Tick(FStateTreeExecutionContext& Context, const float DeltaTime) override;
+	
+	
+protected:
 	// 공격 실행, 어떤 스킬 가져올 건지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FDataTableRowHandle SkillDataHandle;
+	
+	// 페이즈
+	int32 CurrentPhase = 1;
+	bool bHasPlayedMirrorBlade = false;
 	
 };
