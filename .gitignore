@@ -76,5 +76,8 @@ DerivedDataCache/*
 # Rider IDE
 .idea/
 
+# Rider user settings
+*.sln.DotSettings.user
+
 # RiderLink plugin (project-installed)
 Plugins/Developer/RiderLink/
