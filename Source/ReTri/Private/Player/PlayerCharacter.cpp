@@ -5,7 +5,7 @@
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Player/Bullet.h"
+#include "Player/Projectiles/Bullet.h"
 #include "Player/Components/HealthComponent.h"
 #include "Player/Components/AbilityComponent.h"
 #include "Player/Components/StatComponent.h"
