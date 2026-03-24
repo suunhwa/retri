@@ -1,6 +1,5 @@
 # Visual Studio 2015 user specific files
 .vs/
-.idea/
 
 # Compiled Object files
 *.slo
@@ -73,3 +72,12 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Rider IDE
+.idea/
+
+# Rider user settings
+*.sln.DotSettings.user
+
+# RiderLink plugin (project-installed)
+Plugins/Developer/RiderLink/
