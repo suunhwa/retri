@@ -12,14 +12,16 @@
 
 UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	{
-	
-	}
+{
+	bShouldCallTick = true;
+}
 
 EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::EnterState(Context, Transition);
 	// UE_LOG(LogTemp, Warning, TEXT("==== Boss Attack Task 시작! ===="));
+	
+	SkillWaitTime = 0.0f;
 	
 	AActor* OwnerActor = Cast<AActor>(Context.GetOwner());
 	if (!OwnerActor) return EStateTreeRunStatus::Failed;
@@ -45,51 +47,23 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		return EStateTreeRunStatus::Failed;
 	}
 	
-	// // 주인 알아오기
-	// UObject* RawOwner = Context.GetOwner();
-	// if (!RawOwner) return EStateTreeRunStatus::Failed;
-	//
-	// AActor* OwnerActor = Cast<AActor>(RawOwner);
-	// ACharacter* OwnerChar = nullptr;
-	// if (AAIController* aic = Cast<AAIController>(OwnerActor))
-	// {
-	// 	OwnerChar = Cast<ACharacter>(aic->GetPawn());
-	// }
-	//
-	// if (OwnerChar == nullptr)
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("OwnerChar is nullptr (보스 못 찾음)"));
-	// 	return EStateTreeRunStatus::Failed;
-	// }
-	//
-	//
-	// AActor* OwnerEnemy = Cast<AActor>(Context.GetOwner());
-	// AEnemyBase* Boss = nullptr;
-	// if (AController* aic = Cast<AController>(OwnerActor))
-	// {
-	// 	Boss = Cast<AEnemyBase>(aic->GetPawn());
-	// }
-	// if (!Boss || Boss->BossSkills.Num() < 8)
-	// {
-	// 	return EStateTreeRunStatus::Failed;
-	// }
 	
 	// 현재 체력 비율
 	float HPRatio = Boss->CurrentHP / Boss->MaxHP;
-	int32 FinalSkillIndex = 0;		// 최종 스킬 인덱스
+	int32 FinalSkillIndex = -1;		// 최종 스킬 인덱스
 	TArray<int32> SkillPool;	// 이번에 쓸 스킬 후보지
 	
 	// 체력에 따른 페이즈
-	if (HPRatio <= 0.3)				// 3페이즈
+	if (HPRatio <= 0.3f)				// 3페이즈
 	{
 		CurrentPhase = 3;
 		SkillPool = { 5, 6, 7 };
 	}
-	else if (HPRatio <= 0.6)		// 2페이즈
+	else if (HPRatio <= 0.6f)		// 2페이즈
 	{
 		if (CurrentPhase < 2 && !bHasPlayedMirrorBlade)
 		{
-			// 2페이즈 진입 직후 MirrorBlade 스킬 사용
+			// 2페이즈 진입 직후 MirrorBlade 스킬 확정 사용
 			FinalSkillIndex = 4;
 			bHasPlayedMirrorBlade = true;
 			CurrentPhase = 2;
@@ -106,27 +80,30 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		SkillPool = { 0, 1, 1, 2, 2, 3, 3};
 	}
 	
-	if (SkillPool.Num() > 0 && FinalSkillIndex !=3)
+	if (SkillPool.Num() > 0 && FinalSkillIndex == -1)
 	{
 		int32 RandomIndex = FMath::RandRange(0, SkillPool.Num() - 1);
 		FinalSkillIndex = SkillPool[RandomIndex];
 	}
 	
+	
 	// 결정된 인덱스로 스킬 실행
-	FDataTableRowHandle SelectedHandle = Boss->BossSkills[FinalSkillIndex];
-	if (!SelectedHandle.IsNull())
+	if (Boss->BossSkills.IsValidIndex(FinalSkillIndex))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("현재 체력 비율: %.2f | 선택된 스킬 이름: %s"), 
-		   HPRatio, *SelectedHandle.RowName.ToString());
-		
-		FSkillDataTableRow* SkillInfo = SkillDataHandle.GetRow<FSkillDataTableRow>(TEXT("SkillInfo"));
-		
-		if (SkillInfo && SkillInfo->MontageToPlay)
+		SkillDataHandle = Boss->BossSkills[FinalSkillIndex];
+	
+		if (!SkillDataHandle.IsNull())
 		{
-			Boss->PlayAnimMontage(SkillInfo->MontageToPlay);
-			UE_LOG(LogTemp, Warning, TEXT("보스 스킬 실행: 인덱스 %d"), FinalSkillIndex);
+			FSkillDataTableRow* SkillInfo = SkillDataHandle.GetRow<FSkillDataTableRow>(TEXT(""));
+		
+			if (SkillInfo && SkillInfo->MontageToPlay)
+			{
+				Boss->PlayAnimMontage(SkillInfo->MontageToPlay);
+				UE_LOG(LogTemp, Warning, TEXT("==== [%d페이즈] [%s] 시전 중 (인덱스: %d) ===="), CurrentPhase,
+				*SkillDataHandle.RowName.ToString(), FinalSkillIndex);
 			
-			return EStateTreeRunStatus::Running;
+				return EStateTreeRunStatus::Running;
+			}
 		}
 	}
 	
@@ -138,20 +115,37 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 	Super::Tick(Context, DeltaTime);
 	
 	AActor* OwnerActor = Cast<AActor>(Context.GetOwner());
-	ACharacter* OwnerChar = nullptr;
+	AEnemyBase* Boss = Cast<AEnemyBase>(OwnerActor);
 	
-	if (AController* aic = Cast<AController>(OwnerActor))
+	if (!Boss)
 	{
-		OwnerChar = Cast<ACharacter>(aic->GetPawn());
-	}
-	if (OwnerChar)
-	{
-		if (OwnerChar->GetCurrentMontage() == nullptr)
+		if (AAIController* aic = Cast<AAIController>(OwnerActor))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("공격 끗"))
+			Boss = Cast<AEnemyBase>(aic->GetPawn());
+		}
+	}
+	if (Boss)
+	{
+		if (Boss->GetCurrentMontage() != nullptr) return EStateTreeRunStatus::Running;
+		
+		if (Boss->GetCurrentMontage() == nullptr)
+		{
+			SkillWaitTime += DeltaTime;
+			if (SkillWaitTime < 1.0f)
+			{
+				return  EStateTreeRunStatus::Running;
+			}
 			
+			UE_LOG(LogTemp, Warning, TEXT("공격 끗"))
+			SkillWaitTime = 0.0f;
 			return EStateTreeRunStatus::Succeeded;
 		}
+		
+		// if (Boss->GetCurrentMontage() == nullptr)
+		// {
+		// 	UE_LOG(LogTemp, Warning, TEXT("공격 끗"))
+		// 	return EStateTreeRunStatus::Succeeded;
+		// }
 	}
 	
 	return EStateTreeRunStatus::Running;

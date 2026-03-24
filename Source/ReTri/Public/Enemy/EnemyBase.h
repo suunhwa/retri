@@ -37,7 +37,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = EnemySetup)
 	FName EnemyRowName;
 	
-	UPROPERTY(BlueprintReadOnly, Category = Status)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Status)
 	float CurrentHP;
 	
 	UPROPERTY(BlueprintReadOnly, Category = Status)

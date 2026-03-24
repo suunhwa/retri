@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/EnemyBase.h"
-#include "Enemy/EnemyData.h"
 #include "DarkMoon.generated.h"
 
 /**
@@ -35,10 +34,14 @@ protected:
 	void SetSwordCollisionEnabled(bool bEnabled);
 	
 	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
+						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
+						bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
 	void OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 							   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
-	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
 };
 

@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS(Blueprintable, meta=(DisplayName = "공격실행"))
+UCLASS(Blueprintable, meta=(DisplayName = "공격태스크"))
 class RETRI_API UBP_StateTreeTask : public UStateTreeTaskBlueprintBase
 {
 	GENERATED_BODY()
@@ -31,5 +31,10 @@ protected:
 	// 페이즈
 	int32 CurrentPhase = 1;
 	bool bHasPlayedMirrorBlade = false;
+	
+	UPROPERTY(EditAnywhere, Category = Settings)
+	float SkillWaitTime = 0.0f;
+	
+	
 	
 };

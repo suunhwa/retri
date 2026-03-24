@@ -8,7 +8,7 @@ public class ReTri : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "StateTreeModule", "GameplayStateTreeModule", "AIModule" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "StateTreeModule", "GameplayStateTreeModule", "AIModule", "GameplayTags" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
