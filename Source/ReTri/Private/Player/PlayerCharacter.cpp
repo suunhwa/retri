@@ -44,9 +44,9 @@ APlayerCharacter::APlayerCharacter()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 80.0f));
-	SpringArmComp->SetRelativeRotation(FRotator(-50.f, 0.f, 0.f));
-	SpringArmComp->TargetArmLength = 1200.f;   
+	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 160.0f));
+	SpringArmComp->SetRelativeRotation(FRotator(-65.f, 0.f, 0.f));
+	SpringArmComp->TargetArmLength = 2050.f;   
 	SpringArmComp->bUsePawnControlRotation = false; // 카메라 고정
 	SpringArmComp->bInheritPitch = false;
 	SpringArmComp->bInheritYaw = false;
@@ -55,10 +55,12 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationYaw = false; // 캐릭터 컨트롤러 안 따라감
 	GetCharacterMovement()->bOrientRotationToMovement = true; 
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
+	GetCharacterMovement()->bCanWalkOffLedges = false;
+	GetCharacterMovement()->NavAgentProps.bCanWalk = true;
 	
 	CamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CamComp"));
 	CamComp->SetupAttachment(SpringArmComp);
-	CamComp->SetFieldOfView(75.f);
+	CamComp->SetFieldOfView(55.f);
 	
 	ConstructorHelpers::FObjectFinder<UInputAction> TempMoveInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Move.IA_Move'"));
 	if (TempMoveInput.Succeeded())
@@ -158,11 +160,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		{
 			playerInput->BindAction(ia_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMove);
 			playerInput->BindAction(ia_Attack, ETriggerEvent::Started, this, &APlayerCharacter::OnAttack);
-			playerInput->BindAction(ia_TravelerMemory1, ETriggerEvent::Triggered, this, &APlayerCharacter::OnTravelerMemory1);
-			playerInput->BindAction(ia_SkillQ, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillQ);
-			playerInput->BindAction(ia_SkillE, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillE);
-			playerInput->BindAction(ia_TravelerMemory2, ETriggerEvent::Triggered, this, &APlayerCharacter::OnTravelerMemory2);
-			playerInput->BindAction(ia_Dash, ETriggerEvent::Triggered, this, &APlayerCharacter::OnDash);
+			playerInput->BindAction(ia_TravelerMemory1, ETriggerEvent::Started, this, &APlayerCharacter::OnTravelerMemory1);
+			playerInput->BindAction(ia_SkillQ, ETriggerEvent::Started, this, &APlayerCharacter::OnSkillQ);
+			playerInput->BindAction(ia_SkillE, ETriggerEvent::Started, this, &APlayerCharacter::OnSkillE);
+			playerInput->BindAction(ia_TravelerMemory2, ETriggerEvent::Started, this, &APlayerCharacter::OnTravelerMemory2);
+			playerInput->BindAction(ia_Dash, ETriggerEvent::Started, this, &APlayerCharacter::OnDash);
 		}
 	}
 }
