@@ -11,12 +11,18 @@ AEnemyBase::AEnemyBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
 }
 
 // Called when the game starts or when spawned
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (StateTreeComponent)
+	{
+		StateTreeComponent->StartLogic();
+	}
 	
 	// 데이터테이블 존재 && 이름 존재
 	if (StatDataTable != nullptr && !EnemyRowName.IsNone())
@@ -35,8 +41,8 @@ void AEnemyBase::BeginPlay()
 				GetCharacterMovement()->MaxWalkSpeed = MyStatInfo->MoveSpeed;
 			}
 			
-			BasicAttack = MyStatInfo->BasicAttackID;
-			BossSkills = MyStatInfo->BossSkills;
+			// BasicAttack = MyStatInfo->BasicAttackID;
+			BossSkills = MyStatInfo->BossSkillsID;
 			
 			UE_LOG(LogTemp, Warning, TEXT("성공!! %s의 체력은 %f, 스킬은 %d개"), *EnemyRowName.ToString(), CurrentHP, BossSkills.Num());
 		}

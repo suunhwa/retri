@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 
+
 ADarkMoon::ADarkMoon()
 {
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonAurora/Characters/Heroes/Aurora/Skins/GlacialEmpress/Meshes/Aurora_GlacialEmpress.Aurora_GlacialEmpress'"));
@@ -25,6 +26,31 @@ ADarkMoon::ADarkMoon()
 	SwordCollision->SetBoxExtent(FVector(12.173687,51.076195,5.828096));
 	SwordCollision->SetGenerateOverlapEvents(true);
 	SwordCollision->OnComponentBeginOverlap.AddDynamic(this, &ADarkMoon::OnSwordOverlap);
+}
+
+void ADarkMoon::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (StatDataTable)
+	{
+		FEnemyDataTableRow* Data = StatDataTable->FindRow<FEnemyDataTableRow>(EnemyRowName, TEXT("EnemyBegin"));
+		
+		if (Data)
+		{
+			MaxHP = Data->MaxHP;
+			CurrentHP = MaxHP;
+			
+			BossSkills = Data->BossSkillsID;
+			
+			UE_LOG(LogTemp, Warning, TEXT("%s 등장 스킬 %d종류 장착"), *EnemyRowName.ToString(), BossSkills.Num());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("%s행 못 찾음"), *EnemyRowName.ToString());
+		}
+	}
+	
 }
 
 void ADarkMoon::SetSwordCollisionEnabled(bool bEnabled)

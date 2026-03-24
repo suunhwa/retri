@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyData.h"
+#include "Components/StateTreeComponent.h"
 #include "EnemyBase.generated.h"
 
 UCLASS()
@@ -27,7 +28,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-protected:
+public:
 	// 선택할 데이터 테이블
 	UPROPERTY(EditDefaultsOnly, Category = EnemySetup)
 	UDataTable* StatDataTable;
@@ -42,9 +43,14 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = Status)
 	float MaxHP;
 	
-	UPROPERTY(BlueprintReadOnly, Category = Skill)
-	FDataTableRowHandle BasicAttack;
+	// UPROPERTY(BlueprintReadOnly, Category = Skill)
+	// FDataTableRowHandle BasicAttack;
+	
+public:
 	UPROPERTY(BlueprintReadOnly, Category = Skill)
 	TArray<FDataTableRowHandle> BossSkills;
+	
+	UPROPERTY(EditdefaultsOnly, Category = StateTree);
+	class UStateTreeComponent* StateTreeComponent;
 
 };
