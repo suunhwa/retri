@@ -13,6 +13,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Animation/AnimInstance.h"
+#include "InputActionValue.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Player/ReTriPlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -50,7 +53,7 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp->bInheritRoll = false;
 	SpringArmComp->bDoCollisionTest = false;  
 	bUseControllerRotationYaw = false; // 캐릭터 컨트롤러 안 따라감
-	GetCharacterMovement()->bOrientRotationToMovement = false; // 마우스 방향으로 직접 회전
+	GetCharacterMovement()->bOrientRotationToMovement = true; 
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
 	
 	CamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CamComp"));
@@ -118,7 +121,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 항상 마우스 커서 방향을 바라봄
+	/*// 항상 마우스 커서 방향을 바라봄
 	AReTriPlayerController* PC = Cast<AReTriPlayerController>(Controller);
 	if (PC)
 	{
@@ -132,7 +135,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 				SetActorRotation(FRotator(0.f, Dir.Rotation().Yaw, 0.f));
 			}
 		}
-	}
+	}*/
 }
 
 // Called to bind functionality to input
@@ -154,7 +157,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if (playerInput)
 		{
 			playerInput->BindAction(ia_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMove);
-			playerInput->BindAction(ia_Attack, ETriggerEvent::Triggered, this, &APlayerCharacter::OnAttack);
+			playerInput->BindAction(ia_Attack, ETriggerEvent::Started, this, &APlayerCharacter::OnAttack);
 			playerInput->BindAction(ia_TravelerMemory1, ETriggerEvent::Triggered, this, &APlayerCharacter::OnTravelerMemory1);
 			playerInput->BindAction(ia_SkillQ, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillQ);
 			playerInput->BindAction(ia_SkillE, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillE);
@@ -169,84 +172,59 @@ void APlayerCharacter::OnMove(const struct FInputActionValue& inputValue)
 	FVector2D value = inputValue.Get<FVector2D>();
 	AddMovementInput(FVector::ForwardVector, value.X);
 	AddMovementInput(FVector::RightVector, value.Y);
-	/*direction.X = value.X;
-	direction.Y = value.Y;*/
 }
 
 void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
+	// UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
+	
+	// 클릭한 위치 방향 계산
+	AReTriPlayerController* pc = Cast<AReTriPlayerController>(Controller);
+	if (!pc) { UE_LOG(LogTemp, Error, TEXT("OnAttack: PC cast failed")); return; }
+	// if (!pc) return;
+	
+	FVector TargetPoint;
+	if (!pc->GetMouseWorldPosition(TargetPoint)) { UE_LOG(LogTemp, Error, TEXT("OnAttack: GetMouseWorldPosition failed")); return; }
+	// if (!pc->GetMouseWorldPosition(TargetPoint)) return;
+	
+	FVector Direction = TargetPoint - GetActorLocation();
+	Direction.Z = 0.f;
+	if (Direction.IsNearlyZero()) { UE_LOG(LogTemp, Error, TEXT("OnAttack: Direction is zero")); return; }
+	// if (!Direction.IsNearlyZero()) return;
+	Direction.Normalize();
+	
+	// 클릭한 방향으로 플레이어 회전
+	SetActorRotation(FRotator(0.f, Direction.Rotation().Yaw, 0.f));
 
+	// 애니메이션
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AttackMontage && AnimInstance)
 	{
 		AnimInstance->Montage_Play(AttackMontage);
 	}
 
-	if (!BulletClass)
-	{
-		UE_LOG(LogTemp, Error, TEXT("BulletClass is null"));
-		return;
-	}
-
+	// if (!BulletClass) return;
+	if (!BulletClass) { UE_LOG(LogTemp, Error, TEXT("OnAttack: BulletClass is null")); return; }
+	
 	FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
-	UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
-
-	FVector Direction = GetActorForwardVector();
+	// UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
+	/*FVector Direction = GetActorForwardVector();
 	Direction.Z = 0.f;
-	Direction.Normalize();
+	Direction.Normalize();*/
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = this;
+	// SpawnParams.Instigator = GetInstigator();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ABullet* SpawnedBullet = GetWorld()->SpawnActor<ABullet>(
+	GetWorld()->SpawnActor<ABullet>(
 		BulletClass,
 		MuzzleLocation,
 		Direction.Rotation(),
 		SpawnParams
 	);
-
-	UE_LOG(LogTemp, Warning, TEXT("Bullet Spawned: %s"), SpawnedBullet ? TEXT("YES") : TEXT("NO"));
-
-	if (SpawnedBullet)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Bullet Location: %s"), *SpawnedBullet->GetActorLocation().ToString());
-	}
 }
-
-/*void APlayerCharacter::OnAttack(const struct FInputActionValue& inputValue)
-{
-	UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
-	// 애니메이션 (없어도 공격은 됨)
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AttackMontage && AnimInstance)
-	{
-		AnimInstance->Montage_Play(AttackMontage);
-	}
-
-	// 총알 발사
-	//if (!BulletClass) return;
-	if (!BulletClass)
-	{
-		UE_LOG(LogTemp, Error, TEXT("BulletClass is null"));
-		return;
-	}
-
-	FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
-	UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
-	FVector Direction = GetActorForwardVector();
-	Direction.Z = 0.f;
-	Direction.Normalize();
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	GetWorld()->SpawnActor<ABullet>(BulletClass, MuzzleLocation, Direction.Rotation(), SpawnParams);
-}*/
 
 void APlayerCharacter::OnTravelerMemory1(const struct FInputActionValue& inputValue)
 {

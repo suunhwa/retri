@@ -38,7 +38,7 @@ public:
 	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
 	
-private:
+public:
 	// Components
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
@@ -54,7 +54,12 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UStatComponent> StatComp;
-	
+
+// getter (성소 상호작용)
+public:
+	UHealthComponent* GetHealthComponent() const { return HealthComp; }
+	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; }
+	UStatComponent* GetStatComponent() const { return StatComp; }
 
 private:
 	// Input Bindings
