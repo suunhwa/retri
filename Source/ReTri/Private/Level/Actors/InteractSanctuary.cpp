@@ -3,32 +3,35 @@
 
 #include "Level/Actors/InteractSanctuary.h"
 
+#include "ReTriGameData.h"
+#include "Level/Actors/NZW_TestPlayer.h"
+
 #include "Components/CapsuleComponent.h"
 
 AInteractSanctuary::AInteractSanctuary()
 {
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(CapsuleComp);
-	
 	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/Mesh/Sanctuary_Test.Sanctuary_Test'"));
 	if (TempMesh.Succeeded()) MeshComp->SetStaticMesh(TempMesh.Object);
-	MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
+	//MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
+	//MeshComp->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
 }
 
 void AInteractSanctuary::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void AInteractSanctuary::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	
+	InteractableType = EInteractableType::Sanctuary;
 }
 
 void AInteractSanctuary::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
-	FString Type = StaticEnum<EInteractableType>()->GetNameStringByValue((int64)InteractableType);
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *Type);
+	if (!MyPlayer) return;
+	if (MyPlayer->GD->GetGold() <= Cost) return;
+	
+	MyPlayer->GD->UpdateGold(-Cost);
+	MyPlayer->GD->UpdateHP(+HealHP);
+	
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
 }
