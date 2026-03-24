@@ -99,12 +99,27 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
+	
+public:
+	UPROPERTY(EditAnywhere, Category="Combat|Left")
+	int32 AttackCount = 0;
+
+	UPROPERTY(EditAnywhere, Category="Combat|Left")
+	float EnhancedShotMultiplier = 2.0f;
+
+	UPROPERTY(EditAnywhere, Category="Combat|Left")
+	float AttackInterval = 0.2f;
+
+	bool bCanAttack = true;
+
+	FTimerHandle AttackTimerHandle;
 
 private:
 	// Input Handlers
 	void OnMove(const struct FInputActionValue& inputValue);
 	void OnDash(const struct FInputActionValue& inputValue);
 	void OnAttack(const struct FInputActionValue& inputValue);
+	void ResetAttack();
 	void OnTravelerMemory1(const struct FInputActionValue& inputValue);
 	void OnSkillQ(const struct FInputActionValue& inputValue);
 	void OnSkillE(const struct FInputActionValue& inputValue);

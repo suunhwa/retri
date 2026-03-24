@@ -16,6 +16,7 @@
 #include "Animation/AnimInstance.h"
 #include "InputActionValue.h"
 #include "UObject/ConstructorHelpers.h"
+#include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -178,22 +179,24 @@ void APlayerCharacter::OnMove(const struct FInputActionValue& inputValue)
 
 void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 {
+	if (!bCanAttack) return;
 	// UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
 	
 	// 클릭한 위치 방향 계산
 	AReTriPlayerController* pc = Cast<AReTriPlayerController>(Controller);
-	if (!pc) { UE_LOG(LogTemp, Error, TEXT("OnAttack: PC cast failed")); return; }
-	// if (!pc) return;
+	if (!pc) return;
 	
 	FVector TargetPoint;
-	if (!pc->GetMouseWorldPosition(TargetPoint)) { UE_LOG(LogTemp, Error, TEXT("OnAttack: GetMouseWorldPosition failed")); return; }
-	// if (!pc->GetMouseWorldPosition(TargetPoint)) return;
+	if (!pc->GetMouseWorldPosition(TargetPoint)) return;
 	
 	FVector Direction = TargetPoint - GetActorLocation();
 	Direction.Z = 0.f;
-	if (Direction.IsNearlyZero()) { UE_LOG(LogTemp, Error, TEXT("OnAttack: Direction is zero")); return; }
-	// if (!Direction.IsNearlyZero()) return;
+	if (Direction.IsNearlyZero()) return;
 	Direction.Normalize();
+	
+	// 방향 검증 통과 후 쿨타임
+	bCanAttack = false;
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayerCharacter::ResetAttack, AttackInterval, false);
 	
 	// 클릭한 방향으로 플레이어 회전
 	SetActorRotation(FRotator(0.f, Direction.Rotation().Yaw, 0.f));
@@ -205,8 +208,16 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 		AnimInstance->Montage_Play(AttackMontage);
 	}
 
-	// if (!BulletClass) return;
-	if (!BulletClass) { UE_LOG(LogTemp, Error, TEXT("OnAttack: BulletClass is null")); return; }
+	if (!BulletClass) return;
+	
+	// 4탄마다 강화탄
+	AttackCount++;
+    bool bIsEnhancedShot = (AttackCount >= 4);
+	
+	if (bIsEnhancedShot)
+	{
+		AttackCount = 0;
+	}
 	
 	FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
 	// UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
@@ -220,12 +231,27 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	// SpawnParams.Instigator = GetInstigator();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	GetWorld()->SpawnActor<ABullet>(
+	ABullet* SpawnedBullet = GetWorld()->SpawnActor<ABullet>(
 		BulletClass,
 		MuzzleLocation,
 		Direction.Rotation(),
 		SpawnParams
 	);
+	
+	if (SpawnedBullet && bIsEnhancedShot)
+	{
+		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
+		UE_LOG(LogTemp, Warning, TEXT("[Attack] Enhanced shot! Damage: %.1f"), SpawnedBullet->GetBulletDamage());
+	}
+	else if (SpawnedBullet)
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Attack] Normal shot %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
+	}
+}
+
+void APlayerCharacter::ResetAttack()
+{
+	bCanAttack = true;
 }
 
 void APlayerCharacter::OnTravelerMemory1(const struct FInputActionValue& inputValue)
