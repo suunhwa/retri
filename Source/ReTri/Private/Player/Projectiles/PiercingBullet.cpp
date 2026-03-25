@@ -1,25 +1,26 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Projectiles/HandCannonBullet.h"
+#include "Player/Projectiles/PiercingBullet.h"
+
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
-AHandCannonBullet::AHandCannonBullet()
+APiercingBullet::APiercingBullet()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
-	CollisionComp->SetSphereRadius(25.f);
+	CollisionComp->SetSphereRadius(15.f);
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel5);
+	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel4);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	RootComponent = CollisionComp;
@@ -30,8 +31,8 @@ AHandCannonBullet::AHandCannonBullet()
 	
 	MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MoveComp"));
 	MoveComp->SetUpdatedComponent(CollisionComp);
-	MoveComp->InitialSpeed = 1000.f;
-	MoveComp->MaxSpeed = 1000.f;
+	MoveComp->InitialSpeed = 1800.f;
+	MoveComp->MaxSpeed = 1800.f;
 	MoveComp->bRotationFollowsVelocity = true;
 	MoveComp->ProjectileGravityScale = 0.f;
 	
@@ -44,28 +45,26 @@ AHandCannonBullet::AHandCannonBullet()
 }
 
 // Called when the game starts or when spawned
-void AHandCannonBullet::BeginPlay()
+void APiercingBullet::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SpawnLocation = GetActorLocation();
-	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AHandCannonBullet::OnOverlap);
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &APiercingBullet::OnOverlap);
 	
 	if (TrailEffect)
 	{
 		TrailComp->SetTemplate(TrailEffect);
 		TrailComp->Activate();
 	}
-
 }
 
 // Called every frame
-void AHandCannonBullet::Tick(float DeltaTime)
+void APiercingBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
+void APiercingBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex,
@@ -74,25 +73,13 @@ void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
 {
 	if (!OtherActor || OtherActor == GetOwner()) return;
 	
-	// 발사 위치 기준 거리로 근/원거리 판정
-	float distance = FVector::Dist(SpawnLocation, GetActorLocation());
-	bool bIsNear = (distance <= NearRange);
+	// 이미 맞은 액터 스킵
+	if (HitActors.Contains(OtherActor)) return;
 	
-	float Damage = bIsNear ? NearDamage : FarDamage;
+	HitActors.Add(OtherActor);
+	PierceCount++;
+	
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
-	
-	// 근거리 넉백
-	if (bIsNear)
-	{
-		if (ACharacter* HitChar = Cast<ACharacter>(OtherActor))
-		{
-			FVector KnockDir = OtherActor->GetActorLocation() - SpawnLocation;
-			KnockDir.Z = 0.f;
-			KnockDir.Normalize();
-			HitChar->LaunchCharacter(KnockDir * KnockBackForce, true, false);
-		}
-		
-	}
 	
 	// effects
 	// niagara
@@ -112,6 +99,9 @@ void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
 	}
 	
-	Destroy();
+	// 최대 관통 수 초과 시 소멸
+	if (PierceCount >= MaxPierceCount)
+	{
+		Destroy();
+	}
 }
-

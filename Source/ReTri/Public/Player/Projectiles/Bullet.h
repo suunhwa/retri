@@ -47,4 +47,5 @@ public:
 public:
 	void SetBulletDamage(float InDamage) { Damage = InDamage; }
 	float GetBulletDamage() const { return Damage; }
+	void SetEnhanced() {}
 };

@@ -89,6 +89,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
 	TObjectPtr<UInputAction> ia_TravelerMemory2;
 	
+	// Interaction
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Interaction")
+	TObjectPtr<UInputAction> ia_Interaction;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Inputs")
 	TObjectPtr<UInputMappingContext> imc_Player;
 
@@ -124,6 +128,7 @@ private:
 	void OnSkillQ(const struct FInputActionValue& inputValue);
 	void OnSkillE(const struct FInputActionValue& inputValue);
 	void OnTravelerMemory2(const struct FInputActionValue& inputValue);
+	void OnInteraction(const struct FInputActionValue& inputValue);
 	
 private:
 	UFUNCTION()
@@ -133,4 +138,16 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category=PlayerStats)
 	float speed = 600;*/
+	
+public:
+	// 마우스로 Interaction Object Hover했을 때 띄울 UI
+	UFUNCTION(BlueprintCallable)
+	void HoverInteractable();
+	
+	// F를 눌렀을 때 실행 할 함수
+	UFUNCTION(BlueprintCallable)
+	void Interaction();
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UReTriGameData* GD;
 };

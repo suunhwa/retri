@@ -18,6 +18,9 @@
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
+#include "ReTriGameData.h"
+#include "Level/Actors/InteractableBase.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -45,9 +48,9 @@ APlayerCharacter::APlayerCharacter()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 160.0f));
-	SpringArmComp->SetRelativeRotation(FRotator(-65.f, 0.f, 0.f));
-	SpringArmComp->TargetArmLength = 2050.f;   
+	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+	SpringArmComp->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
+	SpringArmComp->TargetArmLength = 2300.f;   
 	SpringArmComp->bUsePawnControlRotation = false; // 카메라 고정
 	SpringArmComp->bInheritPitch = false;
 	SpringArmComp->bInheritYaw = false;
@@ -61,7 +64,9 @@ APlayerCharacter::APlayerCharacter()
 	
 	CamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CamComp"));
 	CamComp->SetupAttachment(SpringArmComp);
-	CamComp->SetFieldOfView(55.f);
+	CamComp->SetFieldOfView(50.f);
+	
+	GD = CreateDefaultSubobject<UReTriGameData>(TEXT("GameData"));
 	
 	ConstructorHelpers::FObjectFinder<UInputAction> TempMoveInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Move.IA_Move'"));
 	if (TempMoveInput.Succeeded())
@@ -104,6 +109,12 @@ APlayerCharacter::APlayerCharacter()
 	{
 		ia_Dash = TempDashInput.Object;
 	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> TempInteractionInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Interaction.IA_Interaction'"));
+	if (TempInteractionInput.Succeeded())
+	{
+		ia_Interaction = TempInteractionInput.Object;
+	}
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> TempIMC(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Inputs/IMC_Player.IMC_Player'"));
 	if (TempIMC.Succeeded())
@@ -117,6 +128,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GD->DebugStat();
 }
 
 // Called every frame
@@ -166,6 +178,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			playerInput->BindAction(ia_SkillE, ETriggerEvent::Started, this, &APlayerCharacter::OnSkillE);
 			playerInput->BindAction(ia_TravelerMemory2, ETriggerEvent::Started, this, &APlayerCharacter::OnTravelerMemory2);
 			playerInput->BindAction(ia_Dash, ETriggerEvent::Started, this, &APlayerCharacter::OnDash);
+			playerInput->BindAction(ia_Interaction, ETriggerEvent::Started, this, &APlayerCharacter::OnInteraction);
 		}
 	}
 }
@@ -274,8 +287,13 @@ void APlayerCharacter::OnTravelerMemory2(const struct FInputActionValue& inputVa
 	AbilityComp->TryActivate(EAbilitySlot::TravelerMemory2);
 }
 
+void APlayerCharacter::OnInteraction(const struct FInputActionValue& inputValue)
+{
+	Interaction();
+}
+
 float APlayerCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent,
-	AController* EventInstigator, AActor* DamageCauser)
+                                   AController* EventInstigator, AActor* DamageCauser)
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	HealthComp->HandleDamage(Damage, EventInstigator);
@@ -289,4 +307,49 @@ void APlayerCharacter::OnDash(const struct FInputActionValue& inputValue)
 
 void APlayerCharacter::HandleDash(AController* Killer)
 {
+}
+
+void APlayerCharacter::HoverInteractable()
+{
+	// 감지하고자 하는 오브젝트 타입들을 배열에 담기.
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel6)); // Interactable
+	
+	FHitResult HitResult;
+	bool bHit = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResult);
+	if (bHit && HitResult.GetActor()->Implements<UInteractableInterface>())
+	{
+		IInteractableInterface::Execute_Hover(HitResult.GetActor());
+	}
+}
+
+void APlayerCharacter::Interaction()
+{
+	// F 키를 눌렀을 때 오브젝트 들과 상호작용 할 수 있도록 
+	
+	// 감지하고자 하는 오브젝트 타입
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel6)); // Interactable
+	
+	// 제외할 Actors 
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+	
+	DrawDebugSphere(GetWorld(), GetActorLocation(), 42.f, 16, FColor::Red);
+	
+	// 근처에 Interaction Object가 있는지 감지 
+	TArray<AActor*> OutActors;
+	bool bHit = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), 42.f, ObjectTypes, AActor::StaticClass(), IgnoreActors,OutActors);
+	
+	if (!bHit) return;
+	for (AActor* Actor : OutActors)
+	{
+		AInteractableBase* Interact = Cast<AInteractableBase>(Actor);
+		if (Interact)
+		{
+			IInteractableInterface::Execute_Interact(Interact);
+			
+			GD->DebugStat();
+		}
+	}
 }
