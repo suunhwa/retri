@@ -313,7 +313,7 @@ void APlayerCharacter::HoverInteractable()
 {
 	// 감지하고자 하는 오브젝트 타입들을 배열에 담기.
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel6)); // Interactable
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
 	
 	FHitResult HitResult;
 	bool bHit = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResult);
@@ -329,7 +329,7 @@ void APlayerCharacter::Interaction()
 	
 	// 감지하고자 하는 오브젝트 타입
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel6)); // Interactable
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
 	
 	// 제외할 Actors 
 	TArray<AActor*> IgnoreActors;
