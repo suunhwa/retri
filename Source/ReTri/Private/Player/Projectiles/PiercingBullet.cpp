@@ -20,7 +20,7 @@ APiercingBullet::APiercingBullet()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	CollisionComp->SetSphereRadius(15.f);
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel4);
+	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel6);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	RootComponent = CollisionComp;

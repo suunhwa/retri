@@ -16,7 +16,7 @@ ABullet::ABullet()
 	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	collisionComp->SetSphereRadius(15.f);
 	collisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	collisionComp->SetCollisionObjectType(ECC_GameTraceChannel4);
+	collisionComp->SetCollisionObjectType(ECC_GameTraceChannel6);
 	collisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	collisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	RootComponent = collisionComp;
