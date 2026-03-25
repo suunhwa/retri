@@ -75,8 +75,8 @@ public:
 	
 	
 protected:
-	UPROPERTY()
-	class ANZW_TestPlayer* MyPlayer;
+	UPROPERTY() //todo 플레이어 클래스로 바꿔야할수도 
+	class APawn* MyPlayer;
 	
 	FString InteractName;
 	FString Description;

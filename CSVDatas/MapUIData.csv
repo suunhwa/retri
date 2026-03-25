@@ -1,0 +1,5 @@
+---,MapName,MapIcon,IconColor
+Start,"Start","/Script/Engine.Texture2D'/Game/LevelInteraction/03_Assets/Icon/Map_Node.Map_Node'","(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
+Combat,"Combat","/Script/Engine.Texture2D'/Game/LevelInteraction/03_Assets/Icon/Map_Node.Map_Node'","(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
+Merchant,"Merchant","/Script/Engine.Texture2D'/Game/LevelInteraction/03_Assets/Icon/Map_Shop.Map_Shop'","(R=0.944197,G=0.627145,B=0.000000,A=1.000000)"
+Boss,"Boss","/Script/Engine.Texture2D'/Game/LevelInteraction/03_Assets/Icon/Map_Boss.Map_Boss'","(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"

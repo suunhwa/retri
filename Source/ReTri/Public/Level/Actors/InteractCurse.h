@@ -13,8 +13,6 @@ UCLASS()
 class RETRI_API AInteractCurse : public AInteractableBase
 {
 	GENERATED_BODY()
-public:
-	AInteractCurse();
 
 protected:
 	// Called when the game starts or when spawned

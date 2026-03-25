@@ -39,6 +39,7 @@ void ALootBase::Tick(float DeltaTime)
 void ALootBase::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
+	if (OtherActor == UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) return;
 	if (bIsBroken == true) return;
 	
 	OtherActor->Destroy();

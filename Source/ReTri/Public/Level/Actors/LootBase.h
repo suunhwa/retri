@@ -43,6 +43,4 @@ public:
 	int32 HP = 2;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AGoodsBase> GoodsClass;
-	
-	
 };

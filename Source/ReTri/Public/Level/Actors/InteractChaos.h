@@ -13,8 +13,6 @@ UCLASS()
 class RETRI_API AInteractChaos : public AInteractableBase
 {
 	GENERATED_BODY()
-public:
-	AInteractChaos();
 
 protected:
 	// Called when the game starts or when spawned
