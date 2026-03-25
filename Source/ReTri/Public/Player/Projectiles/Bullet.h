@@ -43,4 +43,9 @@ public:
 	void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 		bool bFromSweep, const FHitResult& SweepResult);
+
+public:
+	void SetBulletDamage(float InDamage) { Damage = InDamage; }
+	float GetBulletDamage() const { return Damage; }
+	void SetEnhanced() {}
 };

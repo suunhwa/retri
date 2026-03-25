@@ -5,7 +5,7 @@
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Player/Bullet.h"
+#include "Player/Projectiles/Bullet.h"
 #include "Player/Components/HealthComponent.h"
 #include "Player/Components/AbilityComponent.h"
 #include "Player/Components/StatComponent.h"
@@ -13,7 +13,14 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Animation/AnimInstance.h"
+#include "InputActionValue.h"
+#include "UObject/ConstructorHelpers.h"
+#include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
+#include "ReTriGameData.h"
+#include "Level/Actors/InteractableBase.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -41,21 +48,25 @@ APlayerCharacter::APlayerCharacter()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 80.0f));
-	SpringArmComp->SetRelativeRotation(FRotator(-50.f, 0.f, 0.f));
-	SpringArmComp->TargetArmLength = 1200.f;   
+	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+	SpringArmComp->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
+	SpringArmComp->TargetArmLength = 2300.f;   
 	SpringArmComp->bUsePawnControlRotation = false; // 카메라 고정
 	SpringArmComp->bInheritPitch = false;
 	SpringArmComp->bInheritYaw = false;
 	SpringArmComp->bInheritRoll = false;
 	SpringArmComp->bDoCollisionTest = false;  
 	bUseControllerRotationYaw = false; // 캐릭터 컨트롤러 안 따라감
-	GetCharacterMovement()->bOrientRotationToMovement = false; // 마우스 방향으로 직접 회전
+	GetCharacterMovement()->bOrientRotationToMovement = true; 
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
+	GetCharacterMovement()->bCanWalkOffLedges = false;
+	GetCharacterMovement()->NavAgentProps.bCanWalk = true;
 	
 	CamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CamComp"));
 	CamComp->SetupAttachment(SpringArmComp);
-	CamComp->SetFieldOfView(75.f);
+	CamComp->SetFieldOfView(50.f);
+	
+	GD = CreateDefaultSubobject<UReTriGameData>(TEXT("GameData"));
 	
 	ConstructorHelpers::FObjectFinder<UInputAction> TempMoveInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Move.IA_Move'"));
 	if (TempMoveInput.Succeeded())
@@ -98,6 +109,12 @@ APlayerCharacter::APlayerCharacter()
 	{
 		ia_Dash = TempDashInput.Object;
 	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> TempInteractionInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Interaction.IA_Interaction'"));
+	if (TempInteractionInput.Succeeded())
+	{
+		ia_Interaction = TempInteractionInput.Object;
+	}
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> TempIMC(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Inputs/IMC_Player.IMC_Player'"));
 	if (TempIMC.Succeeded())
@@ -111,6 +128,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GD->DebugStat();
 }
 
 // Called every frame
@@ -118,7 +136,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 항상 마우스 커서 방향을 바라봄
+	/*// 항상 마우스 커서 방향을 바라봄
 	AReTriPlayerController* PC = Cast<AReTriPlayerController>(Controller);
 	if (PC)
 	{
@@ -132,7 +150,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 				SetActorRotation(FRotator(0.f, Dir.Rotation().Yaw, 0.f));
 			}
 		}
-	}
+	}*/
 }
 
 // Called to bind functionality to input
@@ -154,12 +172,13 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if (playerInput)
 		{
 			playerInput->BindAction(ia_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMove);
-			playerInput->BindAction(ia_Attack, ETriggerEvent::Triggered, this, &APlayerCharacter::OnAttack);
-			playerInput->BindAction(ia_TravelerMemory1, ETriggerEvent::Triggered, this, &APlayerCharacter::OnTravelerMemory1);
-			playerInput->BindAction(ia_SkillQ, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillQ);
-			playerInput->BindAction(ia_SkillE, ETriggerEvent::Triggered, this, &APlayerCharacter::OnSkillE);
-			playerInput->BindAction(ia_TravelerMemory2, ETriggerEvent::Triggered, this, &APlayerCharacter::OnTravelerMemory2);
-			playerInput->BindAction(ia_Dash, ETriggerEvent::Triggered, this, &APlayerCharacter::OnDash);
+			playerInput->BindAction(ia_Attack, ETriggerEvent::Started, this, &APlayerCharacter::OnAttack);
+			playerInput->BindAction(ia_TravelerMemory1, ETriggerEvent::Started, this, &APlayerCharacter::OnTravelerMemory1);
+			playerInput->BindAction(ia_SkillQ, ETriggerEvent::Started, this, &APlayerCharacter::OnSkillQ);
+			playerInput->BindAction(ia_SkillE, ETriggerEvent::Started, this, &APlayerCharacter::OnSkillE);
+			playerInput->BindAction(ia_TravelerMemory2, ETriggerEvent::Started, this, &APlayerCharacter::OnTravelerMemory2);
+			playerInput->BindAction(ia_Dash, ETriggerEvent::Started, this, &APlayerCharacter::OnDash);
+			playerInput->BindAction(ia_Interaction, ETriggerEvent::Started, this, &APlayerCharacter::OnInteraction);
 		}
 	}
 }
@@ -169,36 +188,60 @@ void APlayerCharacter::OnMove(const struct FInputActionValue& inputValue)
 	FVector2D value = inputValue.Get<FVector2D>();
 	AddMovementInput(FVector::ForwardVector, value.X);
 	AddMovementInput(FVector::RightVector, value.Y);
-	/*direction.X = value.X;
-	direction.Y = value.Y;*/
 }
 
 void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
+	if (!bCanAttack) return;
+	// UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
+	
+	// 클릭한 위치 방향 계산
+	AReTriPlayerController* pc = Cast<AReTriPlayerController>(Controller);
+	if (!pc) return;
+	
+	FVector TargetPoint;
+	if (!pc->GetMouseWorldPosition(TargetPoint)) return;
+	
+	FVector Direction = TargetPoint - GetActorLocation();
+	Direction.Z = 0.f;
+	if (Direction.IsNearlyZero()) return;
+	Direction.Normalize();
+	
+	// 방향 검증 통과 후 쿨타임
+	bCanAttack = false;
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayerCharacter::ResetAttack, AttackInterval, false);
+	
+	// 클릭한 방향으로 플레이어 회전
+	SetActorRotation(FRotator(0.f, Direction.Rotation().Yaw, 0.f));
 
+	// 애니메이션
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AttackMontage && AnimInstance)
 	{
 		AnimInstance->Montage_Play(AttackMontage);
 	}
 
-	if (!BulletClass)
+	if (!BulletClass) return;
+	
+	// 4탄마다 강화탄
+	AttackCount++;
+    bool bIsEnhancedShot = (AttackCount >= 4);
+	
+	if (bIsEnhancedShot)
 	{
-		UE_LOG(LogTemp, Error, TEXT("BulletClass is null"));
-		return;
+		AttackCount = 0;
 	}
-
+	
 	FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
-	UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
-
-	FVector Direction = GetActorForwardVector();
+	// UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
+	/*FVector Direction = GetActorForwardVector();
 	Direction.Z = 0.f;
-	Direction.Normalize();
+	Direction.Normalize();*/
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = this;
+	// SpawnParams.Instigator = GetInstigator();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ABullet* SpawnedBullet = GetWorld()->SpawnActor<ABullet>(
@@ -207,46 +250,22 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 		Direction.Rotation(),
 		SpawnParams
 	);
-
-	UE_LOG(LogTemp, Warning, TEXT("Bullet Spawned: %s"), SpawnedBullet ? TEXT("YES") : TEXT("NO"));
-
-	if (SpawnedBullet)
+	
+	if (SpawnedBullet && bIsEnhancedShot)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Bullet Location: %s"), *SpawnedBullet->GetActorLocation().ToString());
+		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
+		UE_LOG(LogTemp, Warning, TEXT("[Attack] Enhanced shot! Damage: %.1f"), SpawnedBullet->GetBulletDamage());
+	}
+	else if (SpawnedBullet)
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Attack] Normal shot %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
 	}
 }
 
-/*void APlayerCharacter::OnAttack(const struct FInputActionValue& inputValue)
+void APlayerCharacter::ResetAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
-	// 애니메이션 (없어도 공격은 됨)
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AttackMontage && AnimInstance)
-	{
-		AnimInstance->Montage_Play(AttackMontage);
-	}
-
-	// 총알 발사
-	//if (!BulletClass) return;
-	if (!BulletClass)
-	{
-		UE_LOG(LogTemp, Error, TEXT("BulletClass is null"));
-		return;
-	}
-
-	FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
-	UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
-	FVector Direction = GetActorForwardVector();
-	Direction.Z = 0.f;
-	Direction.Normalize();
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	GetWorld()->SpawnActor<ABullet>(BulletClass, MuzzleLocation, Direction.Rotation(), SpawnParams);
-}*/
+	bCanAttack = true;
+}
 
 void APlayerCharacter::OnTravelerMemory1(const struct FInputActionValue& inputValue)
 {
@@ -268,8 +287,13 @@ void APlayerCharacter::OnTravelerMemory2(const struct FInputActionValue& inputVa
 	AbilityComp->TryActivate(EAbilitySlot::TravelerMemory2);
 }
 
+void APlayerCharacter::OnInteraction(const struct FInputActionValue& inputValue)
+{
+	Interaction();
+}
+
 float APlayerCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent,
-	AController* EventInstigator, AActor* DamageCauser)
+                                   AController* EventInstigator, AActor* DamageCauser)
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	HealthComp->HandleDamage(Damage, EventInstigator);
@@ -283,4 +307,49 @@ void APlayerCharacter::OnDash(const struct FInputActionValue& inputValue)
 
 void APlayerCharacter::HandleDash(AController* Killer)
 {
+}
+
+void APlayerCharacter::HoverInteractable()
+{
+	// 감지하고자 하는 오브젝트 타입들을 배열에 담기.
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
+	
+	FHitResult HitResult;
+	bool bHit = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResult);
+	if (bHit && HitResult.GetActor()->Implements<UInteractableInterface>())
+	{
+		IInteractableInterface::Execute_Hover(HitResult.GetActor());
+	}
+}
+
+void APlayerCharacter::Interaction()
+{
+	// F 키를 눌렀을 때 오브젝트 들과 상호작용 할 수 있도록 
+	
+	// 감지하고자 하는 오브젝트 타입
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
+	
+	// 제외할 Actors 
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+	
+	DrawDebugSphere(GetWorld(), GetActorLocation(), 42.f, 16, FColor::Red);
+	
+	// 근처에 Interaction Object가 있는지 감지 
+	TArray<AActor*> OutActors;
+	bool bHit = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), 42.f, ObjectTypes, AActor::StaticClass(), IgnoreActors,OutActors);
+	
+	if (!bHit) return;
+	for (AActor* Actor : OutActors)
+	{
+		AInteractableBase* Interact = Cast<AInteractableBase>(Actor);
+		if (Interact)
+		{
+			IInteractableInterface::Execute_Interact(Interact);
+			
+			GD->DebugStat();
+		}
+	}
 }

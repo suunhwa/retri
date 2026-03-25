@@ -6,7 +6,7 @@
 
 void UDashAbility::Activate(ACharacter* Owner)
 {
-	// 현재 이동 입력 방향으로 대시, 없으면 캐릭터 전방
+	// WASD 입력 방향 갱신 (마우스 방향 무시)
 	FVector Dir = Owner->GetLastMovementInputVector();
 	if (Dir.IsNearlyZero())
 	{

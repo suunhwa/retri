@@ -38,7 +38,7 @@ public:
 	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
 	
-private:
+public:
 	// Components
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
@@ -54,7 +54,12 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UStatComponent> StatComp;
-	
+
+// getter (성소 상호작용)
+public:
+	UHealthComponent* GetHealthComponent() const { return HealthComp; }
+	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; }
+	UStatComponent* GetStatComponent() const { return StatComp; }
 
 private:
 	// Input Bindings
@@ -84,6 +89,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
 	TObjectPtr<UInputAction> ia_TravelerMemory2;
 	
+	// Interaction
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Interaction")
+	TObjectPtr<UInputAction> ia_Interaction;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Inputs")
 	TObjectPtr<UInputMappingContext> imc_Player;
 
@@ -94,16 +103,32 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
+	
+public:
+	UPROPERTY(EditAnywhere, Category="Combat|Left")
+	int32 AttackCount = 0;
+
+	UPROPERTY(EditAnywhere, Category="Combat|Left")
+	float EnhancedShotMultiplier = 2.0f;
+
+	UPROPERTY(EditAnywhere, Category="Combat|Left")
+	float AttackInterval = 0.2f;
+
+	bool bCanAttack = true;
+
+	FTimerHandle AttackTimerHandle;
 
 private:
 	// Input Handlers
 	void OnMove(const struct FInputActionValue& inputValue);
 	void OnDash(const struct FInputActionValue& inputValue);
 	void OnAttack(const struct FInputActionValue& inputValue);
+	void ResetAttack();
 	void OnTravelerMemory1(const struct FInputActionValue& inputValue);
 	void OnSkillQ(const struct FInputActionValue& inputValue);
 	void OnSkillE(const struct FInputActionValue& inputValue);
 	void OnTravelerMemory2(const struct FInputActionValue& inputValue);
+	void OnInteraction(const struct FInputActionValue& inputValue);
 	
 private:
 	UFUNCTION()
@@ -113,4 +138,16 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category=PlayerStats)
 	float speed = 600;*/
+	
+public:
+	// 마우스로 Interaction Object Hover했을 때 띄울 UI
+	UFUNCTION(BlueprintCallable)
+	void HoverInteractable();
+	
+	// F를 눌렀을 때 실행 할 함수
+	UFUNCTION(BlueprintCallable)
+	void Interaction();
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UReTriGameData* GD;
 };

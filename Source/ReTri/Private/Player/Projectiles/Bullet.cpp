@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Bullet.h"
+#include "Player/Projectiles/Bullet.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -16,7 +16,7 @@ ABullet::ABullet()
 	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	collisionComp->SetSphereRadius(15.f);
 	collisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	collisionComp->SetCollisionObjectType(ECC_GameTraceChannel1);
+	collisionComp->SetCollisionObjectType(ECC_GameTraceChannel4);
 	collisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	collisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	RootComponent = collisionComp;
