@@ -3,6 +3,8 @@
 
 #include "Level/Actors/InteractPortal.h"
 
+#include "ReTriGameInstance.h"
+
 void AInteractPortal::BeginPlay()
 {
 	Super::BeginPlay();
@@ -16,4 +18,7 @@ void AInteractPortal::Interact_Implementation()
 	// todo: 메뉴 UI띄우기
 	UE_LOG(LogTemp, Warning, TEXT("메뉴 UI띄우기"));
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
+	
+	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetGameInstance());
+	GI->EnterMap(GI->CurMapIndex+1);
 }

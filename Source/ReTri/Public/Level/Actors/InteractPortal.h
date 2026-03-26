@@ -20,4 +20,8 @@ protected:
 
 public:	
 	virtual void Interact_Implementation() override;
+	
+	// 메뉴 UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UWidgetComponent* InteractInfoUI;
 };
