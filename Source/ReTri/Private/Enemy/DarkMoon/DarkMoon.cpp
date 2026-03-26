@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 ADarkMoon::ADarkMoon()
@@ -31,6 +32,7 @@ ADarkMoon::ADarkMoon()
 void ADarkMoon::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ADarkMoon::OnOverlapBegin);
 	SwordCollision->OnComponentBeginOverlap.AddDynamic(this, &ADarkMoon::OnSwordOverlap);
 	
@@ -107,34 +109,20 @@ void ADarkMoon::SetSwordCollisionEnabled(bool bEnabled)
 		SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+
 void ADarkMoon::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// if (AAIController* aic = Cast<AAIController>(GetController()))
-	// {
-	// 	UActorComponent* STComp = aic->GetComponentByClass(UStateTreeComponent::StaticClass());
-	// 	UStateTreeComponent* StateTreeComp = Cast<UStateTreeComponent>(STComp);
-	// 	
-	// 	if (StateTreeComp)
-	// 	{
-	// 		StateTreeComp->SendStateTreeEvent(FGameplayTag::RequestGameplayTag(TEXT("Boss.StartBattle")));
-	// 		
-	// 		UE_LOG(LogTemp, Error, TEXT("Battle 시작"))
-	// 		
-	// 		GetCapsuleComponent()->OnComponentBeginOverlap.RemoveDynamic(this, &ADarkMoon::OnOverlapBegin);
-	// 	}
-	// }
+	
 }
+
 
 void ADarkMoon::OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != this)
-	{
-		// 대미지
-		UE_LOG(LogTemp, Warning, TEXT("%s를 때렸다!!!"), *OtherActor->GetName());
-	}
+	OnAttackOverlap(OtherActor);
 }
+
 
 void ADarkMoon::StartBattleEvent()
 {
@@ -150,23 +138,19 @@ void ADarkMoon::StartBattleEvent()
 	}
 }
 
-float ADarkMoon::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
-                            class AController* EventInstigator, AActor* DamageCauser)
+void ADarkMoon::OnSwordCollision()
 {
-	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
-	// if (AAIController* aic = Cast<AAIController>(GetController()))
-	// {
-	// 	UActorComponent* STComp = aic->GetComponentByClass(UStateTreeComponent::StaticClass());
-	// 	UStateTreeComponent* StateTreeComp = Cast<UStateTreeComponent>(STComp);
-	// 	
-	// 	if (StateTreeComp)
-	// 	{
-	// 		StateTreeComp->SendStateTreeEvent(FGameplayTag::RequestGameplayTag(TEXT("Boss.StartBattle")));
-	// 		
-	// 		UE_LOG(LogTemp, Error, TEXT("Battle 시작"))
-	// 	}
-	// }
-	
-	return ActualDamage;
+	if (SwordCollision)
+	{
+		SwordCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
 }
+
+void ADarkMoon::OffSwordCollision()
+{
+	if (SwordCollision)
+	{
+		SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+

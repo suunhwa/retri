@@ -40,6 +40,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Status)
 	float CurrentHP;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Status)
+	float CurrentSkillDamage;
+	
 	UPROPERTY(BlueprintReadOnly, Category = Status)
 	float MaxHP;
 	UPROPERTY(BlueprintReadOnly, Category = Status)
@@ -58,5 +61,12 @@ public:
 	
 	UPROPERTY(EditdefaultsOnly, Category = StateTree);
 	class UStateTreeComponent* StateTreeComponent;
+	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
+	UFUNCTION()
+	virtual void OnAttackOverlap(AActor* OtherActor);
+	
+	void SetCurrentSkillDamage(float NewDamage) {CurrentSkillDamage = NewDamage;}
 
 };

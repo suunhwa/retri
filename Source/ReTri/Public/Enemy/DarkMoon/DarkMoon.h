@@ -28,13 +28,19 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Collision)
 	class UBoxComponent* SwordCollision;
 	
-	
+
 	
 	
 protected:
 	UFUNCTION(BlueprintCallable, category=Collision)
 	void SetSwordCollisionEnabled(bool bEnabled);
 	
+	
+	void StartBattleEvent();
+	void ReduceBossHP();
+	void UpdatePhase();
+	
+public:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
 						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
@@ -43,11 +49,12 @@ protected:
 	void OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 							   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
-	void StartBattleEvent();
-	void ReduceBossHP();
-	void UpdatePhase();
+public:
+	UFUNCTION(BlueprintCallable, category=Collision)
+	void OnSwordCollision();
+	UFUNCTION(BlueprintCallable, category=Collision)
+	void OffSwordCollision();
 	
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
 };
 

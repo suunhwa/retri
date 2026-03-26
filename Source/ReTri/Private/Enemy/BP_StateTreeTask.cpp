@@ -9,7 +9,6 @@
 #include "Enemy/EnemyData.h"
 #include "AIController.h"
 #include "Enemy/EnemyBase.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "ReTri/ReTri.h"
 
@@ -22,7 +21,7 @@ UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer
 EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::EnterState(Context, Transition);
-	UE_LOG(LogTemp, Warning, TEXT("==== Boss Attack Task 시작! ===="));
+	//UE_LOG(LogTemp, Warning, TEXT("==== Boss Attack Task 시작! ===="));
 	
 	SkillWaitTime = 0.0f;
 	
@@ -30,10 +29,11 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	if (!OwnerActor) return EStateTreeRunStatus::Failed;
 	
 	AEnemyBase* Boss = Cast<AEnemyBase>(OwnerActor);
+	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	
 	if (!Boss)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("==== 실패 ===="));
+		//UE_LOG(LogTemp, Warning, TEXT("==== 실패 ===="));
 		if (AAIController* aic = Cast<AAIController>(OwnerActor))
 		{
 			Boss = Cast<AEnemyBase>(aic->GetPawn());
@@ -50,6 +50,8 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		UE_LOG(LogTemp, Error, TEXT("보스 스킬 부족! (현재: %d개)"), Boss->BossSkills.Num());
 		return EStateTreeRunStatus::Failed;
 	}
+	
+	
 	
 	
 	// 현재 체력 비율
@@ -81,7 +83,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	else							// 1페이즈
 	{
 		RealPhase = 1;
-		SkillPool = { 0, 1, 1, 2, 2, 3, 3};
+		SkillPool = { 0, 1 , 2, 3 };	//0, 1, 1, 2, 2, 3, 3
 	}
 	
 	if (SkillPool.Num() > 0 && FinalSkillIndex == -1)
@@ -100,15 +102,18 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		if (!SkillDataHandle.IsNull())
 		{
 			FSkillDataTableRow* SkillInfo = SkillDataHandle.GetRow<FSkillDataTableRow>(TEXT(""));
-			ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+			//ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 			EDarkMoonSkillType SelectedSkill = static_cast<EDarkMoonSkillType>(FinalSkillIndex);
-
+			
 			if (SkillInfo) // && SkillInfo->MontageToPlay)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("==== [%d페이즈] [%s] 시전 중 (인덱스: %d) ===="), RealPhase, 
 		*SkillInfo->SkillName, FinalSkillIndex);
 				
 				SCREENLOG("==== [%d페이즈] ==== [%s] !!!! ====", RealPhase, *SkillInfo->SkillName);
+				
+				Boss->SetCurrentSkillDamage(SkillInfo->Damage);
+				Boss ->PlayAnimMontage(SkillInfo->MontageToPlay);
 				
 				switch (SelectedSkill)
 				{
@@ -144,9 +149,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 					ExecutePowerJumpDown(Boss, Player, SkillInfo->MontageToPlay);
 					break;
 				}
-			
-				// UE_LOG(LogTemp, Warning, TEXT("==== [%d페이즈] [%s] 시전 중 (인덱스: %d) ===="), RealPhase, *SkillDataHandle.RowName.ToString(), FinalSkillIndex);
-			
+				
 				return EStateTreeRunStatus::Running;
 			}
 		}
@@ -201,13 +204,13 @@ void UBP_StateTreeTask::ExecuteDash(AEnemyBase* Boss, ACharacter* Player, UAnimM
 	
 	FVector Dir = (Player->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
 	Dir.Z = 0; // 공중 안 가게 Z축은 고정
-	//Boss->SetActorRotation(Dir.Rotation());
-	//Boss->LaunchCharacter(Boss->GetActorForwardVector() * 10000.0f, true, false);
+	Boss->SetActorRotation(Dir.Rotation());
+	Boss->LaunchCharacter(Boss->GetActorForwardVector() * 10000.0f, true, false);
 	
-	// 플레이어 위치로 돌진
-	FVector P0 = Boss->GetActorLocation();
-	FVector vt = DashSpeed * Dir * GetWorld()->GetDeltaSeconds();
-	Boss->SetActorLocationAndRotation(P0 + vt, Dir.Rotation());
+	// // 플레이어 위치로 돌진
+	// FVector P0 = Boss->GetActorLocation();
+	// FVector vt = DashSpeed * Dir * GetWorld()->GetDeltaSeconds();
+	// Boss->SetActorLocationAndRotation(P0 + vt, Dir.Rotation());
 	
 	Boss->PlayAnimMontage(Montage);
 

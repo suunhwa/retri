@@ -3,6 +3,7 @@
 #include "Enemy/EnemyBase.h"
 #include <Codecapi.h>
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -59,5 +60,27 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+
+void AEnemyBase::OnAttackOverlap(AActor* OtherActor)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		// 엔진 공용 함수: "이 액터에게 이만큼 데미지를 줘!"
+		UGameplayStatics::ApplyDamage(
+			OtherActor,          // 맞은 대상 (플레이어)
+			CurrentSkillDamage,     // 데이터 테이블에서 가져온 데미지
+			GetController(),     // 공격 주체의 컨트롤러
+			this,                // 공격 원인 (보스 자신)
+			UDamageType::StaticClass() // 데미지 유형
+		);
+	}
+}
+
+float AEnemyBase::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
