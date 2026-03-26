@@ -42,9 +42,15 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = Status)
 	float MaxHP;
+	UPROPERTY(BlueprintReadOnly, Category = Status)
+	float MoveSpeed;
 	
-	// UPROPERTY(BlueprintReadOnly, Category = Skill)
-	// FDataTableRowHandle BasicAttack;
+	UPROPERTY(BlueprintReadWrite, Category = BossStatus)
+	int32 CurrentPhase = 1;
+	
+	// 분신검기 사용했는지
+	UPROPERTY(BlueprintReadWrite, Category = BossStatus)
+	bool bHasPlayedMirrorBlade = false;
 	
 public:
 	UPROPERTY(BlueprintReadOnly, Category = Skill)
