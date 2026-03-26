@@ -205,6 +205,7 @@ void UReTriGameInstance::SpawnLootPieces(ATargetPoint* TP)
 	}
 	
 	Loot->SetActorLocation(Loot->GetActorLocation() + FVector(0.f, 0.f, Loot->CapsuleComp->GetScaledCapsuleHalfHeight()));
+	UE_LOG(LogTemp, Warning, TEXT("아니ㅡㅡ 왜 뭐 왜 ㅁ눠!!!!!!!!"));
 }
 
 void UReTriGameInstance::EnterMap(int32 MapIndex)
@@ -219,7 +220,7 @@ void UReTriGameInstance::EnterMap(int32 MapIndex)
 	// 2단계 갈래길 양방향 이동 검증
 	if (!CurMapDatas[CurMapIndex].ConnectMapIndexs.Contains(MapIndex))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("갈래길 양방향 이동 검증안됨!"));
+		UE_LOG(LogTemp, Warning, TEXT("멀리있는 장소 선택함!"));
 		return;	
 	}
 	

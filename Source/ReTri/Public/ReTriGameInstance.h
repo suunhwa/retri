@@ -19,7 +19,6 @@ class RETRI_API UReTriGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	
-	
 	// =========== Level ===============================================
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
