@@ -41,7 +41,7 @@ EStateTreeRunStatus UMoveToPlayerTask::EnterState(FStateTreeExecutionContext& Co
 		
 		if (aic && Player)
 		{
-			aic->MoveToActor(Player, 400);
+			aic->MoveToActor(Player, 200);
 			return EStateTreeRunStatus::Running;
 		}
 	}
@@ -74,9 +74,9 @@ EStateTreeRunStatus UMoveToPlayerTask::Tick(FStateTreeExecutionContext& Context,
 	
 	if (MyPawn && Player)
 	{
-		Distance = FVector::Dist(MyPawn->GetActorLocation().GetSafeNormal2D(), Player->GetActorLocation());
+		Distance = FVector::Dist(MyPawn->GetActorLocation(), Player->GetActorLocation());
 		
-		if (Distance <= 600.0f) 
+		if (Distance <= 400.0f) 
 		{
 			return EStateTreeRunStatus::Succeeded; 
 		}
