@@ -9,6 +9,9 @@
 #include "Enemy/EnemyData.h"
 #include "AIController.h"
 #include "Enemy/EnemyBase.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "ReTri/ReTri.h"
 
 UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -50,33 +53,33 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	
 	// 현재 체력 비율
 	float HPRatio = Boss->CurrentHP / Boss->MaxHP;
+	int32 RealPhase = Boss->CurrentPhase;
 	int32 FinalSkillIndex = -1;		// 최종 스킬 인덱스
 	TArray<int32> SkillPool;	// 이번에 쓸 스킬 후보지
 	
 	// 체력에 따른 페이즈
 	if (HPRatio <= 0.3f)				// 3페이즈
 	{
-		CurrentPhase = 3;
+		RealPhase = 3;
 		SkillPool = { 5, 6, 7 };
 	}
 	else if (HPRatio <= 0.6f)		// 2페이즈
 	{
-		if (CurrentPhase < 2 && !bHasPlayedMirrorBlade)
+		if (Boss && !Boss->bHasPlayedMirrorBlade)
 		{
-			// 2페이즈 진입 직후 MirrorBlade 스킬 확정 사용
 			FinalSkillIndex = 4;
-			bHasPlayedMirrorBlade = true;
-			CurrentPhase = 2;
+			Boss->bHasPlayedMirrorBlade = true;
+			RealPhase = 2;
 		}
 		else
 		{
-			CurrentPhase = 2;
+			RealPhase = 2;
 			SkillPool = { 0, 2, 2, 3, 3, 5, 5 };
 		}
 	}
 	else							// 1페이즈
 	{
-		CurrentPhase = 1;
+		RealPhase = 1;
 		SkillPool = { 0, 1, 1, 2, 2, 3, 3};
 	}
 	
@@ -91,16 +94,57 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	if (Boss->BossSkills.IsValidIndex(FinalSkillIndex))
 	{
 		SkillDataHandle = Boss->BossSkills[FinalSkillIndex];
+		Boss->CurrentPhase = RealPhase;
 	
 		if (!SkillDataHandle.IsNull())
 		{
 			FSkillDataTableRow* SkillInfo = SkillDataHandle.GetRow<FSkillDataTableRow>(TEXT(""));
-		
-			if (SkillInfo && SkillInfo->MontageToPlay)
+			ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+			EDarkMoonSkillType SelectedSkill = static_cast<EDarkMoonSkillType>(FinalSkillIndex);
+
+			if (SkillInfo) // && SkillInfo->MontageToPlay)
 			{
-				Boss->PlayAnimMontage(SkillInfo->MontageToPlay);
-				UE_LOG(LogTemp, Warning, TEXT("==== [%d페이즈] [%s] 시전 중 (인덱스: %d) ===="), CurrentPhase,
-				*SkillDataHandle.RowName.ToString(), FinalSkillIndex);
+				UE_LOG(LogTemp, Warning, TEXT("==== [%d페이즈] [%s] 시전 중 (인덱스: %d) ===="), RealPhase, 
+		*SkillInfo->SkillName, FinalSkillIndex);
+				
+				SCREENLOG("==== [%d페이즈] ==== [%s] !!!! ====", RealPhase, *SkillInfo->SkillName);
+				
+				switch (SelectedSkill)
+				{
+				case EDarkMoonSkillType::BasicAttack:
+					ExecuteBasicAttack(Boss, Player, SkillInfo->MontageToPlay);
+					break;
+				
+				case EDarkMoonSkillType::Dash:
+					ExecuteDash(Boss, Player, SkillInfo->MontageToPlay);
+					break;
+				
+				case EDarkMoonSkillType::Flash:
+					ExecuteFlash(Boss, Player, SkillInfo->MontageToPlay);
+					break;
+				
+				case EDarkMoonSkillType::JumpDown:
+					ExecuteJumpDown(Boss, Player, SkillInfo->MontageToPlay);
+					break;
+				
+				case EDarkMoonSkillType::MirrorBlade:
+					ExecuteMirrorBlade(Boss, Player, SkillInfo->MontageToPlay);
+					break;
+				
+				case EDarkMoonSkillType::PowerDashSword:
+					ExecutePowerDashSword(Boss, Player, SkillInfo->MontageToPlay);
+					break;
+				
+				case EDarkMoonSkillType::PowerDashShadow:
+					ExecutePowerDashShadow(Boss, Player, SkillInfo->MontageToPlay);
+					break;
+				
+				case EDarkMoonSkillType::PowerJumpDown:
+					ExecutePowerJumpDown(Boss, Player, SkillInfo->MontageToPlay);
+					break;
+				}
+			
+				// UE_LOG(LogTemp, Warning, TEXT("==== [%d페이즈] [%s] 시전 중 (인덱스: %d) ===="), RealPhase, *SkillDataHandle.RowName.ToString(), FinalSkillIndex);
 			
 				return EStateTreeRunStatus::Running;
 			}
@@ -131,7 +175,7 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 		if (Boss->GetCurrentMontage() == nullptr)
 		{
 			SkillWaitTime += DeltaTime;
-			if (SkillWaitTime < 1.0f)
+			if (SkillWaitTime < 2.0f)
 			{
 				return  EStateTreeRunStatus::Running;
 			}
@@ -140,15 +184,55 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 			SkillWaitTime = 0.0f;
 			return EStateTreeRunStatus::Succeeded;
 		}
-		
-		// if (Boss->GetCurrentMontage() == nullptr)
-		// {
-		// 	UE_LOG(LogTemp, Warning, TEXT("공격 끗"))
-		// 	return EStateTreeRunStatus::Succeeded;
-		// }
 	}
 	
 	return EStateTreeRunStatus::Running;
 }
 
+void UBP_StateTreeTask::ExecuteBasicAttack(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+	Boss->PlayAnimMontage(Montage, 0.8);
+}
+
+void UBP_StateTreeTask::ExecuteDash(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+	if (!Boss || !Player || !Montage) return;
+	
+	FVector Dir = (Player->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
+	Dir.Z = 0; // 공중 안 가게 Z축은 고정
+	//Boss->SetActorRotation(Dir.Rotation());
+	//Boss->LaunchCharacter(Boss->GetActorForwardVector() * 10000.0f, true, false);
+	
+	// 플레이어 위치로 돌진
+	FVector P0 = Boss->GetActorLocation();
+	FVector vt = DashSpeed * Dir * GetWorld()->GetDeltaSeconds();
+	Boss->SetActorLocationAndRotation(P0 + vt, Dir.Rotation());
+	
+	Boss->PlayAnimMontage(Montage);
+
+}
+
+void UBP_StateTreeTask::ExecuteFlash(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+}
+
+void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+}
+
+void UBP_StateTreeTask::ExecuteMirrorBlade(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+}
+
+void UBP_StateTreeTask::ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+}
+
+void UBP_StateTreeTask::ExecutePowerDashShadow(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+}
+
+void UBP_StateTreeTask::ExecutePowerJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+}
 

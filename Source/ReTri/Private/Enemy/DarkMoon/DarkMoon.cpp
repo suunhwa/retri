@@ -49,11 +49,55 @@ void ADarkMoon::BeginPlay()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("%s행 못 찾음"), *EnemyRowName.ToString());
+			UE_LOG(LogTemp, Log, TEXT("[오류] %s행 못 찾음"), *EnemyRowName.ToString());
 		}
 	}
 	
 }
+
+void ADarkMoon::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::L))
+	{
+		StartBattleEvent();
+	}
+	
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::M))
+	{
+		ReduceBossHP();
+	}
+	
+}
+
+void ADarkMoon::ReduceBossHP()
+{
+	CurrentHP -=(MaxHP * 0.2f);
+	if (CurrentHP < 0) CurrentHP = 0;
+	
+	UE_LOG(LogTemp, Warning, TEXT("==== [치트키] 현재 체력: %.1f / %.1f ===="), CurrentHP, MaxHP);
+	
+	UpdatePhase();
+}
+
+void ADarkMoon::UpdatePhase()
+{
+	float HPRatio = CurrentHP / MaxHP;
+	if (HPRatio < 0.3f)
+	{
+		CurrentPhase = 3;
+	}
+	else if (HPRatio < 0.6f)
+	{
+		CurrentPhase = 2;
+	}
+	else
+	{
+		CurrentPhase = 1;
+	}
+}
+
 
 void ADarkMoon::SetSwordCollisionEnabled(bool bEnabled)
 {
@@ -66,20 +110,20 @@ void ADarkMoon::SetSwordCollisionEnabled(bool bEnabled)
 void ADarkMoon::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AAIController* aic = Cast<AAIController>(GetController()))
-	{
-		UActorComponent* STComp = aic->GetComponentByClass(UStateTreeComponent::StaticClass());
-		UStateTreeComponent* StateTreeComp = Cast<UStateTreeComponent>(STComp);
-		
-		if (StateTreeComp)
-		{
-			StateTreeComp->SendStateTreeEvent(FGameplayTag::RequestGameplayTag(TEXT("Boss.StartBattle")));
-			
-			UE_LOG(LogTemp, Error, TEXT("Battle 시작"))
-			
-			GetCapsuleComponent()->OnComponentBeginOverlap.RemoveDynamic(this, &ADarkMoon::OnOverlapBegin);
-		}
-	}
+	// if (AAIController* aic = Cast<AAIController>(GetController()))
+	// {
+	// 	UActorComponent* STComp = aic->GetComponentByClass(UStateTreeComponent::StaticClass());
+	// 	UStateTreeComponent* StateTreeComp = Cast<UStateTreeComponent>(STComp);
+	// 	
+	// 	if (StateTreeComp)
+	// 	{
+	// 		StateTreeComp->SendStateTreeEvent(FGameplayTag::RequestGameplayTag(TEXT("Boss.StartBattle")));
+	// 		
+	// 		UE_LOG(LogTemp, Error, TEXT("Battle 시작"))
+	// 		
+	// 		GetCapsuleComponent()->OnComponentBeginOverlap.RemoveDynamic(this, &ADarkMoon::OnOverlapBegin);
+	// 	}
+	// }
 }
 
 void ADarkMoon::OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -92,8 +136,22 @@ void ADarkMoon::OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	}
 }
 
+void ADarkMoon::StartBattleEvent()
+{
+	if (AAIController* aic = Cast<AAIController>(GetController()))
+	{
+		UStateTreeComponent* StateTreeComp = aic->FindComponentByClass<UStateTreeComponent>();
+        
+		if (StateTreeComp)
+		{
+			StateTreeComp->SendStateTreeEvent(FGameplayTag::RequestGameplayTag(TEXT("Boss.StartBattle")));
+			UE_LOG(LogTemp, Error, TEXT("Battle 시작"));
+		}
+	}
+}
+
 float ADarkMoon::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
-	class AController* EventInstigator, AActor* DamageCauser)
+                            class AController* EventInstigator, AActor* DamageCauser)
 {
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	

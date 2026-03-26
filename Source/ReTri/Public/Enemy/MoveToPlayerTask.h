@@ -16,8 +16,12 @@ class RETRI_API UMoveToPlayerTask : public UStateTreeTaskBlueprintBase
 	GENERATED_BODY()
 	
 public:
+	UMoveToPlayerTask(const FObjectInitializer& ObjectInitializer);
+	
 	UPROPERTY(EditDefaultsOnly, Category = Setteings)
 	float Speed = 600.f;
+	
+	float Distance;
 	
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) override;
 	virtual EStateTreeRunStatus Tick(FStateTreeExecutionContext& Context, const float DeltaTime) override;

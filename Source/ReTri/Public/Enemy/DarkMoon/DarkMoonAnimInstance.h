@@ -17,11 +17,11 @@ class RETRI_API UDarkMoonAnimInstance : public UAnimInstance
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Anim)
-	float Speed = 0;
+	float CurrentSpeed = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Anim)
 	bool bIsInAir = false;
 	
-	
+	void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 	
 };
