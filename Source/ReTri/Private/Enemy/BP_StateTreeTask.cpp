@@ -22,7 +22,7 @@ UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer
 EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::EnterState(Context, Transition);
-	// UE_LOG(LogTemp, Warning, TEXT("==== Boss Attack Task 시작! ===="));
+	UE_LOG(LogTemp, Warning, TEXT("==== Boss Attack Task 시작! ===="));
 	
 	SkillWaitTime = 0.0f;
 	
@@ -33,6 +33,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	
 	if (!Boss)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("==== 실패 ===="));
 		if (AAIController* aic = Cast<AAIController>(OwnerActor))
 		{
 			Boss = Cast<AEnemyBase>(aic->GetPawn());

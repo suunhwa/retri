@@ -23,5 +23,5 @@ public:
 	
 	// 메뉴 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UWidgetComponent* InteractInfoUI;
+	UWidgetComponent* MapUI;
 };
