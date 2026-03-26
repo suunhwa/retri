@@ -104,6 +104,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> HitMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> DeathMontage;
+	
 public:
 	UPROPERTY(EditAnywhere, Category="Combat|Left")
 	int32 AttackCount = 0;
@@ -132,7 +138,7 @@ private:
 	
 private:
 	UFUNCTION()
-	void HandleDash(AController* Killer);
+	void HandleDeath(AController* Killer);
 	
 	/*FVector direction;
 	

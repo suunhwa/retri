@@ -21,6 +21,8 @@
 #include "ReTriGameData.h"
 #include "Level/Actors/InteractableBase.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -254,11 +256,11 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	if (SpawnedBullet && bIsEnhancedShot)
 	{
 		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
-		UE_LOG(LogTemp, Warning, TEXT("[Attack] Enhanced shot! Damage: %.1f"), SpawnedBullet->GetBulletDamage());
+		UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
 	}
 	else if (SpawnedBullet)
 	{
-		UE_LOG(LogTemp, Log, TEXT("[Attack] Normal shot %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
+		UE_LOG(LogTemp, Log, TEXT("[Attack] normal 탄 %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
 	}
 }
 
@@ -296,7 +298,17 @@ float APlayerCharacter::TakeDamage(float DamageAmount, const FDamageEvent& Damag
                                    AController* EventInstigator, AActor* DamageCauser)
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
 	HealthComp->HandleDamage(Damage, EventInstigator);
+
+	UE_LOG(LogTemp, Warning, TEXT("[Hit] Damage: %.1f | HP: %.1f / %.1f"),
+		Damage, HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
+
+	if (!HealthComp->IsDead() && HitMontage)
+	{
+		PlayAnimMontage(HitMontage);
+	}
+
 	return Damage;
 }
 
@@ -305,8 +317,32 @@ void APlayerCharacter::OnDash(const struct FInputActionValue& inputValue)
 	AbilityComp->TryActivate(EAbilitySlot::Dash);
 }
 
-void APlayerCharacter::HandleDash(AController* Killer)
+void APlayerCharacter::HandleDeath(AController* Killer)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[Death] 플레이어 사망"));
+	
+	// 입력 차단
+	DisableInput(Cast<APlayerController>(Controller));
+
+	// 이동 정지
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+
+	// 충돌 비활성화
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 사망 몽타주 재생
+	if (DeathMontage)
+	{
+		PlayAnimMontage(DeathMontage);
+	}
+
+	// 일정 시간 후 레벨 재시작
+	FTimerHandle DeathTimerHandle;
+	GetWorldTimerManager().SetTimer(DeathTimerHandle, [this]()
+	{
+		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+	}, 3.f, false);
 }
 
 void APlayerCharacter::HoverInteractable()
