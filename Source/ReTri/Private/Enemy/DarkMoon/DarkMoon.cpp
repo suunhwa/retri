@@ -61,11 +61,12 @@ void ADarkMoon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::L))
-	{
-		StartBattleEvent();
-	}
+	// if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::L))
+	// {
+	// 	StartBattleEvent();
+	// }
 	
+	// 치트키
 	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::M))
 	{
 		ReduceBossHP();
@@ -73,7 +74,7 @@ void ADarkMoon::Tick(float DeltaTime)
 	
 }
 
-void ADarkMoon::ReduceBossHP()
+void ADarkMoon::ReduceBossHP()	// 치트키
 {
 	CurrentHP -=(MaxHP * 0.2f);
 	if (CurrentHP < 0) CurrentHP = 0;
@@ -101,13 +102,13 @@ void ADarkMoon::UpdatePhase()
 }
 
 
-void ADarkMoon::SetSwordCollisionEnabled(bool bEnabled)
-{
-	if (bEnabled)
-		SwordCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	else
-		SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-}
+// void ADarkMoon::SetSwordCollisionEnabled(bool bEnabled)
+// {
+// 	if (bEnabled)
+// 		SwordCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+// 	else
+// 		SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+// }
 
 
 void ADarkMoon::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -123,18 +124,34 @@ void ADarkMoon::OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	OnAttackOverlap(OtherActor);
 }
 
+float ADarkMoon::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	// EnemyBase 로직 먼저 실행
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// 보스 전용 아직 싸움 시작 전인데 맞았다면? Battle
+	if (!bIsBattleStarted && ActualDamage > 0.0f)
+	{
+		bIsBattleStarted = true;
+		
+		StartBattleEvent(); 
+	}
+	return ActualDamage;
+}
+
 
 void ADarkMoon::StartBattleEvent()
 {
-	if (AAIController* aic = Cast<AAIController>(GetController()))
+	AAIController* aic = Cast<AAIController>(GetController());
+	if (!aic) return;
+
+	UStateTreeComponent* StateTreeComp = aic->FindComponentByClass<UStateTreeComponent>();
+	
+	if (StateTreeComp && StateTreeComp->IsRunning())
 	{
-		UStateTreeComponent* StateTreeComp = aic->FindComponentByClass<UStateTreeComponent>();
-        
-		if (StateTreeComp)
-		{
-			StateTreeComp->SendStateTreeEvent(FGameplayTag::RequestGameplayTag(TEXT("Boss.StartBattle")));
-			UE_LOG(LogTemp, Error, TEXT("Battle 시작"));
-		}
+		StateTreeComp->SendStateTreeEvent(FGameplayTag::RequestGameplayTag(TEXT("Boss.StartBattle")));
+		UE_LOG(LogTemp, Error, TEXT("Battle 시작"));
 	}
 }
 
@@ -153,4 +170,5 @@ void ADarkMoon::OffSwordCollision()
 		SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
+
 

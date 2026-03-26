@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EnemyBase.h"
+#include "StateTreeTaskBase.h"
 #include "Blueprint/StateTreeTaskBlueprintBase.h"
 #include "BP_StateTreeTask.generated.h"
 
@@ -23,11 +24,12 @@ enum class EDarkMoonSkillType : uint8
 };
 
 
+
 UCLASS(Blueprintable, meta=(DisplayName = "공격태스크"))
 class RETRI_API UBP_StateTreeTask : public UStateTreeTaskBlueprintBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer);
 	
@@ -52,6 +54,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Settings)
 	float DashSpeed = 10000;
 	
+
 private:
 	void ExecuteBasicAttack(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	void ExecuteDash(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
