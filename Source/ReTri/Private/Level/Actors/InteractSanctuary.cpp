@@ -8,13 +8,6 @@
 
 #include "Components/CapsuleComponent.h"
 
-AInteractSanctuary::AInteractSanctuary()
-{
-	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/Mesh/Sanctuary_Test.Sanctuary_Test'"));
-	if (TempMesh.Succeeded()) MeshComp->SetStaticMesh(TempMesh.Object);
-	//MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
-	//MeshComp->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
-}
 
 void AInteractSanctuary::BeginPlay()
 {
@@ -28,10 +21,13 @@ void AInteractSanctuary::Interact_Implementation()
 	Super::Interact_Implementation();
 	
 	if (!MyPlayer) return;
-	if (MyPlayer->GD->GetGold() <= Cost) return;
 	
-	MyPlayer->GD->UpdateGold(-Cost);
-	MyPlayer->GD->UpdateHP(+HealHP);
+	// todo 플레이어 골드 뺏고 
+	// todo 플레이어 회복
+	
+	// if (MyPlayer->GD->GetGold() <= Cost) return;
+	// MyPlayer->GD->UpdateGold(-Cost);
+	// MyPlayer->GD->UpdateHP(+HealHP);
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
 }

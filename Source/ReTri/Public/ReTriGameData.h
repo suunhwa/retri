@@ -55,7 +55,6 @@ public:
 	
 public:
 	/** --- 개별 통계 Get 함수들 --- */
-
 	// 기본 재화 및 경험치
 	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
 	int32 GetGold() const { return PlayerStats.Gold; }

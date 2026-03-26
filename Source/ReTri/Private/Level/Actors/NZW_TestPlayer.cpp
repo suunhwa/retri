@@ -3,6 +3,7 @@
 #include "Level/Actors/NZW_TestPlayer.h"
 #include "ReTriGameData.h"
 #include "Level/Actors/InteractableBase.h"
+#include "ReTriGameData.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 

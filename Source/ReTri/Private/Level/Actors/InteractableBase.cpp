@@ -2,6 +2,7 @@
 
 
 #include "Level/Actors/InteractableBase.h"
+
 #include "Level/Actors/NZW_TestPlayer.h"
 #include "Level/Data/InteractableData.h"
 #include "Level/UI/InteractableInfoUI.h"
@@ -22,27 +23,28 @@ AInteractableBase::AInteractableBase()
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("BoxComp"));
 	SetRootComponent(CapsuleComp);
 	CapsuleComp->SetCollisionProfileName(TEXT("Interaction"));
-	CapsuleComp->SetCapsuleHalfHeight(200.f);
-	CapsuleComp->SetCapsuleRadius(150.f);
+	// CapsuleComp->SetCapsuleHalfHeight(200.f);
+	// CapsuleComp->SetCapsuleRadius(150.f);
 	
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(CapsuleComp);
+	MeshComp->SetupAttachment(CapsuleComp);	
+	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 	MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
 	MeshComp->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
 	
 	InteractUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractUI"));
 	InteractUI->SetupAttachment(CapsuleComp);
-	InteractUI->SetWidgetSpace(EWidgetSpace::World);
+	InteractUI->SetWidgetSpace(EWidgetSpace::Screen); //! EWidgetSpace::World
 	InteractUI->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
 	InteractUI->SetRelativeScale3D(FVector(0.8f, 0.8f, 0.8f));
-	ConstructorHelpers::FClassFinder<UInteractableUI> TempUI(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/LevelInteraction/01_UI/WBP_InteractableUI.WBP_InteractableUI_C'"));
+	ConstructorHelpers::FClassFinder<UInteractableUI> TempUI(TEXT("/Game/LevelInteraction/01_UI/WBP_InteractableUI.WBP_InteractableUI_C"));
 	if (TempUI.Succeeded()) InteractUI->SetWidgetClass(TempUI.Class);
 	InteractUI->SetVisibility(false);
 		
 	InteractInfoUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractInfoUI"));
 	InteractInfoUI->SetupAttachment(CapsuleComp);
 	InteractInfoUI->SetWidgetSpace(EWidgetSpace::Screen);
-	ConstructorHelpers::FClassFinder<UInteractableInfoUI> TempInfoUI(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/LevelInteraction/01_UI/WBP_InteractableInfoUI.WBP_InteractableInfoUI_C'"));
+	ConstructorHelpers::FClassFinder<UInteractableInfoUI> TempInfoUI(TEXT("/Game/LevelInteraction/01_UI/WBP_InteractableInfoUI.WBP_InteractableInfoUI_C"));
 	if (TempInfoUI.Succeeded()) InteractInfoUI->SetWidgetClass(TempInfoUI.Class);
 	InteractInfoUI->SetVisibility(false); 
 }
@@ -70,7 +72,7 @@ void AInteractableBase::Tick(float DeltaTime)
 		bIsHovering = false;
 	}
 	
-	UIFocus();
+	//UIFocus();
 	UIHold();
 }
 
@@ -80,13 +82,21 @@ void AInteractableBase::DataInit(FInteractableData RowData)
 	InteractName = RowData.InteractName;
 	Description = RowData.Description;
 	//!Probability = RowData.Probability;
+	UStaticMesh* LoadMesh = RowData.InteractableMesh.LoadSynchronous();
+	if (LoadMesh)
+		MeshComp->SetStaticMesh(LoadMesh);
+	else
+		UE_LOG(LogTemp, Warning, TEXT("Load 매시 로드 안됨 왜?"));
 	
 	UInteractableUI* InteractableUI = Cast<UInteractableUI>(InteractUI->GetUserWidgetObject());
 	if (InteractableUI) 
 		InteractableUI->InteractableName->SetText(FText::FromString(InteractName));
 	UInteractableInfoUI* InteractableInfoUI = Cast<UInteractableInfoUI>(InteractInfoUI->GetUserWidgetObject());
 	if (InteractableInfoUI)
-		InteractableInfoUI->InfoText->SetText(FText::FromString(Description)); 
+		InteractableInfoUI->InfoText->SetText(FText::FromString(Description));
+	
+	FVector Pos = GetActorLocation();
+	SetActorLocation(FVector(Pos.X, Pos.Y, Pos.Z+CapsuleComp->GetScaledCapsuleHalfHeight()));
 }
 
 void AInteractableBase::Hover_Implementation()
@@ -111,7 +121,7 @@ void AInteractableBase::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 	
-	MyPlayer = Cast<ANZW_TestPlayer>(OtherActor);
+	MyPlayer = Cast<APawn>(OtherActor);
 	if (!MyPlayer) return;
 	
 	bIsInteractable = true;

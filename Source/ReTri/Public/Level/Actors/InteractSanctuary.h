@@ -13,8 +13,6 @@ UCLASS()
 class RETRI_API AInteractSanctuary : public AInteractableBase
 {
 	GENERATED_BODY()
-public:
-	AInteractSanctuary();
 	
 protected:
 	// Called when the game starts or when spawned
