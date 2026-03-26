@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Player/Projectiles/HandCannonBullet.h"
 #include "Player/ReTriPlayerController.h"
+#include "Player/PlayerCharacter.h"
+#include "Player/Components/StatComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Particles/ParticleSystem.h"
@@ -42,6 +44,16 @@ void UHandCannonSkill::Activate(ACharacter* Owner)
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		
 		Owner->GetWorld()->SpawnActor<AHandCannonBullet>(HandCannonClass, MuzzleLocation, Direction.Rotation(), SpawnInfo);
+		AHandCannonBullet* Bullet = Owner->GetWorld()->SpawnActor<AHandCannonBullet>(HandCannonClass, MuzzleLocation, Direction.Rotation(), SpawnInfo);
+		if (Bullet)
+		{
+			float AP = 0.f;
+			if (APlayerCharacter* Player = Cast<APlayerCharacter>(Owner))
+			{
+				AP = Player->GetStatComponent()->GetAbilityPower();
+			}
+			Bullet->SetDamage(AP * NearCoefficient, AP * FarCoefficient);
+		}
 	}
 	
 	// 플레이어 반동 (발사 반대 방향으로)

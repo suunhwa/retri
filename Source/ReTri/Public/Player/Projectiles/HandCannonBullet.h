@@ -61,6 +61,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Damage")
 	float KnockBackForce = 800.f;
 	
+	void SetDamage(float InNearDamage, float InFarDamage);
+	
 	// effects
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UParticleSystem> TrailEffect;

@@ -29,6 +29,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="HandCannon")
 	float RecoilForce = 1200.f;
 	
+	// AbilityPower 기준 근/원거리 데미지 계수
+	UPROPERTY(EditDefaultsOnly, Category="HandCannon")
+	float NearCoefficient = 1.5f;
+
+	UPROPERTY(EditDefaultsOnly, Category="HandCannon")
+	float FarCoefficient = 0.8f;
+	
 	// 이펙트 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> HandCannonEffect;
