@@ -1,7 +1,2 @@
-Name,HP,AttackDamage,AttackSpeed,MoveSpeed,DashCooldown,MaxHP,FireDamage,RequiredExp
-Level_1,220,43,1.0,1.0,100,0,0
-Level_2,220,44,1.05,0.95,120,0,300
-Level_3,220,45,1.1,0.9,145,0,700
-Level_4,220,46,1.15,0.85,175,0,1300
-Level_5,220,47,1.2,0.8,210,0,2100
-
+Name,BaseHP,HPGrowth,BaseAD,ADGrowth,BaseAP,APGrowth,BaseAS,ASGrowth,BaseCrit,CritGrowth,BaseMS,MSGrowth,BaseDefense,DefenseGrowth,BaseHaste,HasteGrowth,BaseDashCooldown,DashCooldownGrowth,BaseFire,FireGrowth
+Player,220,44,43,1,41,1,1.41,0,0,0,520,0,0,0,0,0,5,0,0,0
