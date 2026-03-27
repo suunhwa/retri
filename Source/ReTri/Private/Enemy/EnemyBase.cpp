@@ -25,7 +25,7 @@ void AEnemyBase::BeginPlay()
 	if (StatDataTable != nullptr && !EnemyRowName.IsNone())
 	{
 		// 엑셀에서 이름과 일치하는 줄 가져오기
-		FEnemyDataTableRow* MyStatInfo = StatDataTable->FindRow<FEnemyDataTableRow>(EnemyRowName, TEXT("Enemy Stat Lookup"));
+		FEnemyDataTableRow* MyStatInfo = StatDataTable->FindRow<FEnemyDataTableRow>(EnemyRowName, TEXT("Enemy Row Name"));
 		
 		// 데이터를 찾았다면 내 몸에 적용
 		if (MyStatInfo != nullptr)

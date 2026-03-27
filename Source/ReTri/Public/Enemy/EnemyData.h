@@ -13,17 +13,17 @@ struct FSkillDataTableRow : public FTableRowBase
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
 	FString SkillName;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill);
-	float Damage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
+	float Damage = 0.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill);
-	float Range;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
+	float Range = 0.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill);
-	class UAnimMontage* MontageToPlay;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
+	class UAnimMontage* MontageToPlay = nullptr;
 	
 };
 
@@ -34,23 +34,24 @@ struct FEnemyDataTableRow : public FTableRowBase
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic);
-	float MaxHP;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic)
+	FName MonsterName;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic);
-	float MoveSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic)
+	float MaxHP = 0.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic);
-	float BasicAttackCoolDown;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic)
+	float MoveSpeed = 0.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic);
-	float BossPhase2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic)
+	float BasicAttackCoolDown = 0.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic);
-	float BossPhase3;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic)
+	float BossPhase2 = 0.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatSkills);
-	FDataTableRowHandle BasicAttackID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic)
+	float BossPhase3 = 0.f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatSkills)
 	TArray<FDataTableRowHandle> BossSkillsID;
 	

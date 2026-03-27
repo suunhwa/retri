@@ -41,7 +41,7 @@ EStateTreeRunStatus UMoveToPlayerTask::EnterState(FStateTreeExecutionContext& Co
 		
 		if (aic && Player)
 		{
-			aic->MoveToActor(Player, 500);
+			aic->MoveToActor(Player, 900);
 			return EStateTreeRunStatus::Running;
 		}
 	}

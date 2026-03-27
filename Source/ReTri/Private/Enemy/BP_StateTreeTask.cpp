@@ -87,7 +87,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	else							// 1페이즈
 	{
 		RealPhase = 1;
-		if (Distance >= 400.f && Distance <= 800.f)
+		if (Distance >= 400.f && Distance <= 1000.f)
 		{
 			// 중거리면 돌진, 점프만
 			SkillPool = { 1 }; // 1, 1, 3

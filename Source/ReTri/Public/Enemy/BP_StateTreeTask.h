@@ -23,8 +23,6 @@ enum class EDarkMoonSkillType : uint8
 	PowerJumpDown 
 };
 
-
-
 UCLASS(Blueprintable, meta=(DisplayName = "공격태스크"))
 class RETRI_API UBP_StateTreeTask : public UStateTreeTaskBlueprintBase
 {

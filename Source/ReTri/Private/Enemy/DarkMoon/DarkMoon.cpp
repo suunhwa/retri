@@ -25,7 +25,7 @@ ADarkMoon::ADarkMoon()
 	SwordCollision->SetupAttachment(GetMesh(), TEXT("SwordSocket"));
 	SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SwordCollision->SetRelativeLocation(FVector(0.000000,65.000000,0.000000));
-	SwordCollision->SetBoxExtent(FVector(12.173687,51.076195,5.828096));
+	SwordCollision->SetBoxExtent(FVector(14.175652,58.968844,10.359240));
 	SwordCollision->SetGenerateOverlapEvents(true);
 }
 
