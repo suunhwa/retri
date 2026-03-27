@@ -43,7 +43,6 @@ void UHandCannonSkill::Activate(ACharacter* Owner)
 		SpawnInfo.Instigator = Owner;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		
-		Owner->GetWorld()->SpawnActor<AHandCannonBullet>(HandCannonClass, MuzzleLocation, Direction.Rotation(), SpawnInfo);
 		AHandCannonBullet* Bullet = Owner->GetWorld()->SpawnActor<AHandCannonBullet>(HandCannonClass, MuzzleLocation, Direction.Rotation(), SpawnInfo);
 		if (Bullet)
 		{
