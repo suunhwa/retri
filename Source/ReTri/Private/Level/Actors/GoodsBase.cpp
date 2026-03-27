@@ -3,6 +3,7 @@
 
 #include "Level/Actors/GoodsBase.h"
 
+#include "AIHelpers.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -34,18 +35,7 @@ void AGoodsBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (TargetPlayer)
-	{
-		FVector CurLoc = GetActorLocation();
-        
-		// 플레이어 발밑이 아니라 가슴팍 정도로 빨려오게 위치 보정
-		FVector TargetLoc = TargetPlayer->GetActorLocation() + FVector(0, 0, 50.0f);
-        
-		// VInterpTo: 현재 위치에서 타겟 위치로 부드럽게 이동. 속도 InterpSpeed로 조정
-		FVector NewLoc = FMath::VInterpTo(CurLoc, TargetLoc, DeltaTime, Speed);
-        
-		SetActorLocation(NewLoc);
-	}
+	MoveAndRotate(DeltaTime);
 }
 
 void AGoodsBase::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -53,5 +43,21 @@ void AGoodsBase::NotifyActorBeginOverlap(AActor* OtherActor)
 	Super::NotifyActorBeginOverlap(OtherActor);
 	
 
+}
+
+void AGoodsBase::MoveAndRotate(float DeltaTime)
+{
+	if (TargetPlayer)
+	{
+		FVector CurLoc = GetActorLocation();
+		FVector TargetLoc = TargetPlayer->GetActorLocation() + FVector(0, 0, 50.0f);
+		FVector NewLoc = FMath::VInterpTo(CurLoc, TargetLoc, DeltaTime, Speed);
+		SetActorLocation(NewLoc);
+		
+		// Yaw와 Roll 축으로만 회전 값 생성
+		FRotator DeltaRot = FRotator(0.f, YawRotSpeed * DeltaTime, RollRotSpeed * DeltaTime);
+		// 현재 회전에 이만큼을 '더해라' (Local 기준)
+		AddActorLocalRotation(DeltaRot);
+	}
 }
 

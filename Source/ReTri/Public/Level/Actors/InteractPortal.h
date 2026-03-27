@@ -6,6 +6,8 @@
 #include "Level/Actors/InteractableBase.h"
 #include "InteractPortal.generated.h"
 
+class UMapUI;
+
 /**
  * 
  */
@@ -23,5 +25,8 @@ public:
 	
 	// 메뉴 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UWidgetComponent* MapUI;
+	TSubclassOf<UMapUI> MapUIClass;
+	
+	UPROPERTY()
+	UMapUI* MapUI;
 };

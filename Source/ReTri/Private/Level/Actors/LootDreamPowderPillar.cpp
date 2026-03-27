@@ -7,7 +7,7 @@
 
 ALootDreamPowderPillar::ALootDreamPowderPillar()
 {
-	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/Mesh/DreamPowderPillar_Test.DreamPowderPillar_Test'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/Stylized_PBR_Nature/Rocks/Assets/SM_S_Rock_04.SM_S_Rock_04'"));
 	if (TempMesh.Succeeded()) MeshComp->SetStaticMesh(TempMesh.Object);
 }
 

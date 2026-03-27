@@ -14,7 +14,7 @@ struct FPlayerStats
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 Gold = 0;				// 골드
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) int32 DreamPowder = 0;		// 꿈가루
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) float Exp = 1;				// 경험치
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float Exp = 1;				// 경험치 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float MaxHP = 100.0f;		// 최대 체력		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float CurrentHP = 100.0f;	// 현재 체력

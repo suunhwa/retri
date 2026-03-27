@@ -8,7 +8,7 @@
 
 AGoodsDreamPowder::AGoodsDreamPowder()
 {
-	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/Mesh/DreamPowder_Test.DreamPowder_Test'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/gold-star/source/SM_Dream.SM_Dream'"));
 	if (TempMesh.Succeeded()) MeshComp->SetStaticMesh(TempMesh.Object);  
 }
 

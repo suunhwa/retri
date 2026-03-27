@@ -18,8 +18,8 @@ ALootBase::ALootBase()
 	
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(CapsuleComp);
-	MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
-	MeshComp->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
+	//MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
+	//MeshComp->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
 }
 
 // Called when the game starts or when spawned

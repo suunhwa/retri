@@ -3,6 +3,7 @@
 
 #include "ReTriGameInstance.h"
 
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/TargetPoint.h"
 #include "Kismet/GameplayStatics.h"
@@ -19,8 +20,9 @@ void UReTriGameInstance::Init()
 	else
 		UE_LOG(LogTemp, Warning, TEXT("[UReTriGameInstance] InteractionData 할당안됨"));
 	
-	GenerateMap();
+	//GenerateMap();
 	//EnterMap(1);
+	ProceduralGenerateMap();
 }
 
 FInteractableData UReTriGameInstance::GetRowInteractionData(FName RowName, bool& bSuccess)
@@ -78,6 +80,7 @@ void UReTriGameInstance::GenerateMap()
 	// 4단계 거미줄처럼 갈래길 위주로 뻗어나가는 '가지 치기' (Tree 확장) 알고리즘
 	// - 1. 방의 최대 깊이 (ex.4)
 	int32 MaxDepth = 3; //! 멤버 변수
+	//! int32 MaxWidth = 4; 
 	// - 2. 지금 방에서 가지를 뻗어야 하는 부모 방들의 인덱스 목록
 	TArray<int32> CurDepthNodes;
 	// - 3. 처음엔 0번(금방 만든 시작 방)을 목록에 넣기
@@ -168,6 +171,170 @@ void UReTriGameInstance::GenerateMap()
 	UE_LOG(LogTemp, Warning, TEXT("맵 개수 : %d"), CurMapDatas.Num());
 }
 
+void UReTriGameInstance::ProceduralGenerateMap()
+{
+	// 1단계 낡은 맵 정보 배열 모두 비우고, 내 위치를 0번(시작 방)으로 초기화.
+	CurMapDatas.Empty();
+	CurMapIndex = 0;
+	
+	// 2단계 InteractionData 확인 예외처리
+	if (!InteractionData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[UReTriGameInstance] No InteractionData"));
+		return;
+	}
+	
+	int32 MaxDepth = 4;
+	int32 MinWidth = 1;
+	int32 MaxWidth = 3;
+	
+	TArray<TArray<int32>> NodeGrid;
+	NodeGrid.SetNum(MaxDepth);
+	
+	// 방생성 
+	for (int32 Depth = 0; Depth < MaxDepth; Depth++)
+	{
+		// 레벨 Width 랜덤 정하기
+		int32 Width = FMath::RandRange(MinWidth, MaxWidth);
+		
+		// UI를 위한 기본적 위치값 지정 -> 가운데에 배치하기 위해 계산 필요
+		float XSpacing = 300.0f;
+		float YSpacing = 150.0f;
+		float StartX = (1920.0f - (XSpacing * MaxDepth + 400.0f)) / 2.0f;	// 가로 간격 MaxDepth * 100 + 400 (양 옆 200)
+		float StartY = (1080.0f - (YSpacing * MaxWidth + 400.0f)) / 2.0f;	// 세로 간격 MaxWidth * 100 + 400 (양 위아래 200)
+	
+		// 현재 레벨 Width 만큼 돌면서
+		for (int32 W = 0; W < Width; W++)
+		{
+			// 맵 생성
+			FMapNodeData NewNode;
+			
+			// 맵테마 설정 (전투 80% / 상점 20%)
+			int32 RandomMapType = FMath::RandRange(1, 10);
+			NewNode.MapType = (RandomMapType <= 2) ? EMapNodeType::Merchant : EMapNodeType::Combat;
+			NewNode.bIsCleared = false;
+				
+			// 상호작용 기물 스폰 랜덤 정하기
+			int32 RandomNum = 0; /*! FMath::RandRange(1, 3); // 원래는 랜덤*/
+			// 상호작용 기물 랜덤 배치를 위한 설정
+			switch (NewNode.MapType)
+			{
+			case EMapNodeType::Combat:
+				RandomNum = 3;
+				break;
+			case EMapNodeType::Merchant:
+				RandomNum = 2;
+				break;
+			default: break;
+			}
+			NewNode.SpawnInteractableRowNames = RandomInteractable(RandomNum);
+			
+			// 위치 정해진 위치에서 +- 랜덤 위치 (지터링) RandomRange (-40, 40)
+			float X = StartX + (Depth * XSpacing); 
+			float Y = StartY + (W * YSpacing);
+			float JitterX = FMath::RandRange(-40.f, 40.f);			
+			float JitterY = FMath::RandRange(-40.f, 40.f);
+			NewNode.UIPosition = FVector2D(X + JitterX, Y + JitterY);
+			
+			// 전역 배열에 맵추가 CurMapDatas
+			int32 NewNodeIndex = CurMapDatas.Add(NewNode);
+			CurMapDatas[NewNodeIndex].MapIndex = NewNodeIndex;
+			// 깊이에도 저장 NodeGrid[Depth].Add
+			NodeGrid[Depth].Add(NewNodeIndex);
+	
+			// 디버깅 출력
+			const UEnum* EnumPtr = StaticEnum<EMapNodeType>();
+			FString DisplayStr = EnumPtr->GetDisplayNameTextByValue((int64)CurMapDatas[NewNodeIndex].MapType).ToString();
+			UE_LOG(LogTemp, Warning, TEXT("[ProceduralGenerateMap] %d번째 맵 (Depth:%d) : %s / Pos: %s"), NewNodeIndex, Depth, *DisplayStr, *NewNode.UIPosition.ToString());
+		}
+	}
+	
+	// 선 연결 -> 현재 열끼리 (옆 노드끼리), 다음 열의 노드와
+	for (int32 Depth = 0; Depth < MaxDepth - 1; Depth++)
+	{
+		// 현재 열끼리 (옆 노드끼리)
+		for (int32 i = 0; i < NodeGrid[Depth].Num()-1; i++)
+		{
+			int32 RandomMapType = FMath::RandRange(1, 10);
+			if (RandomMapType >= 6)
+			{
+				int32 NodeA = NodeGrid[Depth][i];
+				int32 NodeB = NodeGrid[Depth][i+1];
+				CurMapDatas[NodeA].ConnectMapIndexs.Add(NodeB);
+				CurMapDatas[NodeB].ConnectMapIndexs.Add(NodeA);
+			}
+		}
+		
+		// 다음 열의 노드와 연결
+		TArray<int32>& CurDepth = NodeGrid[Depth];
+		TArray<int32>& NextDepth = NodeGrid[Depth+1];
+		
+		for (int32 CurNodeIndex : CurDepth)
+		{
+			int32 EdgeNums = FMath::RandRange(1, NextDepth.Num());
+			for (int32 i = 0; i < EdgeNums; i++)
+			{
+				int32 NextTargetIndex = NextDepth[FMath::RandRange(0, NextDepth.Num()-1)];
+				if (!CurMapDatas[CurNodeIndex].ConnectMapIndexs.Contains(NextTargetIndex))
+				{
+					CurMapDatas[CurNodeIndex].ConnectMapIndexs.Add(NextTargetIndex);
+					CurMapDatas[NextTargetIndex].ConnectMapIndexs.Add(CurNodeIndex);
+				}
+			}
+		}
+		
+		// 길 잃은 노드 찾아서 연결
+		for (int32 NextNodeIdx : NodeGrid[Depth+1]) 
+		{
+			bool bHasIncoming = false; // 들어오는 선이 있는가?
+			// NextNodeIdx 방에 연결된 모든 선들 중에
+			for(int32 cIdx : CurMapDatas[NextNodeIdx].ConnectMapIndexs) 
+			{
+				if (NodeGrid[Depth].Contains(cIdx)) 
+				{ 
+					bHasIncoming = true; // 이전 열에서 들어온 선 발견!
+					break;
+				}
+			}
+			// 들어온 선이 1개도 없다면 (길을 잃었다면)
+			if (!bHasIncoming) 
+			{
+				// 1. 이전 층 방 목록(NodeGrid[Depth]) 중에서 무작위로 방 번호(인덱스) 1개 뽑기
+				int32 RandomCurNodeIdx = NodeGrid[Depth][FMath::RandRange(0, NodeGrid[Depth].Num() - 1)];
+    
+				// 2. 길 잃은 내 방 <-> 뽑힌 이전 층 방, 양방향으로 억지로 선 연결해주기!
+				CurMapDatas[RandomCurNodeIdx].ConnectMapIndexs.Add(NextNodeIdx);
+				CurMapDatas[NextNodeIdx].ConnectMapIndexs.Add(RandomCurNodeIdx);
+			}
+		}
+	}
+	
+	// 시작방 지정 -> Depth1~2라인에서 선택 (보류)
+	if (NodeGrid[0].Num() > 0)
+	{
+		int32 StartIdxCandidate = NodeGrid[0][FMath::RandRange(0, NodeGrid[0].Num() - 1)];
+		CurMapDatas[StartIdxCandidate].MapType = EMapNodeType::Start;
+		CurMapDatas[StartIdxCandidate].bIsCleared = true; 
+		CurMapDatas[StartIdxCandidate].SpawnInteractableRowNames.Empty();
+		CurMapDatas[StartIdxCandidate].ConnectMapIndexs.Add(StartIdxCandidate);
+		
+		// 현재 캐릭터가 서 있는 빙의 위치를 시작 방 인덱스로 맞춰줍니다!
+		CurMapIndex = StartIdxCandidate; 
+	}
+	
+	// 보스방 지정 -> Depth 마지막 라인에서 선택 
+	int32 LastDepth = MaxDepth - 1;
+	if (NodeGrid[LastDepth].Num() > 0)
+	{
+		int32 BossIdxCandidate = NodeGrid[LastDepth][FMath::RandRange(0, NodeGrid[LastDepth].Num() - 1)];
+		CurMapDatas[BossIdxCandidate].MapType = EMapNodeType::Boss;
+		CurMapDatas[BossIdxCandidate].SpawnInteractableRowNames.Empty();
+		CurMapDatas[BossIdxCandidate].SpawnInteractableRowNames.Add(TEXT("Sanctuary"));
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("[GenerateMap_F] 맵 생성 완료! 총 노드 개수 : %d / 게임 셋업 시작 노드 인덱스: %d"), CurMapDatas.Num(), CurMapIndex);
+}
+
 TArray<FName> UReTriGameInstance::RandomInteractable(int32 RandomNum)
 {
 	TArray<FName> RowNames = InteractionData->GetRowNames();
@@ -220,7 +387,7 @@ void UReTriGameInstance::EnterMap(int32 MapIndex)
 	// 2단계 갈래길 양방향 이동 검증
 	if (!CurMapDatas[CurMapIndex].ConnectMapIndexs.Contains(MapIndex))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("멀리있는 장소 선택함!"));
+		UE_LOG(LogTemp, Warning, TEXT("멀리있는 장소 선택함! : %d"), MapIndex);
 		return;	
 	}
 	

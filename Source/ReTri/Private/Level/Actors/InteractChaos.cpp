@@ -15,6 +15,7 @@ void AInteractChaos::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
+	
 	// todo: 스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!
 	UE_LOG(LogTemp, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);

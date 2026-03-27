@@ -6,6 +6,7 @@
 #include "ReTriGameData.h"
 #include "Engine/GameInstance.h"
 #include "Level/Data/InteractableData.h"
+#include "Player/Data/PlayerStatData.h"
 #include "ReTriGameInstance.generated.h"
 
 /**
@@ -20,9 +21,11 @@ public:
 	virtual void Init() override;
 	
 	// =========== Level ===============================================
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
-	FPlayerStats SavePlayerStats;
+	FPlayerStats NZWSavePlayerStats;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
+	FPlayerStatInfo CurPlayerStats;
 	
 	//! 상호작용 데이터
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Interaction")
@@ -52,6 +55,10 @@ public:
 	// 시작 방을 기준으로 여러 갈래로 뻗어나가며 끝 부분에 보스 방을 배치하는 다갈래길 맵 생성 함수
 	UFUNCTION(BlueprintCallable, Category="Map|NodeMap")
 	void GenerateMap();
+	
+	// 시작 방을 기준으로 여러 갈래로 뻗어나가며 끝 부분에 보스 방을 배치하는 다갈래길 맵 생성 함수
+	UFUNCTION(BlueprintCallable, Category="Map|NodeMap")
+	void ProceduralGenerateMap();
 	
 	// 상호작용 기물 랜덤으로 선택해주는 함수 
 	UFUNCTION(BlueprintCallable, Category="Map|NodeMap")

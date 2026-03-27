@@ -20,6 +20,8 @@ public class ReTri : ModuleRules
 			"AIModule",
 			"GameplayTags",
 			"Niagara",
+			"Slate",
+			"SlateCore",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
