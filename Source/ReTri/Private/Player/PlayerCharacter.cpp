@@ -50,9 +50,9 @@ APlayerCharacter::APlayerCharacter()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
-	SpringArmComp->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
-	SpringArmComp->TargetArmLength = 2300.f;   
+	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	SpringArmComp->SetRelativeRotation(FRotator(-50.f, 0.f, 0.f));
+	SpringArmComp->TargetArmLength = 1500.f;   
 	SpringArmComp->bUsePawnControlRotation = false; // 카메라 고정
 	SpringArmComp->bInheritPitch = false;
 	SpringArmComp->bInheritYaw = false;
@@ -66,7 +66,7 @@ APlayerCharacter::APlayerCharacter()
 	
 	CamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CamComp"));
 	CamComp->SetupAttachment(SpringArmComp);
-	CamComp->SetFieldOfView(50.f);
+	CamComp->SetFieldOfView(70.f);
 	
 	GD = CreateDefaultSubobject<UReTriGameData>(TEXT("GameData"));
 	
@@ -276,12 +276,12 @@ void APlayerCharacter::OnTravelerMemory1(const struct FInputActionValue& inputVa
 
 void APlayerCharacter::OnSkillQ(const struct FInputActionValue& inputValue)
 {
-	
+	AbilityComp->TryActivate(EAbilitySlot::SkillQ);
 }
 
 void APlayerCharacter::OnSkillE(const struct FInputActionValue& inputValue)
 {
-	
+	AbilityComp->TryActivate(EAbilitySlot::SkillE);
 }
 
 void APlayerCharacter::OnTravelerMemory2(const struct FInputActionValue& inputValue)
