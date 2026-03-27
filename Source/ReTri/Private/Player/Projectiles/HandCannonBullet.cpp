@@ -34,6 +34,7 @@ AHandCannonBullet::AHandCannonBullet()
 	MoveComp->MaxSpeed = 1000.f;
 	MoveComp->bRotationFollowsVelocity = true;
 	MoveComp->ProjectileGravityScale = 0.f;
+	MoveComp->bSweepCollision = true;
 	
 	// trail
 	TrailComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailComp"));
@@ -67,8 +68,8 @@ void AHandCannonBullet::Tick(float DeltaTime)
 
 void AHandCannonBullet::SetDamage(float InNearDamage, float InFarDamage)
 {
-	// NearDamage = InNearDamage;
-	// FarDamage = InFarDamage;
+	NearDamage = InNearDamage;
+	FarDamage = InFarDamage;
 }
 
 void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,

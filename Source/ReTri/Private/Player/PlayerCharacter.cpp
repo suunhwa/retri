@@ -15,6 +15,9 @@
 #include "InputMappingContext.h"
 #include "Animation/AnimInstance.h"
 #include "InputActionValue.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
@@ -129,6 +132,9 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// OnDeath 델리게이트 바인딩
+	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
 	
 	GD->DebugStat();
 }
@@ -257,10 +263,36 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	{
 		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
 		UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
+		
+		if (EnhancedShotEffect)
+		{
+			if (UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAttached(
+				EnhancedShotEffect,
+				SpawnedBullet->GetRootComponent(),
+				NAME_None,
+				FVector::ZeroVector,
+				FRotator::ZeroRotator,
+				EAttachLocation::SnapToTarget,
+				true
+			))
+			{
+				NC->SetWorldScale3D(FVector(EnhancedShotEffectScale));
+			}
+		}
+		if (EnhancedShotParticle)
+		{
+			if (UParticleSystemComponent* PSC = UGameplayStatics::SpawnEmitterAttached(
+				EnhancedShotParticle,
+				SpawnedBullet->GetRootComponent()
+			))
+			{
+				PSC->SetWorldScale3D(FVector(EnhancedShotEffectScale));
+			}
+		}
 	}
 	else if (SpawnedBullet)
 	{
-		UE_LOG(LogTemp, Log, TEXT("[Attack] normal 탄 %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
+		UE_LOG(LogTemp, Log, TEXT("[Attack] 일반탄 %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
 	}
 }
 

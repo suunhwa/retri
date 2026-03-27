@@ -14,6 +14,8 @@ class UAbilityComponent;
 class ABullet;
 class UInputAction;
 class UInputMappingContext;
+class UNiagaraSystem;
+class UParticleSystem;
 
 UCLASS()
 class RETRI_API APlayerCharacter : public ACharacter
@@ -103,6 +105,16 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
+	
+	// 4타 강화탄 이펙트
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TObjectPtr<UNiagaraSystem> EnhancedShotEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TObjectPtr<UParticleSystem> EnhancedShotParticle;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	float EnhancedShotEffectScale = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> HitMontage;
