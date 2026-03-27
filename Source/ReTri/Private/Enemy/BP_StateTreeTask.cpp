@@ -90,12 +90,12 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		if (Distance >= 400.f && Distance <= 800.f)
 		{
 			// 중거리면 돌진, 점프만
-			SkillPool = { 1, 1, 3 };
+			SkillPool = { 1 }; // 1, 1, 3
 		}
 		else
 		{
 			// 가까우면 모든 스킬
-			SkillPool = { 0, 1, 1, 2, 2, 3, 3 };	//0, 1, 1, 2, 2, 3, 3
+			SkillPool = { 0, 1, 1};	//0, 1, 1, 2, 2, 3, 3
 		}
 	}
 	
@@ -198,7 +198,7 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 		if (Boss->GetCurrentMontage() == nullptr)
 		{
 			SkillWaitTime += DeltaTime;
-			if (SkillWaitTime < 2.0f)
+			if (SkillWaitTime < 1.5f)
 			{
 				return  EStateTreeRunStatus::Running;
 			}

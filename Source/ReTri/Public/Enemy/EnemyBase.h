@@ -56,6 +56,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = BossStatus)
 	bool bHasPlayedMirrorBlade = false;
 	
+	// 애니메이션
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
+	class UAnimMontage* ChargeMontage;
+	
 public:
 	// (1스킬) 차징 상태인지
 	bool bIsCharging = false;

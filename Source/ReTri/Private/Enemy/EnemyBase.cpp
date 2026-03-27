@@ -67,6 +67,11 @@ void AEnemyBase::Tick(float DeltaTime)
 	// bIsCharging이 true일 때 플레이어 방향으로 회전
 	if (bIsCharging && TargetActor)
 	{
+		if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(ChargeMontage))
+		{
+			PlayAnimMontage(ChargeMontage, 1.0f);
+		}
+		
 		// 보스 위치 -> 플레이어 위치로 향하는 방향 벡터를 구하고, Z는 0
 		FVector LookDir = TargetActor->GetActorLocation() - GetActorLocation();
 		LookDir.Z = 0.0f; 

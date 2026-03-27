@@ -26,7 +26,7 @@ protected:
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Collision)
-	class UBoxComponent* SwordCollision;
+	class UBoxComponent* SwordCollision = nullptr;
 	
 private:
 	bool bIsBattleStarted = false; // 전투가 이미 시작되었는지 체크

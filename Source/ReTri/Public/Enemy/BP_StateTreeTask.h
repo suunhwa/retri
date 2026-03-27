@@ -53,6 +53,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = Settings)
 	float DashSpeed = 10000;
+
 	
 
 private:

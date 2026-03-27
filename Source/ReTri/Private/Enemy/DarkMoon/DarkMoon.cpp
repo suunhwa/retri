@@ -18,7 +18,7 @@ ADarkMoon::ADarkMoon()
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -180.0f), FRotator(0.0f, -90.0f, 0.0f));
 		GetMesh()->SetRelativeScale3D(FVector(2.0f, 2.0f, 2.0f));
 	}
-	GetCapsuleComponent()->InitCapsuleSize(55.0f, 196.0f);
+	GetCapsuleComponent()->InitCapsuleSize(80.0f, 196.0f);
 	
 	
 	SwordCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordCollision"));
