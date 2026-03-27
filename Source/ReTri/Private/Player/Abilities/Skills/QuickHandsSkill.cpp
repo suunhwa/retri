@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Abilities/Skills/FastHandsSkill.h"
+#include "Player/Abilities/Skills/QuickHandsSkill.h"
 
 #include "GameFramework/Character.h"
 #include "NiagaraFunctionLibrary.h"
@@ -12,17 +12,17 @@
 #include "Player/Projectiles/PiercingBullet.h"
 #include "TimerManager.h"
 
-UFastHandsSkill::UFastHandsSkill()
+UQuickHandsSkill::UQuickHandsSkill()
 {
 	Cooldown = 0.1f;
 }
 
-bool UFastHandsSkill::CanActivate(ACharacter* Owner)
+bool UQuickHandsSkill::CanActivate(ACharacter* Owner)
 {
 	return CurrentCharges > 0;
 }
 
-void UFastHandsSkill::Activate(ACharacter* Owner)
+void UQuickHandsSkill::Activate(ACharacter* Owner)
 {
 	APlayerCharacter* Player = Cast<APlayerCharacter>(Owner);
 	if (!Player) return;
@@ -48,7 +48,7 @@ void UFastHandsSkill::Activate(ACharacter* Owner)
 	RechargeTimerHandle.Add(NewHandle);
 	Owner->GetWorldTimerManager().SetTimer(
 		RechargeTimerHandle.Last(),
-		this, &UFastHandsSkill::RestoreCharge,
+		this, &UQuickHandsSkill::RestoreCharge,
 		RechargeTime, false
 	);
 	
@@ -75,12 +75,12 @@ void UFastHandsSkill::Activate(ACharacter* Owner)
 	
 	// 2번탄 즉시 발사 (150%)
 	FTimerDelegate Del2;
-	Del2.BindUObject(this, &UFastHandsSkill::FireShot, WeakOwner, 1, Direction, BaseDamage);
+	Del2.BindUObject(this, &UQuickHandsSkill::FireShot, WeakOwner, 1, Direction, BaseDamage);
 	Owner->GetWorldTimerManager().SetTimer(FireTimerHandle2, Del2, FireDelay, false);
 	
 	// 3번탄 즉시 발사 (420%)
 	FTimerDelegate Del3;
-	Del3.BindUObject(this, &UFastHandsSkill::FireShot, WeakOwner, 2, Direction, BaseDamage);
+	Del3.BindUObject(this, &UQuickHandsSkill::FireShot, WeakOwner, 2, Direction, BaseDamage);
 	Owner->GetWorldTimerManager().SetTimer(FireTimerHandle3, Del3, FireDelay * 2.f, false);
 	
 	// effects
@@ -94,7 +94,7 @@ void UFastHandsSkill::Activate(ACharacter* Owner)
 	}
 }
 
-void UFastHandsSkill::FireShot(TWeakObjectPtr<ACharacter> WeakOwner,
+void UQuickHandsSkill::FireShot(TWeakObjectPtr<ACharacter> WeakOwner,
 	int32 ShotIndex,
 	FVector Direction,
 	float BaseDamage)
@@ -125,7 +125,7 @@ void UFastHandsSkill::FireShot(TWeakObjectPtr<ACharacter> WeakOwner,
 	}
 }
 
-void UFastHandsSkill::RestoreCharge()
+void UQuickHandsSkill::RestoreCharge()
 {
 	CurrentCharges = FMath::Min(CurrentCharges + 1, MaxCharges);
 }
