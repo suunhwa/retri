@@ -67,8 +67,8 @@ void AHandCannonBullet::Tick(float DeltaTime)
 
 void AHandCannonBullet::SetDamage(float InNearDamage, float InFarDamage)
 {
-	NearDamage = InNearDamage;
-	FarDamage = InFarDamage;
+	// NearDamage = InNearDamage;
+	// FarDamage = InFarDamage;
 }
 
 void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,

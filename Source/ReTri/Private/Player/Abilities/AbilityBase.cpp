@@ -23,10 +23,9 @@ void UAbilityBase::StartCooldown(UWorld* World)
 	RemainingCooldown = Cooldown;
 	OnCooldownChanged.Broadcast(RemainingCooldown, Cooldown);
 	
-	World->GetTimerManager().SetTimer(CooldownTimer, [this]()
-	{
-		TickCooldown();
-	}, 0.05f, true);
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindUObject(this, &UAbilityBase::TickCooldown);
+	World->GetTimerManager().SetTimer(CooldownTimer, TimerDelegate, 0.05f, true);
 }
 
 void UAbilityBase::TickCooldown()
