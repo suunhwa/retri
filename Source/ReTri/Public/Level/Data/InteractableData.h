@@ -19,8 +19,8 @@ enum class EInteractableType : uint8
 	Well		UMETA(DisplayName = "Well"),        // 우물
 	Chaos		UMETA(DisplayName = "Chaos"),       // 혼돈
 	Curse		UMETA(DisplayName = "Curse"),       // 저주
-	Remnants	UMETA(DisplayName = "Remnants"),     // 기억의 잔재
-	Portal		UMETA(DisplayName = "Portal")     // 기억의 잔재
+	Remnants	UMETA(DisplayName = "Remnants"),    // 기억의 잔재
+	Portal		UMETA(DisplayName = "Portal")		// 균열
 };
 
 USTRUCT(BlueprintType)

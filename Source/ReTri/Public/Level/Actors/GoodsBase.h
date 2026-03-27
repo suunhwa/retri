@@ -27,7 +27,9 @@ public:
 	
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	
-protected:	
+	UFUNCTION(BlueprintCallable)
+	void MoveAndRotate(float DeltaTime);
+protected:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* SphereComp;
 	UPROPERTY(VisibleAnywhere)
@@ -39,4 +41,8 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed = 3.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float YawRotSpeed = 2000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RollRotSpeed = 1500.f;
 };

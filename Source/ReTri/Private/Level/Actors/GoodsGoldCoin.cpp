@@ -9,7 +9,7 @@
 
 AGoodsGoldCoin::AGoodsGoldCoin()
 {
-	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/Mesh/Gold_Test.Gold_Test'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/low-poly_gold_coin/StaticMeshes/SM_Gold.SM_Gold'"));
 	if (TempMesh.Succeeded()) MeshComp->SetStaticMesh(TempMesh.Object);
 }
 
