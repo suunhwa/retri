@@ -2,7 +2,11 @@
 
 #include "Enemy/EnemyBase.h"
 #include <Codecapi.h>
+
+#include "AIController.h"
+#include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -16,11 +20,6 @@ AEnemyBase::AEnemyBase()
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (StateTreeComponent)
-	{
-		StateTreeComponent->StartLogic();
-	}
 	
 	// 데이터테이블 존재 && 이름 존재
 	if (StatDataTable != nullptr && !EnemyRowName.IsNone())
@@ -45,12 +44,47 @@ void AEnemyBase::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("성공!! %s의 체력은 %f, 스킬은 %d개"), *EnemyRowName.ToString(), CurrentHP, BossSkills.Num());
 		}
 	}
+	
+	FTimerHandle StartTimer;
+	GetWorldTimerManager().SetTimer(StartTimer, [this]()
+	{
+		if (AAIController* aic = Cast<AAIController>(GetController()))
+		{
+			UStateTreeComponent* STComp = aic->FindComponentByClass<UStateTreeComponent>();
+			if (STComp)
+			{
+				STComp->StartLogic();
+			}
+		}
+	}, 0.2f, false);
 }
 
 // Called every frame
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	// bIsCharging이 true일 때 플레이어 방향으로 회전
+	if (bIsCharging && TargetActor)
+	{
+		if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(ChargeMontage))
+		{
+			PlayAnimMontage(ChargeMontage, 1.0f);
+		}
+		
+		// 보스 위치 -> 플레이어 위치로 향하는 방향 벡터를 구하고, Z는 0
+		FVector LookDir = TargetActor->GetActorLocation() - GetActorLocation();
+		LookDir.Z = 0.0f; 
+
+		// 구한 방향을 회전값으로
+		FRotator TargetRot = LookDir.Rotation();
+
+		// 현재 회전에서 목표 회전까지 부드럽게 보간
+		// IntterpSpeed = 회전속도
+		FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, 10.0f);
+        
+		SetActorRotation(NewRot);
+	}
 
 }
 
@@ -61,3 +95,60 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 }
 
+
+
+void AEnemyBase::OnAttackOverlap(AActor* OtherActor)
+{
+	if (bHasHitTarget || !OtherActor || OtherActor == this) return;
+	
+	ACharacter* Player = Cast<ACharacter>(OtherActor);
+	if (Player)
+	{
+		UGameplayStatics::ApplyDamage
+		(
+			OtherActor,           // 맞는 대상
+			CurrentSkillDamage,   // Task에서 설정한 수치
+			GetController(),      // 보스의 컨트롤러
+			this,                 // 보스 자신
+			nullptr               // 특별한 타입 없으면 null
+		);
+		
+		bHasHitTarget = true;
+
+		UE_LOG(LogTemp, Warning, TEXT("플레이어에게 %f 데미지를 입혔다!"), CurrentSkillDamage);
+	}
+}
+
+float AEnemyBase::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	CurrentHP -= ActualDamage;
+	UpdatePhase();
+	
+	UE_LOG(LogTemp, Warning, TEXT("보스가 맞았다! 남은 체력: %f"), CurrentHP);
+	
+	
+	if (CurrentHP <= 0.0f)
+	{
+		//Die(); // 죽는 함수
+	}
+
+	return ActualDamage;
+}
+
+void AEnemyBase::StartCharging(AActor* NewTarget)
+{
+	if (NewTarget)
+	{
+		TargetActor = NewTarget;
+		bIsCharging = true;
+	}
+}
+
+void AEnemyBase::StopCharging()
+{
+	bIsCharging = false;
+	TargetActor = nullptr;
+}

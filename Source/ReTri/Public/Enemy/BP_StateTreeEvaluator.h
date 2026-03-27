@@ -25,11 +25,11 @@ protected:
 	virtual void Tick(FStateTreeExecutionContext& Context, const float DeltaTime) override;
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* Target;
+	UPROPERTY(EditAnywhere, Category = "Output", meta = (BindingKind = "Output"))
+	float DistanceToTarget = 0.0f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DistanceToTarget;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Output")
+	AActor* Target;
 	
 	
 };

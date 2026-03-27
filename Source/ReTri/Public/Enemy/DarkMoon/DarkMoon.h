@@ -26,15 +26,21 @@ protected:
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Collision)
-	class UBoxComponent* SwordCollision;
+	class UBoxComponent* SwordCollision = nullptr;
 	
-	
-	
+private:
+	bool bIsBattleStarted = false; // 전투가 이미 시작되었는지 체크
 	
 protected:
 	UFUNCTION(BlueprintCallable, category=Collision)
-	void SetSwordCollisionEnabled(bool bEnabled);
+	//void SetSwordCollisionEnabled(bool bEnabled);
 	
+	
+	void StartBattleEvent();
+	void ReduceBossHP();
+	virtual void UpdatePhase() override;
+	
+public:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
 						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
@@ -42,12 +48,14 @@ protected:
 	UFUNCTION()
 	void OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 							   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-	void StartBattleEvent();
-	void ReduceBossHP();
-	void UpdatePhase();
-	
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
+public:
+	UFUNCTION(BlueprintCallable, category=Collision)
+	void OnSwordCollision();
+	UFUNCTION(BlueprintCallable, category=Collision)
+	void OffSwordCollision();
+	
 	
 };
 
