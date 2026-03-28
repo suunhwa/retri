@@ -114,7 +114,6 @@ void AInteractableBase::Interact_Implementation()
 	IInteractableInterface::Interact_Implementation();
 	
 	// 여기에 Interact F 키 눌렀을 때 플레이어가 실행할 함수 내용 각각 적용
-	UE_LOG(LogTemp, Warning, TEXT("Interactable Base Class"));
 }
 
 void AInteractableBase::NotifyActorBeginOverlap(AActor* OtherActor)

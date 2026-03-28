@@ -13,9 +13,9 @@ void AInteractCurse::BeginPlay()
 
 void AInteractCurse::Interact_Implementation()
 {
-	Super::Interact_Implementation();
-	
 	// todo: 3가지 선택지 UI 띄우기 -> 저주를 받고 스텟 레벨업
-	UE_LOG(LogTemp, Warning, TEXT("3가지 선택지 UI 띄우기 -> 저주를 받고 스텟 레벨업"));
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
+	UE_LOG(jiwon, Warning, TEXT("3가지 선택지 UI 띄우기 -> 저주를 받고 스텟 레벨업"));
+	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	
+	Super::Interact_Implementation();
 }

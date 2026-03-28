@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "ReTri/ReTri.h"
 #include "GameFramework/Actor.h"
 #include "Level/Data/InteractableData.h"
 #include "Level/Interfaces/InteractableInterface.h"

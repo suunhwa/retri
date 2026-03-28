@@ -20,5 +20,5 @@ void ALootGoldCoinPot::Break()
 	GetWorld()->SpawnActor<AGoodsGoldCoin>(GoodsClass, GetActorLocation(), GetActorRotation());
 	
 	// Effect Play
-	UE_LOG(LogTemp, Warning, TEXT("ALootGoldCoinPot"));
+	UE_LOG(jiwon, Warning, TEXT("ALootGoldCoinPot"));
 }

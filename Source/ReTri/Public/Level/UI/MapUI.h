@@ -28,3 +28,5 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UCanvasPanel* MapCanvas;
 };
+
+
