@@ -32,6 +32,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> CastEffect;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	float EffectDuration = 2.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> CastSound;
