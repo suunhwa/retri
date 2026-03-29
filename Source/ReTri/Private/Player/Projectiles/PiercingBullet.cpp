@@ -22,7 +22,8 @@ APiercingBullet::APiercingBullet()
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel6);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	CollisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap); // dark moon
+	CollisionComp->SetGenerateOverlapEvents(true);
 	RootComponent = CollisionComp;
 	
 	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));

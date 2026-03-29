@@ -18,7 +18,8 @@ ABullet::ABullet()
 	collisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	collisionComp->SetCollisionObjectType(ECC_GameTraceChannel6);
 	collisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	collisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	collisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap); // dark moon
+	collisionComp->SetGenerateOverlapEvents(true);
 	RootComponent = collisionComp;
 
 	bodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
