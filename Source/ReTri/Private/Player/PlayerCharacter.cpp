@@ -27,6 +27,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/UI/HPBar.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -135,6 +136,17 @@ void APlayerCharacter::BeginPlay()
 	
 	// OnDeath 델리게이트 바인딩
 	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
+	
+	// HUD 위젯 생성 및 Delegate 구독
+	if (HPWidgetClass)
+	{
+		HPWidget = CreateWidget<UHPBar>(GetWorld(), HPWidgetClass);
+		if (HPWidget)
+		{
+			HPWidget->AddToViewport();
+			HealthComp->OnHPChanged.AddDynamic(HPWidget, &UHPBar::OnHPChanged);
+		}
+	}
 	
 	GD->DebugStat();
 }
