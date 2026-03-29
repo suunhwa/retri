@@ -7,6 +7,7 @@
 #include "Level/Data/InteractableData.h"
 #include "Level/UI/InteractableInfoUI.h"
 #include "Level/UI/InteractableUI.h"
+#include "Level/UI/SelectUI.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/TextBlock.h"
@@ -57,6 +58,17 @@ void AInteractableBase::BeginPlay()
 	CurDescriptionTime = MaxDescriptionTime;
 }
 
+void AInteractableBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// GC에서 해결 되지 않고 플레이를 끈 경우 
+	if (SelectUIInstance && SelectUIInstance->IsInViewport())
+	{
+		SelectUIInstance->RemoveFromParent();
+	}
+	
+	Super::EndPlay(EndPlayReason);
+}
+
 // Called every frame
 void AInteractableBase::Tick(float DeltaTime)
 {
@@ -78,10 +90,10 @@ void AInteractableBase::Tick(float DeltaTime)
 
 void AInteractableBase::DataInit(FInteractableData RowData)
 {
+	InteractableData = RowData;
 	InteractableType = RowData.InteractableType; 
 	InteractName = RowData.InteractName;
 	Description = RowData.Description;
-	//!Probability = RowData.Probability;
 	UStaticMesh* LoadMesh = RowData.InteractableMesh.LoadSynchronous();
 	if (LoadMesh)
 		MeshComp->SetStaticMesh(LoadMesh);
@@ -156,4 +168,45 @@ void AInteractableBase::UIHold()
 		InteractInfoUI->SetVisibility(true);
 	else
 		InteractInfoUI->SetVisibility(false);
+}
+
+void AInteractableBase::ShowSelectUI()
+{
+	if (!SelectUIClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
+		return;
+	}
+	
+	// 최소한 한 번만 생성, 이후에는 인스턴스 재사용
+	if (!SelectUIInstance)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+		SelectUIInstance = CreateWidget<USelectUI>(PC, SelectUIClass);
+		if (SelectUIInstance)
+		{
+			// PIE Undo Buffer Leaks 방지
+			// 위 코드는 위젯을 생성하자마자 
+			// "이 위젯은 실행 취소 기록에 남기지 마! 넌 그냥 게임 플레이 도중에 쓰고 버릴 일회용이야!" 
+			// 라고 플래그(RF_Transactional)를 강제로 지워버리는 역할
+			SelectUIInstance->ClearFlags(RF_Transactional);
+		}
+	}
+
+	if (!SelectUIInstance) return;
+
+	// 이전 버튼들 정리 
+	SelectUIInstance->ClearButtons();
+	if (!SelectUIInstance->IsInViewport())
+	{
+		SelectUIInstance->AddToViewport();
+	}
+}
+
+void AInteractableBase::HideSelectUI()
+{
+	if (SelectUIInstance->IsInViewport())
+	{
+		SelectUIInstance->RemoveFromParent();
+	}
 }

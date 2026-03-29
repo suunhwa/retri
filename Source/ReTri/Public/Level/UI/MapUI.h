@@ -7,6 +7,7 @@
 #include "MapUI.generated.h"
 
 class UMapNode;
+class UMapLineDrawer;
 
 /**
  * 
@@ -16,17 +17,25 @@ class RETRI_API UMapUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
 	virtual void NativeConstruct() override;
 	
-protected:
-	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;	
+	virtual void NativeDestruct() override;	
+	
+	//virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;	
 	
 public:
+	UPROPERTY(meta=(BindWidget))
+	class UCanvasPanel* MapCanvas;
+	
 	UPROPERTY(EditAnywhere, Category = "MapUI")
 	TSubclassOf<UMapNode> MapUIClass;
 	
-	UPROPERTY(meta=(BindWidget))
-	class UCanvasPanel* MapCanvas;
+	UPROPERTY(EditAnywhere, Category = "MapUI")
+	TSubclassOf<UMapLineDrawer> MapLineClass;
+	
+	//UPROPERTY()
+	//TArray<UMapNode*> NodeWidgets;
 };
 
 
