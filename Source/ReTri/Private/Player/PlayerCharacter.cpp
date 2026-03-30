@@ -22,6 +22,7 @@
 #include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
 #include "ReTriGameData.h"
+#include "ReTriGameInstance.h"
 #include "Level/Actors/InteractableBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -72,7 +73,7 @@ APlayerCharacter::APlayerCharacter()
 	CamComp->SetupAttachment(SpringArmComp);
 	CamComp->SetFieldOfView(70.f);
 	
-	GD = CreateDefaultSubobject<UReTriGameData>(TEXT("GameData"));
+	// GD = CreateDefaultSubobject<UReTriGameData>(TEXT("GameData"));
 	
 	ConstructorHelpers::FObjectFinder<UInputAction> TempMoveInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Move.IA_Move'"));
 	if (TempMoveInput.Succeeded())
@@ -148,7 +149,7 @@ void APlayerCharacter::BeginPlay()
 		}
 	}
 	
-	GD->DebugStat();
+	// GD->DebugStat();
 }
 
 // Called every frame
@@ -429,7 +430,9 @@ void APlayerCharacter::Interaction()
 		{
 			IInteractableInterface::Execute_Interact(Interact);
 			
-			GD->DebugStat();
+			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+			GI->GameData->DebugStat();
+			// GD->DebugStat();
 		}
 	}
 }
