@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "ReTri/ReTri.h"
 #include "GameFramework/Actor.h"
 #include "Level/Data/InteractableData.h"
 #include "Level/Interfaces/InteractableInterface.h"
@@ -11,6 +13,7 @@
 
 class UCapsuleComponent;
 class UWidgetComponent;
+class USelectUI;
 
 UCLASS()
 class RETRI_API AInteractableBase : public AActor, public IInteractableInterface
@@ -24,6 +27,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame
@@ -53,6 +57,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractableType InteractableType;
 	
+	FInteractableData InteractableData;
+	
 	// 상호작용 중인지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
 	bool bIsInteractable = false;
@@ -61,7 +67,7 @@ public:
 	bool bIsHovering = false;
 	// 사용 했는지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
-	bool bIsRun = false;
+	bool bIsUsed = false;
 	
 	// Interaction Object 이름과 상호작용을 띄울 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -72,11 +78,20 @@ public:
 	
 	float CurDescriptionTime = 0.f;
 	float MaxDescriptionTime = 3.f;
+
+	// === [ Select ] ===
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SelectUI")
+	TSubclassOf<USelectUI> SelectUIClass;
 	
+	UPROPERTY()
+	USelectUI* SelectUIInstance;
+	
+	void ShowSelectUI();
+	void HideSelectUI();
 	
 protected:
 	UPROPERTY() //todo 플레이어 클래스로 바꿔야할수도 
-	class APawn* MyPlayer;
+	APawn* MyPlayer;
 	
 	FString InteractName;
 	FString Description;

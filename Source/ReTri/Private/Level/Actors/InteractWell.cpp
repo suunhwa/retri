@@ -3,8 +3,6 @@
 
 #include "Level/Actors/InteractWell.h"
 
-#include "Components/CapsuleComponent.h"
-
 
 void AInteractWell::BeginPlay()
 {
@@ -15,9 +13,9 @@ void AInteractWell::BeginPlay()
 
 void AInteractWell::Interact_Implementation()
 {
-	Super::Interact_Implementation();
-	
 	// todo: 스킬 Level Up! UI
-	UE_LOG(LogTemp, Warning, TEXT("스킬 Level Up! UI"));
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
+	UE_LOG(jiwon, Warning, TEXT("스킬 Level Up! UI"));
+	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	
+	Super::Interact_Implementation();
 }

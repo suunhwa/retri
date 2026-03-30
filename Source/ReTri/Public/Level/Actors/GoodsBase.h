@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ReTri/ReTri.h"
 #include "GameFramework/Actor.h"
 #include "GoodsBase.generated.h"
 

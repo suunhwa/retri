@@ -2,8 +2,8 @@
 
 
 #include "Level/Actors/LootBase.h"
-
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ALootBase::ALootBase()
@@ -43,7 +43,6 @@ void ALootBase::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (bIsBroken == true) return;
 	
 	OtherActor->Destroy();
-	UE_LOG(LogTemp, Error, TEXT("충돌!"));
 	
 	// 공격 Actor와 오버랩 되었을 떄
 	HP -= 1;
@@ -58,7 +57,6 @@ void ALootBase::NotifyActorBeginOverlap(AActor* OtherActor)
 void ALootBase::Break()
 {
 	// 깨졌을 때 이부분은 각각 자식들이 구현
-	UE_LOG(LogTemp, Warning, TEXT("Loot Base"));
 	Destroy();
 }
 

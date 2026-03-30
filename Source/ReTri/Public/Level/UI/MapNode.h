@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Image.h"
 #include "MapNode.generated.h"
 
 class UImage;
@@ -20,16 +21,24 @@ protected:
 	virtual void NativeConstruct() override;
 	
 public:
-	UFUNCTION()
-	void OnNodeClicked();
+	UPROPERTY(meta = (BindWidget))
+	UImage* CurUI;
 	
 	UPROPERTY(meta = (BindWidget))
 	UImage* Sanctuary;
+	UFUNCTION(BlueprintCallable)
+	void SetSanctuaryVisibility(ESlateVisibility InVisibility){ Sanctuary->SetVisibility(InVisibility); }
+	
 	UPROPERTY(meta = (BindWidget))
 	UImage* Well;
+	UFUNCTION(BlueprintCallable)
+	void SetWellVisibility(ESlateVisibility InVisibility) { Well->SetVisibility(InVisibility); }
 	
 	UPROPERTY(meta = (BindWidget))
 	UButton* Node;
+
+	UFUNCTION(BlueprintCallable)
+	void OnNodeClicked();
 	
 	UPROPERTY(BlueprintReadOnly)
 	int32 NodeIndexNumber; 

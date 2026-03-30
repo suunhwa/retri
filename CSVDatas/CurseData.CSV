@@ -1,0 +1,4 @@
+Name,CurseName,CurseInfo,CurseType,CurseColor
+Curse_Light,미약한 증오,무작위 미약한 저주를 받고 보상을 획득합니다.,Curse_Light,"(R=0.802083,G=0.618273,B=0.618273,A=1.000000)"
+Curse_Strong,강력한 증오,무작위 강력한 저주를 받고 큰 보상을 획득합니다. ,Curse_Strong,"(R=1.000000,G=0.229627,B=0.073284,A=1.000000)"
+Curse_Extreme,극렬한 증오,무작위 극렬한 저주를 받고 더욱 큰 보상을 획득합니다.,Curse_Extreme,"(R=0.300544,G=0.000000,B=0.000000,A=1.000000)"

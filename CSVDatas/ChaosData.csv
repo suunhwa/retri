@@ -1,0 +1,6 @@
+Name,ChaosName,ChaosInfo,ChaosType,ChaosLevel,ChaosValues
+Chaos_Health,꺾이지 않는 의지,최대 체력이 {0} 증가합니다.,Chaos_Health,0,"(60.000000,120.000000,220.000000,400.000000)"
+Chaos_AttackDamage,거인의 근력,공격력이 {0} 증가합니다.,Chaos_AttackDamage,0,"(6.000000,9.000000,17.000000,27.000000)"
+Chaos_AbilityPower,무한한 지식,주문력이 {0} 증가합니다.,Chaos_AbilityPower,0,"(5.000000,8.000000,12.000000,20.000000)"
+Chaos_AttackSpeed,맹렬한 분노,공격속도가 {0}% 증가합니다.,Chaos_AttackSpeed,0,"(1.100000,1.150000,1.200000,1.350000)"
+Chaos_MemoryHaste,기민한 정신,기억 가속이 {0} 증가합니다.,Chaos_MemoryHaste,0,"(8.000000,13.000000,18.000000,30.000000)"
