@@ -76,6 +76,9 @@ public:
 	// 바라보면서 회전할지 여부
 	UPROPERTY(BlueprintReadWrite, Category = "Boss")
 	bool bCanRotate = true;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = EnemySetup)
+	bool bIsBoss = false;
 
 public:
 	// 공격 시작 시 호출

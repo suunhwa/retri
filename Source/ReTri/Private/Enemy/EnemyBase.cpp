@@ -18,9 +18,7 @@ AEnemyBase::AEnemyBase()
 
 // Called when the game starts or when spawned
 void AEnemyBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
+{	
 	// 데이터테이블 존재 && 이름 존재
 	if (StatDataTable != nullptr && !EnemyRowName.IsNone())
 	{
@@ -44,6 +42,9 @@ void AEnemyBase::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("성공!! %s의 체력은 %f, 스킬은 %d개"), *EnemyRowName.ToString(), CurrentHP, BossSkills.Num());
 		}
 	}
+	
+	// Begin이 연쇄적으로 일어나서 FSM에 Null로 뜸
+	Super::BeginPlay();
 	
 	FTimerHandle StartTimer;
 	GetWorldTimerManager().SetTimer(StartTimer, [this]()
@@ -119,7 +120,7 @@ float AEnemyBase::TakeDamage(float DamageAmount, struct FDamageEvent const& Dama
 	CurrentHP -= ActualDamage;
 	UpdatePhase();
 	
-	UE_LOG(LogTemp, Warning, TEXT("보스가 맞았다! 남은 체력: %f"), CurrentHP);
+	UE_LOG(LogTemp, Warning, TEXT("%s 적중! 남은 체력: %f"), *EnemyRowName.ToString(), CurrentHP);
 	
 	
 	if (CurrentHP <= 0.0f)

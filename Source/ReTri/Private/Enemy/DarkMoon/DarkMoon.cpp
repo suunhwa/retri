@@ -11,6 +11,7 @@
 
 ADarkMoon::ADarkMoon()
 {
+	bIsBoss = true;
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonAurora/Characters/Heroes/Aurora/Skins/GlacialEmpress/Meshes/Aurora_GlacialEmpress.Aurora_GlacialEmpress'"));
 	if (TempMesh.Succeeded())
 	{
