@@ -333,28 +333,28 @@ void APlayerCharacter::ResetAttack()
 
 void APlayerCharacter::OnTravelerMemory1(const struct FInputActionValue& inputValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("RMB pressed"));
+	// UE_LOG(LogTemp, Warning, TEXT("RMB pressed"));
 	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::TravelerMemory1);
 }
 
 void APlayerCharacter::OnSkillQ(const struct FInputActionValue& inputValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Q pressed"));
+	// UE_LOG(LogTemp, Warning, TEXT("Q pressed"));
 	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::SkillQ);
 }
 
 void APlayerCharacter::OnSkillE(const struct FInputActionValue& inputValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("E pressed"));
+	// UE_LOG(LogTemp, Warning, TEXT("E pressed"));
 	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::SkillE);
 }
 
 void APlayerCharacter::OnTravelerMemory2(const struct FInputActionValue& inputValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("R pressed"));
+	// UE_LOG(LogTemp, Warning, TEXT("R pressed"));
 	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::TravelerMemory2);
 }
