@@ -32,7 +32,7 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-		GI->GameData->PlayerStats.Gold += GI->GameData->GetRandomGold();
+		GI->GameData->UpdateGold(+GI->GameData->GetRandomGold());
 		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.CurGold += GI->GameData->GetRandomGold();
 		
 		GI->GameData->DebugStat();

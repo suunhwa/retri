@@ -31,8 +31,6 @@ void UMapUI::NativeConstruct()
 	auto MapSub = GI->GetSubsystem<UMapSubSystem>();
 	if (!MapSub) return;
 	
-	//NodeWidgets.Empty();
-	
 	// 선 그리기 -> 아래 깔리게 하기 위해
 	if (MapCanvas && MapLineClass)
 	{

@@ -28,6 +28,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Curse")
 	UDataTable* CurseDataTable;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Curse")
+	UDataTable* CurseRewardDataTable;
+	
 private:
 	TArray<FCurseData*> CurseDatas;
+	TArray<FCurseRewardData*> CurseRewardDatas;
 };

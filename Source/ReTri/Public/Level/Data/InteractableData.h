@@ -92,6 +92,34 @@ public:
 	ECurseType CurseType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor CurseColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurseMonster;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurseMap;
+};
+
+UENUM(BlueprintType)
+enum class ERewardType: uint8
+{
+	RewardGold			UMETA(DisplayName="RewardGold"),			// 
+	RewardDreamPowder	UMETA(DisplayName="RewardDreamPowder"),		// 
+	RewardMaxHP			UMETA(DisplayName="RewardMaxHP"),			// 
+	RewardAttackDamage	UMETA(DisplayName="RewardAttackDamage"),	// 
+	RewardMemoryHaste	UMETA(DisplayName="RewardMemoryHaste")		// 
+};
+
+USTRUCT(BlueprintType)
+struct FCurseRewardData : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ERewardType RewardType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> RewardLevels;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Info;
 };
 
 // === [ Map Info ] ===

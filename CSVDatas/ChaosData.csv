@@ -1,4 +1,4 @@
-Name,ChaosName,ChaosInfo,ChaosType,ChaosLevel,ChaosValues
+﻿Name,ChaosName,ChaosInfo,ChaosType,ChaosLevel,ChaosValues
 Chaos_Health,꺾이지 않는 의지,최대 체력이 {0} 증가합니다.,Chaos_Health,0,"(60.000000,120.000000,220.000000,400.000000)"
 Chaos_AttackDamage,거인의 근력,공격력이 {0} 증가합니다.,Chaos_AttackDamage,0,"(6.000000,9.000000,17.000000,27.000000)"
 Chaos_AbilityPower,무한한 지식,주문력이 {0} 증가합니다.,Chaos_AbilityPower,0,"(5.000000,8.000000,12.000000,20.000000)"

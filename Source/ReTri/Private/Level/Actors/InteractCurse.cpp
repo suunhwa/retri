@@ -5,6 +5,7 @@
 
 #include "Level/UI/SelectButtonUI.h"
 #include "Level/UI/SelectUI.h"
+#include "ReTri/ReTri.h"
 
 
 void AInteractCurse::BeginPlay()
@@ -46,6 +47,43 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 	//todo 저주를 받고 스텟 레벨업
 	FCurseData* CurseData = CurseDatas[Index];
 	JIWONLOG("선택된 저주: %s", *CurseData->CurseName);
+	
+	int32 RandomCurse = FMath::RandRange(0, 1);
+	if (RandomCurse == 0)
+	{
+		SCREENLOG("몬스터를 %d마리 처치하세요!", CurseData->CurseMonster);
+	}
+	else
+	{
+		SCREENLOG("맵을 %d구역 클리어하세요!", CurseData->CurseMap);
+	}
+	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	CurseRewardDataTable->GetAllRows<FCurseRewardData>(TEXT("Curse::Select"), CurseRewardDatas);
+	int32 RandomReward = FMath::RandRange(0, CurseRewardDatas.Num() - 1);
+	
+	int32 RewardVal = CurseRewardDatas[RandomReward]->RewardLevels[static_cast<int32>(CurseData->CurseType)];
+	switch (CurseRewardDatas[RandomReward]->RewardType)
+	{
+	case ERewardType::RewardGold:
+		GI->GameData->UpdateGold(+RewardVal);
+		break;
+	case ERewardType::RewardDreamPowder:
+		GI->GameData->UpdateDreamPowder(+RewardVal);
+		break;
+	case ERewardType::RewardMaxHP:
+		GI->GameData->UpdateMaxHP(+RewardVal);
+		break;
+	case ERewardType::RewardAttackDamage:
+		GI->GameData->UpdateAttackDamage(+RewardVal);
+		break;
+	case ERewardType::RewardMemoryHaste:
+		GI->GameData->UpdateCoolTime(+RewardVal);
+		break;
+	}
+	
+	//todo Info 띄우기 	CurseRewardDatas[RandomReward]->Info;
+	SCREENLOG("%s", *CurseRewardDatas[RandomReward]->Info);
+	JIWONLOG("%s", *CurseRewardDatas[RandomReward]->Info);
 	
 	HideSelectUI();
 	bIsUsed = true;
