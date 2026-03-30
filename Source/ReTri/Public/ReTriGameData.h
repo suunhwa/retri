@@ -28,6 +28,8 @@ struct FPlayerStats
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float CoolTime = 1;			// 기억 가속 (쿨타임) 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float FireDamage = 1;		// 화염 데미지 계수
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) float CurseMoves = 1;		// 저주 
+	
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<스킬> 인벤토리 스킬;
 };
 
@@ -79,7 +81,7 @@ public:
 	FLootsInfo LootsInfo;
 	
 public:
-	/** --- 개별 통계 Get 함수들 --- */
+	// === GET ===
 	// 기본 재화 및 경험치
 	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
 	int32 GetCurGold() const { return PlayerStats.Gold; }
@@ -96,7 +98,7 @@ public:
 
 	// 전투 스탯
 	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
-	float GetCurAttackPower() const { return PlayerStats.AttackPower; }
+	float GetCurAttackDamage() const { return PlayerStats.AttackPower; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
 	float GetCurAttackSpeed() const { return PlayerStats.AttackSpeed; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
@@ -110,16 +112,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stats|Elemental")
 	float GetCurFireDamage() const { return PlayerStats.FireDamage; }
 	
-	// 스탯 변화 함수
-	UFUNCTION(BlueprintCallable)
-	void UpdateHP(float AmountHP) { PlayerStats.CurrentHP += AmountHP; }
-	UFUNCTION(BlueprintCallable)
-	void UpdateGold(int32 AmountGold) { PlayerStats.Gold += AmountGold; }
-	UFUNCTION(BlueprintCallable)
-	void UpdateDreamPowder(int32 AmountDreamPowder) { PlayerStats.DreamPowder += AmountDreamPowder; }
-	UFUNCTION(BlueprintCallable)
-	void UpdateExp(float AmountExp) { PlayerStats.Exp += AmountExp; }
-	
 	// Loot 관련 함수
 	UFUNCTION(BlueprintCallable, Category="LootInfo")
 	int32 GetRandomGold() const { return FMath::RandRange(LootsInfo.MinGold, LootsInfo.MaxGold); }
@@ -129,6 +121,34 @@ public:
 	int32 GetMaxGold() const { return LootsInfo.MaxGold; }
 	UFUNCTION(BlueprintCallable, Category="LootInfo")
 	int32 GetMaxDreamPowder() const { return LootsInfo.MaxDreamPowder; }
+	
+	// === SET ===
+	// 기본 재화 및 경험치, 체력 
+	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
+	void UpdateGold(int32 AmountGold) { PlayerStats.Gold += AmountGold; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
+	void UpdateDreamPowder(int32 AmountDreamPowder) { PlayerStats.DreamPowder += AmountDreamPowder; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
+	void UpdateExp(float AmountExp) { PlayerStats.Exp += AmountExp; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Stats|Health")
+	void UpdateHP(float AmountHP) { PlayerStats.CurrentHP += AmountHP; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Health")
+	void UpdateMaxHP(float AmountHP) { PlayerStats.MaxHP += AmountHP; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
+	void UpdateAttackDamage(float Amount) { PlayerStats.AttackPower += Amount; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
+	void UpdateAttackSpeed(float Amount) { PlayerStats.AttackSpeed += Amount; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
+	void UpdateAbilityPower(float Amount) { PlayerStats.AbilityPower += Amount; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Stats|Utility")
+	void UpdateMoveSpeed(float Amount) { PlayerStats.MoveSpeed += Amount; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Utility")
+	void UpdateCoolTime(float Amount) { PlayerStats.CoolTime += Amount; }
+	UFUNCTION(BlueprintCallable, Category = "Stats|Elemental")
+	void UpdateFireDamage(float Amount) { PlayerStats.FireDamage += Amount; }
 	
 	void DebugStat() const
 	{

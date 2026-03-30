@@ -31,7 +31,7 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-		GI->GameData->PlayerStats.DreamPowder += GI->GameData->GetRandomDreamPowder();
+		GI->GameData->UpdateDreamPowder(+GI->GameData->GetRandomDreamPowder());
 		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.DreamPowder += GI->GameData->GetRandomDreamPowder();
 		
 		GI->GameData->DebugStat();

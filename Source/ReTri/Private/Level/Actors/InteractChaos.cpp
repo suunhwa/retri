@@ -45,8 +45,9 @@ void AInteractChaos::Interact_Implementation()
 	for (int i = 0; i < 3; i++)
 	{
 		PickedChaoses.Add(AllChaos[i]);
+
 		FStringFormatOrderedArguments Args;
-		Args.Add(AllChaos[i]->ChaosValues[AllChaos[i]->ChaosLevel]); // 배열의 값을 컨테이너에 넣기
+		Args.Add(FMath::TruncToInt(AllChaos[i]->ChaosValues[AllChaos[i]->ChaosLevel]));
 		FString Info = FString::Format(*AllChaos[i]->ChaosInfo, Args);
 		USelectButtonUI* Button = SelectUIInstance->AddButton(AllChaos[i]->ChaosName, Info, i);
 		Button->OnSelectClicked.AddDynamic(this, &AInteractChaos::OnChaosSelected);
@@ -58,8 +59,32 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	FChaosData* ChaosData = PickedChaoses[Index];
 	JIWONLOG("선택된 저주: %s", *ChaosData->ChaosName);
 	
+	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	
+	float Val = ChaosData->ChaosValues[ChaosData->ChaosLevel++];
 	// todo: MyPlayer에게 Chaos 효과 적용
+	switch (ChaosData->ChaosType)
+	{
+	case EChaosType::Chaos_Health:
+		GI->GameData->UpdateHP(+Val);
+		break;
+	case EChaosType::Chaos_AttackDamage:
+		GI->GameData->UpdateAttackDamage(+Val);
+		break;
+	case EChaosType::Chaos_AbilityPower:
+		GI->GameData->UpdateAbilityPower(+Val);
+		break;
+	case EChaosType::Chaos_AttackSpeed:
+		Val = GI->GameData->GetCurAttackSpeed() * (Val - 1.0f);
+		GI->GameData->UpdateAttackSpeed(+Val);
+		break;
+	case EChaosType::Chaos_MemoryHaste:
+		GI->GameData->UpdateCoolTime(+Val);
+		break;
+	}
 
+	GI->GameData->DebugStat();
+	
 	HideSelectUI();
 	bIsUsed = true;
 	// todo InteractableData->IsUsed = true;

@@ -33,9 +33,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "MapUI")
 	TSubclassOf<UMapLineDrawer> MapLineClass;
-	
-	//UPROPERTY()
-	//TArray<UMapNode*> NodeWidgets;
 };
 
 
