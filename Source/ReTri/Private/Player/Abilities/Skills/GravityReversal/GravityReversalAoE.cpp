@@ -79,6 +79,9 @@ void AGravityReversalAoE::ApplyLift()
 	{
 		if (!Actor || Actor == GetOwner()) continue;
 
+		AEnemyBase* Enemy = Cast<AEnemyBase>(Actor);
+		if (!Enemy && Enemy->bIsBoss) continue;
+		
 		ACharacter* EnemyChar = Cast<ACharacter>(Actor);
 		if (!EnemyChar) continue;
 
