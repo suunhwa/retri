@@ -34,6 +34,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = EnemySetup)
 	UDataTable* StatDataTable;
 	
+	FEnemyDataTableRow* MyStatInfo;
+	
 	// 이름 (노말or보스)
 	UPROPERTY(EditDefaultsOnly, Category = EnemySetup)
 	FName EnemyRowName;
@@ -70,6 +72,10 @@ public:
 	
 	// 이미 누군가를 때렸는지
 	bool bHasHitTarget = false;
+	
+	// 바라보면서 회전할지 여부
+	UPROPERTY(BlueprintReadWrite, Category = "Boss")
+	bool bCanRotate = true;
 
 public:
 	// 공격 시작 시 호출
@@ -92,8 +98,10 @@ public:
 public:
 	void StartCharging(AActor* NewTarget);	// Task에서 호출할 함수
 	void StopCharging();					// 차징 스탑! (돌진 직전에 호출)
+	void RotateToTarget(float DeltaTime, float InterpSpeed);	// 플레이어 바라보는 함수
 	
-	protected:
+	
+protected:
 	virtual void UpdatePhase() { }
 	
 };

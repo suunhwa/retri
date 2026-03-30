@@ -25,7 +25,7 @@ void AEnemyBase::BeginPlay()
 	if (StatDataTable != nullptr && !EnemyRowName.IsNone())
 	{
 		// 엑셀에서 이름과 일치하는 줄 가져오기
-		FEnemyDataTableRow* MyStatInfo = StatDataTable->FindRow<FEnemyDataTableRow>(EnemyRowName, TEXT("Enemy Row Name"));
+		MyStatInfo = StatDataTable->FindRow<FEnemyDataTableRow>(EnemyRowName, TEXT("Enemy Row Name"));
 		
 		// 데이터를 찾았다면 내 몸에 적용
 		if (MyStatInfo != nullptr)
@@ -71,19 +71,11 @@ void AEnemyBase::Tick(float DeltaTime)
 		{
 			PlayAnimMontage(ChargeMontage, 1.0f);
 		}
-		
-		// 보스 위치 -> 플레이어 위치로 향하는 방향 벡터를 구하고, Z는 0
-		FVector LookDir = TargetActor->GetActorLocation() - GetActorLocation();
-		LookDir.Z = 0.0f; 
-
-		// 구한 방향을 회전값으로
-		FRotator TargetRot = LookDir.Rotation();
-
-		// 현재 회전에서 목표 회전까지 부드럽게 보간
-		// IntterpSpeed = 회전속도
-		FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, 10.0f);
-        
-		SetActorRotation(NewRot);
+	}
+	
+	if (bCanRotate)
+	{
+		RotateToTarget(DeltaTime, 10.0f);
 	}
 
 }
@@ -151,4 +143,22 @@ void AEnemyBase::StopCharging()
 {
 	bIsCharging = false;
 	TargetActor = nullptr;
+}
+
+void AEnemyBase::RotateToTarget(float DeltaTime, float InterpSpeed)
+{
+	if (!TargetActor) return; // 타겟이 없으면 중단
+
+	// 보스 위치 -> 플레이어 위치로 향하는 방향 벡터를 구하고, Z는 0
+	FVector LookDir = TargetActor->GetActorLocation() - GetActorLocation();
+	LookDir.Z = 0.0f; 
+
+	// 구한 방향을 회전값으로
+	FRotator TargetRot = LookDir.Rotation();
+
+	// 현재 회전에서 목표 회전까지 부드럽게 보간
+	// IntterpSpeed = 회전속도
+	FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, InterpSpeed);
+        
+	SetActorRotation(NewRot);
 }

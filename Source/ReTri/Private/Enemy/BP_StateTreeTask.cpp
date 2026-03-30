@@ -198,6 +198,7 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 		if (Boss->GetCurrentMontage() == nullptr)
 		{
 			SkillWaitTime += DeltaTime;
+			
 			if (SkillWaitTime < 1.5f)
 			{
 				return  EStateTreeRunStatus::Running;
@@ -205,6 +206,7 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 			
 			//UE_LOG(LogTemp, Warning, TEXT("공격 끗"))
 			SkillWaitTime = 0.0f;
+			Boss->RotateToTarget(DeltaTime, 3.0f);
 			return EStateTreeRunStatus::Succeeded;
 		}
 	}

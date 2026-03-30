@@ -46,6 +46,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic)
 	float BasicAttackCoolDown = 0.f;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
+	class UAnimMontage* MinionAttackMontage = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StatBasic)
 	float BossPhase2 = 0.f;
 	
