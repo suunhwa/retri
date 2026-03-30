@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/EnemyBase.h"
-
 #include "Minion.generated.h"
 
 /**
@@ -31,8 +30,32 @@ protected:
 	bool bIsAttacking = false;
 	
 	
+	
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSM)
+	class UMyMinionFSM* FSM;
+	
+	
+	
 protected:
 	void CheckDistanceAndMove(float DeltaTime);
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
+public:
+	FEnemyDataTableRow* GetStatInfo() { return MyStatInfo; }
+	
+	void PlayMontage(UAnimMontage* MontageToPlay);
+
+private:
+	// 맞았을 때 색 변경
+	void FlashRed();
+	FTimerHandle FlashTimer;
+	
+	
+	
+	
+	
+	
 	
 	
 };
