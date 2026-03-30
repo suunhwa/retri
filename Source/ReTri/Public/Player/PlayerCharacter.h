@@ -126,6 +126,14 @@ private:
 public:
 	UPROPERTY(EditAnywhere, Category="Combat|Left")
 	int32 AttackCount = 0;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	bool bIsCombat = false;
+	
+	UPROPERTY(EditAnywhere, Category="Combat")
+	float CombatExitDelay = 2.0f;
+
+	float LastCombatTime = -100.f;
 
 	UPROPERTY(EditAnywhere, Category="Combat|Left")
 	float EnhancedShotMultiplier = 2.0f;
@@ -141,6 +149,7 @@ private:
 	// Input Handlers
 	void OnMove(const struct FInputActionValue& inputValue);
 	void OnDash(const struct FInputActionValue& inputValue);
+	void EnterCombat();
 	void OnAttack(const struct FInputActionValue& inputValue);
 	void ResetAttack();
 	void OnTravelerMemory1(const struct FInputActionValue& inputValue);

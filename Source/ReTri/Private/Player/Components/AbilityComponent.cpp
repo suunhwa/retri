@@ -44,6 +44,13 @@ bool UAbilityComponent::TryActivate(EAbilitySlot Slot)
 {
 	UAbilityBase* Ability = GetAbility(Slot);
 	if (!Ability) return false;
+	/*if (!Ability)
+	{
+		UE_LOG(LogTemp, Error, TEXT("TryActivate FAILED: Slot %d not registered"), (int32)Slot);
+		return false;
+	}*/
+	
+	// UE_LOG(LogTemp, Warning, TEXT("RegisterAbility SUCCESS: Slot %d"), (int32)Slot);
 	
 	ACharacter* OwnerChar = Cast<ACharacter>(GetOwner());
 	return Ability->TryActivate(OwnerChar);

@@ -56,8 +56,8 @@ APlayerCharacter::APlayerCharacter()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	SpringArmComp->SetRelativeRotation(FRotator(-50.f, 0.f, 0.f));
-	SpringArmComp->TargetArmLength = 1500.f;   
+	SpringArmComp->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+	SpringArmComp->TargetArmLength = 2700.f;   
 	SpringArmComp->bUsePawnControlRotation = false; // 카메라 고정
 	SpringArmComp->bInheritPitch = false;
 	SpringArmComp->bInheritYaw = false;
@@ -156,6 +156,15 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (bIsCombat)
+	{
+		const float CurrentTime = GetWorld()->GetTimeSeconds();
+		if (CurrentTime - LastCombatTime >= CombatExitDelay)
+		{
+			bIsCombat = false;
+		}
+	}
 
 	/*// 항상 마우스 커서 방향을 바라봄
 	AReTriPlayerController* PC = Cast<AReTriPlayerController>(Controller);
@@ -211,9 +220,17 @@ void APlayerCharacter::OnMove(const struct FInputActionValue& inputValue)
 	AddMovementInput(FVector::RightVector, value.Y);
 }
 
+void APlayerCharacter::EnterCombat()
+{
+	bIsCombat = true;
+	LastCombatTime = GetWorld()->GetTimeSeconds();
+}
+
 void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 {
 	if (!bCanAttack) return;
+	EnterCombat();
+	
 	// UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
 	
 	// 클릭한 위치 방향 계산
@@ -316,21 +333,29 @@ void APlayerCharacter::ResetAttack()
 
 void APlayerCharacter::OnTravelerMemory1(const struct FInputActionValue& inputValue)
 {
+	UE_LOG(LogTemp, Warning, TEXT("RMB pressed"));
+	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::TravelerMemory1);
 }
 
 void APlayerCharacter::OnSkillQ(const struct FInputActionValue& inputValue)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Q pressed"));
+	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::SkillQ);
 }
 
 void APlayerCharacter::OnSkillE(const struct FInputActionValue& inputValue)
 {
+	UE_LOG(LogTemp, Warning, TEXT("E pressed"));
+	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::SkillE);
 }
 
 void APlayerCharacter::OnTravelerMemory2(const struct FInputActionValue& inputValue)
 {
+	UE_LOG(LogTemp, Warning, TEXT("R pressed"));
+	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::TravelerMemory2);
 }
 
