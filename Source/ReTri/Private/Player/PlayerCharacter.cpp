@@ -128,6 +128,12 @@ APlayerCharacter::APlayerCharacter()
 	{
 		imc_Player = TempIMC.Object;
 	}
+	
+	HPBarComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarComp"));
+	HPBarComp->SetupAttachment(GetMesh());
+	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 250.f)); // 머리 위 높이 조절
+	HPBarComp->SetWidgetSpace(EWidgetSpace::World); // 항상 카메라 향함
+	HPBarComp->SetDrawSize(FVector2D(150.f, 20.f));  // 크기 조절
 }
 
 // Called when the game starts or when spawned
@@ -138,15 +144,9 @@ void APlayerCharacter::BeginPlay()
 	// OnDeath 델리게이트 바인딩
 	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
 	
-	// HUD 위젯 생성 및 Delegate 구독
-	if (HPWidgetClass)
+	if (UHPBar* HPWidget = Cast<UHPBar>(HPBarComp->GetUserWidgetObject()))
 	{
-		HPWidget = CreateWidget<UHPBar>(GetWorld(), HPWidgetClass);
-		if (HPWidget)
-		{
-			HPWidget->AddToViewport();
-			HealthComp->OnHPChanged.AddDynamic(HPWidget, &UHPBar::OnHPChanged);
-		}
+		HealthComp->OnHPChanged.AddDynamic(HPWidget, &UHPBar::OnHPChanged);
 	}
 	
 	// GD->DebugStat();

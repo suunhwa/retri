@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "UI/HPBar.h"
 #include "PlayerCharacter.generated.h"
@@ -179,10 +180,6 @@ public:
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UReTriGameData* GD;*/
 	
-	UPROPERTY(EditDefaultsOnly, Category="UI")
-	TSubclassOf<UHPBar> HPWidgetClass;
-
-private:
-	UPROPERTY()
-	TObjectPtr<UHPBar> HPWidget;
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UWidgetComponent> HPBarComp;
 };
