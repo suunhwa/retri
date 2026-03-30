@@ -34,7 +34,7 @@ void APillarOfFireAoE::BeginPlay()
 	HitVolume->SetCapsuleSize(HitRadius, 200.f);
 
 	// 디버그 범위 표시 (주황색, DoTDuration 동안 유지)
-	DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 200), HitRadius, 32, FColor::Orange, false, DoTDuration);
+	// DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 200), HitRadius, 32, FColor::Orange, false, DoTDuration);
 
 	// 이펙트 재생
 	if (FireEffect)

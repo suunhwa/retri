@@ -34,7 +34,7 @@ void AGravityReversalAoE::BeginPlay()
 	HitVolume->SetCapsuleSize(HitRadius, 200.f);
 
 	// 디버그 범위 표시 (파란색, LiftDuration 동안 유지)
-	DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 200), HitRadius, 32, FColor::Blue, false, LiftDuration);
+	// DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 200), HitRadius, 32, FColor::Blue, false, LiftDuration);
 
 	if (GravityEffect)
 	{

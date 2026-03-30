@@ -21,7 +21,8 @@ AHandCannonBullet::AHandCannonBullet()
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel6);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	CollisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap); // dark moon
+	CollisionComp->SetGenerateOverlapEvents(true);
 	RootComponent = CollisionComp;
 	
 	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
@@ -34,7 +35,7 @@ AHandCannonBullet::AHandCannonBullet()
 	MoveComp->MaxSpeed = 1000.f;
 	MoveComp->bRotationFollowsVelocity = true;
 	MoveComp->ProjectileGravityScale = 0.f;
-	MoveComp->bSweepCollision = true;
+	MoveComp->bSweepCollision = false;
 	
 	// trail
 	TrailComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailComp"));

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/ReTriPlayerController.h"
 #include "Player/Components/StatComponent.h"
@@ -54,7 +55,15 @@ void UPillarOfFireSkill::Activate(ACharacter* Owner)
 
 	if (CastEffect)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(Owner->GetWorld(), CastEffect, TargetPoint);
+		if (UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(Owner->GetWorld(), CastEffect, TargetPoint))
+		{
+			NC->SetAutoDestroy(true);
+			FTimerHandle TimerHandle;
+			Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [NC]()
+			{
+				if (NC) NC->DeactivateImmediate();
+			}, EffectDuration, false);
+		}
 	}
 
 	if (CastSound)
