@@ -167,8 +167,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Interaction();
 	
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	// class UReTriGameData* GD;
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UReTriGameData* GD;*/
 	
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<UHPBar> HPWidgetClass;

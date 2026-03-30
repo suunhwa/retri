@@ -432,6 +432,8 @@ void APlayerCharacter::Interaction()
 			
 			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 			GI->GameData->DebugStat();
+			
+			// GD->DebugStat();
 		}
 	}
 }
