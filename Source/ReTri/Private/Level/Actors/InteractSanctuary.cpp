@@ -4,9 +4,7 @@
 #include "Level/Actors/InteractSanctuary.h"
 
 #include "ReTriGameData.h"
-#include "Level/Actors/NZW_TestPlayer.h"
-
-#include "Components/CapsuleComponent.h"
+#include "ReTriGameInstance.h"
 
 
 void AInteractSanctuary::BeginPlay()
@@ -18,16 +16,17 @@ void AInteractSanctuary::BeginPlay()
 
 void AInteractSanctuary::Interact_Implementation()
 {
-	Super::Interact_Implementation();
-	
+	// Super::Interact_Implementation();
 	if (!MyPlayer) return;
 	
 	// todo 플레이어 골드 뺏고 
 	// todo 플레이어 회복
 	
-	// if (MyPlayer->GD->GetGold() <= Cost) return;
-	// MyPlayer->GD->UpdateGold(-Cost);
-	// MyPlayer->GD->UpdateHP(+HealHP);
+	auto GI = Cast<UReTriGameInstance>(GetGameInstance());
+	if (GI->GameData->GetCurGold() < Cost) return;
+	GI->GameData->UpdateGold(-Cost);
+	GI->GameData->UpdateHP(+HealHP);
 	
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractName);
+	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	Super::Interact_Implementation();
 }

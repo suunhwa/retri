@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "ReTri/ReTri.h"
 #include "ReTriGameData.generated.h"
 
-// 다음 맵으로 넘길 Struct
+//! PlayerStats 
 USTRUCT(BlueprintType)
 struct FPlayerStats
 {
@@ -30,6 +31,24 @@ struct FPlayerStats
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite) TArray<스킬> 인벤토리 스킬;
 };
 
+//! Loot Info 
+USTRUCT(BlueprintType)
+struct FLootsInfo
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MinGold = 20;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxGold = 100;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MinDreamPowder = 20;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxDreamPowder = 100;
+};
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class RETRI_API UReTriGameData : public UActorComponent
 {
@@ -47,43 +66,49 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	//! Stat 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FPlayerStats PlayerStats;
-	
 	UFUNCTION(BlueprintCallable)
 	FPlayerStats GetPlayerStats() { return PlayerStats; }
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerStats(FPlayerStats CurStats) { PlayerStats = CurStats; }
+	
+	//! Loot
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLootsInfo LootsInfo;
 	
 public:
 	/** --- 개별 통계 Get 함수들 --- */
 	// 기본 재화 및 경험치
 	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
-	int32 GetGold() const { return PlayerStats.Gold; }
+	int32 GetCurGold() const { return PlayerStats.Gold; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
-	int32 GetDreamPowder() const { return PlayerStats.DreamPowder; }
+	int32 GetCurDreamPowder() const { return PlayerStats.DreamPowder; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Currency")
-	float GetExp() const { return PlayerStats.Exp; }
+	float GetCurExp() const { return PlayerStats.Exp; }
 
 	// 체력 관련
 	UFUNCTION(BlueprintCallable, Category = "Stats|Health")
 	float GetMaxHP() const { return PlayerStats.MaxHP; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Health")
-	float GetCurrentHP() const { return PlayerStats.CurrentHP; }
+	float GetCurHP() const { return PlayerStats.CurrentHP; }
 
 	// 전투 스탯
 	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
-	float GetAttackPower() const { return PlayerStats.AttackPower; }
+	float GetCurAttackPower() const { return PlayerStats.AttackPower; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
-	float GetAttackSpeed() const { return PlayerStats.AttackSpeed; }
+	float GetCurAttackSpeed() const { return PlayerStats.AttackSpeed; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Combat")
-	float GetAbilityPower() const { return PlayerStats.AbilityPower; }
+	float GetCurAbilityPower() const { return PlayerStats.AbilityPower; }
 
 	// 보조 및 유틸리티
 	UFUNCTION(BlueprintCallable, Category = "Stats|Utility")
-	float GetMoveSpeed() const { return PlayerStats.MoveSpeed; }
+	float GetCurMoveSpeed() const { return PlayerStats.MoveSpeed; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Utility")
-	float GetCoolTime() const { return PlayerStats.CoolTime; }
+	float GetCurCoolTime() const { return PlayerStats.CoolTime; }
 	UFUNCTION(BlueprintCallable, Category = "Stats|Elemental")
-	float GetFireDamage() const { return PlayerStats.FireDamage; }
+	float GetCurFireDamage() const { return PlayerStats.FireDamage; }
 	
 	// 스탯 변화 함수
 	UFUNCTION(BlueprintCallable)
@@ -95,17 +120,27 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateExp(float AmountExp) { PlayerStats.Exp += AmountExp; }
 	
+	// Loot 관련 함수
+	UFUNCTION(BlueprintCallable, Category="LootInfo")
+	int32 GetRandomGold() const { return FMath::RandRange(LootsInfo.MinGold, LootsInfo.MaxGold); }
+	UFUNCTION(BlueprintCallable, Category="LootInfo")
+	int32 GetRandomDreamPowder() const { return FMath::RandRange(LootsInfo.MinDreamPowder, LootsInfo.MaxDreamPowder); }
+	UFUNCTION(BlueprintCallable, Category="LootInfo")
+	int32 GetMaxGold() const { return LootsInfo.MaxGold; }
+	UFUNCTION(BlueprintCallable, Category="LootInfo")
+	int32 GetMaxDreamPowder() const { return LootsInfo.MaxDreamPowder; }
+	
 	void DebugStat() const
 	{
-		UE_LOG(LogTemp, Log, TEXT("==================== Player Stats ===================="));
+		UE_LOG(jiwon, Log, TEXT("==================== Player Stats ===================="));
 		// 기본 스탯
-		UE_LOG(LogTemp, Log, TEXT("[Base Stats] HP: %.2f / AD: %.2f / AP: %.2f"), PlayerStats.CurrentHP, PlayerStats.AttackPower, PlayerStats.AbilityPower);
-		UE_LOG(LogTemp, Log, TEXT("[Base Stats] Gold: %d / DreamPowder: %d / Exp: %.2f"), PlayerStats.Gold, PlayerStats.DreamPowder, PlayerStats.Exp);
+		UE_LOG(jiwon, Log, TEXT("[Base Stats] HP: %.2f / AD: %.2f / AP: %.2f"), PlayerStats.CurrentHP, PlayerStats.AttackPower, PlayerStats.AbilityPower);
+		UE_LOG(jiwon, Log, TEXT("[Base Stats] Gold: %d / DreamPowder: %d / Exp: %.2f"), PlayerStats.Gold, PlayerStats.DreamPowder, PlayerStats.Exp);
 		// 보조 스탯
-		UE_LOG(LogTemp, Log, TEXT("[Secondary Stats] AS: %.2f / CoolTime: %.2f"), PlayerStats.AttackSpeed, PlayerStats.CoolTime);
+		UE_LOG(jiwon, Log, TEXT("[Secondary Stats] AS: %.2f / CoolTime: %.2f"), PlayerStats.AttackSpeed, PlayerStats.CoolTime);
 		// 유틸리티 및 원소 스탯
-		UE_LOG(LogTemp, Log, TEXT("[Utility] MoveSpeed: %.2f"), PlayerStats.MoveSpeed);
-		UE_LOG(LogTemp, Log, TEXT("[Elemental] FireDamage: %.2f"), PlayerStats.FireDamage);
-		UE_LOG(LogTemp, Log, TEXT("======================================================"));
+		UE_LOG(jiwon, Log, TEXT("[Utility] MoveSpeed: %.2f"), PlayerStats.MoveSpeed);
+		UE_LOG(jiwon, Log, TEXT("[Elemental] FireDamage: %.2f"), PlayerStats.FireDamage);
+		UE_LOG(jiwon, Log, TEXT("======================================================"));
 	}
 };

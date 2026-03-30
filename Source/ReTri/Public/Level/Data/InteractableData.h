@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "Engine/Texture2D.h" 
+#include "Templates/SubclassOf.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/Texture2D.h"
 #include "InteractableData.generated.h"
 
+class AInteractableBase;
 
-// -------------------------------------------------------------------
-// [ 상호작용 기물 ]
-// -------------------------------------------------------------------
+// === [ Interaction Info ] ===
 
 UENUM(BlueprintType)
 enum class EInteractableType : uint8
@@ -41,17 +42,67 @@ public:
 	FString Description;
 };
 
-// -------------------------------------------------------------------
-// [ Map 정보 ]
-// -------------------------------------------------------------------
+UENUM(BlueprintType)
+enum class EChaosType : uint8
+{
+	Chaos_Health		UMETA(DisplayName="Chaos_Health"),		// 꺾이지 않는 의지
+	Chaos_AttackDamage	UMETA(DisplayName="Chaos_AttackDamage"),  // 거인의 근력
+	Chaos_AbilityPower	UMETA(DisplayName="Chaos_AbilityPower"),	// 무한한 지식
+	Chaos_AttackSpeed	UMETA(DisplayName="Chaos_AttackSpeed"),   // 맹렬한 분노
+	Chaos_MemoryHaste	UMETA(DisplayName="Chaos_MemoryHaste")	// 기민한 정신
+};
+
+USTRUCT(BlueprintType)
+struct FChaosData : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ChaosName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ChaosInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EChaosType ChaosType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 ChaosLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<float> ChaosValues;
+};
+
+UENUM(BlueprintType)
+enum class ECurseType : uint8
+{
+	Curse_Light		UMETA(DisplayName = "Curse_Light"),   // 미약한 증오
+	Curse_Strong	UMETA(DisplayName = "Curse_Strong"),  // 강력한 증오
+	Curse_Extreme	UMETA(DisplayName = "Curse_Extreme")  // 극렬한 증오
+};
+
+USTRUCT(BlueprintType)
+struct FCurseData : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString CurseName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString CurseInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ECurseType CurseType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor CurseColor;
+};
+
+// === [ Map Info ] ===
 
 UENUM(BlueprintType)
 enum class EMapNodeType : uint8
 {
-	Start		UMETA(DisplayName = "Start"),	// 시작맵
-	Combat		UMETA(DisplayName = "Combat"),  // 전투맵
-	Merchant	UMETA(DisplayName = "Merchant"),// 상점맵
-	Boss		UMETA(DisplayName = "Boss")		// 보스맵
+	Start		UMETA(DisplayName = "Start"),	 // 시작맵
+	Combat		UMETA(DisplayName = "Combat"),   // 전투맵
+	Merchant	UMETA(DisplayName = "Merchant"), // 상점맵
+	Boss		UMETA(DisplayName = "Boss")		 // 보스맵
 };
 
 USTRUCT(BlueprintType)
@@ -64,7 +115,7 @@ public:
 	FName MapName;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* MapIcon;
+	TObjectPtr<UTexture2D> MapIcon;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor IconColor = FLinearColor::White;

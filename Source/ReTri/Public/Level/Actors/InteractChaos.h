@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Level/Actors/InteractableBase.h"
+#include "Level/Data/InteractableData.h"
 #include "InteractChaos.generated.h"
 
 /**
@@ -20,4 +21,13 @@ protected:
 
 public:	
 	virtual void Interact_Implementation() override;
+	
+	UFUNCTION()
+	void OnChaosSelected(int32 Index);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Chaos")
+	UDataTable* ChaosDataTable;
+	
+private:
+	TArray<FChaosData*> PickedChaoses;
 };

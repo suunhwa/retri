@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "ReTri/ReTri.h"
 #include "GameFramework/Actor.h"
-#include "Kismet/GameplayStatics.h"
 #include "LootBase.generated.h"
 
 class UCapsuleComponent;

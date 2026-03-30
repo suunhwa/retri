@@ -2,7 +2,6 @@
 
 
 #include "Level/Actors/LootDreamPowderPillar.h"
-
 #include "Level/Actors/GoodsDreamPowder.h"
 
 ALootDreamPowderPillar::ALootDreamPowderPillar()
@@ -20,5 +19,5 @@ void ALootDreamPowderPillar::Break()
 	GetWorld()->SpawnActor<AGoodsDreamPowder>(GoodsClass, GetActorLocation(), GetActorRotation());
 	
 	// Effect Play
-	UE_LOG(LogTemp, Warning, TEXT("ALootDreamPowderPillar"));
+	UE_LOG(jiwon, Warning, TEXT("ALootDreamPowderPillar"));
 }
