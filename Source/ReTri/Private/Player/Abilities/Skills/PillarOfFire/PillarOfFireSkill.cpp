@@ -30,7 +30,7 @@ void UPillarOfFireSkill::Activate(ACharacter* Owner)
 	float AP = 0.f;
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(Owner))
 	{
-		AP = Player->GetStatComponent()->GetAbilityPower();
+		AP = Player->GetStatComponent()->GetSpellPower();
 	}
 
 	// Init → BeginPlay 순서 보장을 위해 Deferred Spawn 사용

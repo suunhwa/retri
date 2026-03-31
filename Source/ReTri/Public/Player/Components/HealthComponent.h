@@ -54,10 +54,10 @@ public:
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Health", meta=(AllowPrivateAccess="true"))
-	float MaxHP = 100.f;
+	float MaxHP = 220.f;
 	
 	UPROPERTY(EditAnywhere, Category="Health", meta=(AllowPrivateAccess="true"))
-	float CurrentHP = 100.f;
+	float CurrentHP = 0;
 	
 	bool bIsDead = false;
 };

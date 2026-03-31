@@ -56,7 +56,7 @@ void UQuickHandsSkill::Activate(ACharacter* Owner)
 	float BaseDamage = 10.f;
 	if (UStatComponent* StatComp = Player->GetStatComponent())
 	{
-		BaseDamage = StatComp->GetAttackDamage();
+		BaseDamage = StatComp->GetAttackPower();
 	}
 	
 	// 공격 속도로 발사 간격 계산

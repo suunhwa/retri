@@ -18,9 +18,6 @@ USTRUCT(BlueprintType)
 struct RETRI_API FPlayerLevelData : public FTableRowBase
 {
 	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Level = 1;
 
 	// 이 레벨 도달에 필요한 누적 경험치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

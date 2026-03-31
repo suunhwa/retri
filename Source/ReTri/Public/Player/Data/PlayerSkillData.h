@@ -12,6 +12,33 @@
 #include "Engine/DataTable.h"
 #include "PlayerSkillData.generated.h"
 
+/** Active: 입력으로 발동 / Passive: 자동 발동 */
+UENUM(BlueprintType)
+enum class ESkillType : uint8
+{
+	Active  UMETA(DisplayName = "Active"),
+	Passive UMETA(DisplayName = "Passive"),
+};
+
+/** 스킬 분류 (원작 기억 카테고리 기준) */
+UENUM(BlueprintType)
+enum class ESkillCategory : uint8
+{
+	Innate   UMETA(DisplayName = "Innate"),    // 기본 공격 등 기본 내장
+	Identity UMETA(DisplayName = "Identity"),  // 정체성 기억 (패시브)
+	Traveler UMETA(DisplayName = "Traveler"),  // 여행자 기억 (고유 스킬)
+	Acquired UMETA(DisplayName = "Acquired"),  // 공용 기억 (획득 스킬)
+};
+
+/** 쿨다운 방식 */
+UENUM(BlueprintType)
+enum class ESkillCooldownType : uint8
+{
+	Cooldown UMETA(DisplayName = "Cooldown"), // 일반 쿨다운
+	Charge   UMETA(DisplayName = "Charge"),   // 충전식
+	None     UMETA(DisplayName = "None"),     // 패시브 등 쿨다운 없음
+};
+
 USTRUCT(BlueprintType)
 struct RETRI_API FPlayerSkillData : public FTableRowBase
 {
@@ -27,14 +54,13 @@ struct RETRI_API FPlayerSkillData : public FTableRowBase
 	FString SkillNameKR;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString SkillType;
+	ESkillType SkillType = ESkillType::Active;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString SkillCategory;
+	ESkillCategory SkillCategory = ESkillCategory::Innate;
 
-	// "Cooldown": standard cooldown skill / "Charge": charge-based skill (charged by damage dealt) / "None": passive
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString CooldownType;
+	ESkillCooldownType CooldownType = ESkillCooldownType::Cooldown;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Description;
