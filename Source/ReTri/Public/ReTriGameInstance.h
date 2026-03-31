@@ -19,8 +19,17 @@ class RETRI_API UReTriGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	
+	// =========== Player ===============================================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
 	FPlayerStatInfo CurPlayerStats;
+	
+	// 스킬 데이터 (DT_PlayerSkills)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Data")
+	UDataTable* SkillDataTable;
+
+	// 레벨/경험치 데이터 (DT_LevelExp)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Data")
+	UDataTable* LevelDataTable;
 	
 	// todo Player Stat 부분 정리 필
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")

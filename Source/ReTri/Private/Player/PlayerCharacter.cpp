@@ -21,7 +21,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
-#include "ReTriGameData.h"
+// #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
 #include "Level/Actors/InteractableBase.h"
 #include "Kismet/KismetSystemLibrary.h"
