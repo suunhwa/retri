@@ -200,6 +200,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 			}
 			NewNode.SpawnInteractableRowNames = RandomInteractable(RandomNum);
 			
+			
 			// 위치 정해진 위치에서 +- 랜덤 위치 (지터링) RandomRange (-40, 40)
 			float X = StartX + (Depth * XSpacing); 
 			float Y = StartY + (W * YSpacing);

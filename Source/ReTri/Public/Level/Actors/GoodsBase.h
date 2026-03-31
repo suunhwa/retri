@@ -8,6 +8,7 @@
 #include "GoodsBase.generated.h"
 
 class USphereComponent;
+class UFloatingUI;
 
 UCLASS()
 class RETRI_API AGoodsBase : public AActor
@@ -46,4 +47,7 @@ public:
 	float YawRotSpeed = 2000.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RollRotSpeed = 1500.f;
+	
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class AFloatingUIActor> FloatingUIActorClass;
 };

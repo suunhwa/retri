@@ -23,7 +23,7 @@ public:
 	// === Infrastructure (UE Overrides) ===
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-    
+	
 public:
 	// === Configuration (Set by GameInstance) ===
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map|Config")
@@ -44,9 +44,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
 	int32 CurMapIndex = 0;
-
+	
 	// === Public API ===
-	/** 맵 생성 (트리 구조) */
+	/** 맵 생성 (트리 구조) XXXX */
 	UFUNCTION(BlueprintCallable, Category="Map|Generation")
 	void GenerateMap();
 	
@@ -73,6 +73,8 @@ public:
 	// 포탈 설치하는 함수
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SpawnPortal(AActor* TP);
+
+	//todo Spawner get하는 것? 암튼 전투맵 클리어 조건 
 
 	// 금화, 꿈가루 설치하는 함수
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
