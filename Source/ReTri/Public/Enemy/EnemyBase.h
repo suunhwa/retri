@@ -8,6 +8,11 @@
 #include "Components/StateTreeComponent.h"
 #include "EnemyBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMinionDieDelegate);
+
+class UCameraShakeBase;
+class UNIagaraSystem;
+
 UCLASS()
 class RETRI_API AEnemyBase : public ACharacter
 {
@@ -17,6 +22,8 @@ class RETRI_API AEnemyBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AEnemyBase();
+	
+	FMinionDieDelegate OnMinionDieDelegate;
 
 protected:
 	// Called when the game starts or when spawned
@@ -62,6 +69,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
 	class UAnimMontage* ChargeMontage;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
+	class UAnimMontage* DieMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
+	TSubclassOf<class UCameraShakeBase> DeathCameraShake;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
+	class UNiagaraSystem* DeathVFX;
+	
+	
+	
 public:
 	// (1스킬) 차징 상태인지
 	bool bIsCharging = false;
@@ -79,6 +97,10 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = EnemySetup)
 	bool bIsBoss = false;
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDead = false; // 보스 죽었는지 여부
+	
 
 public:
 	// 공격 시작 시 호출
@@ -103,6 +125,8 @@ public:
 	void StopCharging();					// 차징 스탑! (돌진 직전에 호출)
 	void RotateToTarget(float DeltaTime, float InterpSpeed);	// 플레이어 바라보는 함수
 	
+	void PlayDeathEffect();
+	void BroadcastDeath();
 	
 protected:
 	virtual void UpdatePhase() { }

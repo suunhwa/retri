@@ -89,10 +89,16 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 		}
 		else
 		{
-			FSM->_State = EMinionState::Attack;
+			FSM->_State = EMinionState::Attack;	// 나중에 Damage로 바꾸기
 		}
 	}
 	return ActualDamage;
+}
+
+void AMinion::DoRagdoll()
+{
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	GetMesh()->SetSimulatePhysics(true);
 }
 
 void AMinion::FlashRed()

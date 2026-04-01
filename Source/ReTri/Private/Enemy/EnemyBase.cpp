@@ -4,7 +4,9 @@
 #include <Codecapi.h>
 
 #include "AIController.h"
+#include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -115,6 +117,8 @@ void AEnemyBase::OnAttackOverlap(AActor* OtherActor)
 float AEnemyBase::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 	class AController* EventInstigator, AActor* DamageCauser)
 {
+	if (bIsDead) return 0.0f;
+	
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
 	CurrentHP -= ActualDamage;
@@ -122,13 +126,30 @@ float AEnemyBase::TakeDamage(float DamageAmount, struct FDamageEvent const& Dama
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s 적중! 남은 체력: %f"), *EnemyRowName.ToString(), CurrentHP);
 	
-	
-	if (CurrentHP <= 0.0f)
-	{
-		//Die(); // 죽는 함수
-	}
 
 	return ActualDamage;
+}
+
+void AEnemyBase::PlayDeathEffect()
+{
+	if (DeathCameraShake)
+	{
+		APlayerController* pc = GetWorld()->GetFirstPlayerController();
+		if (pc)
+		{
+			pc->ClientStartCameraShake(DeathCameraShake);
+		}
+	}
+	
+	if (DeathVFX)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, GetActorLocation());
+	}
+}
+
+void AEnemyBase::BroadcastDeath()
+{
+	OnMinionDieDelegate.Broadcast();
 }
 
 void AEnemyBase::StartCharging(AActor* NewTarget)

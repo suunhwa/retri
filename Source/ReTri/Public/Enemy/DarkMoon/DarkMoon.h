@@ -39,6 +39,7 @@ protected:
 	void StartBattleEvent();
 	void ReduceBossHP();
 	virtual void UpdatePhase() override;
+	void BossDead();
 	
 public:
 	UFUNCTION()

@@ -130,17 +130,53 @@ float ADarkMoon::TakeDamage(float DamageAmount, struct FDamageEvent const& Damag
 {
 	// EnemyBase 로직 먼저 실행
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	// 보스 전용 아직 싸움 시작 전인데 맞았다면? Battle
+	
+	// 보스 전용, 아직 싸움 시작 전인데 맞았다면? Battle
 	if (!bIsBattleStarted && ActualDamage > 0.0f)
 	{
 		bIsBattleStarted = true;
 		
 		StartBattleEvent(); 
 	}
+	
+	if (CurrentHP <= 0.1f)
+	{
+		BossDead();
+	}
 	return ActualDamage;
 }
 
+void ADarkMoon::BossDead()
+{
+	//if (bIsDead) return;
+	bIsDead = true;
+	
+	PlayDeathEffect();
+	
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.5f);
+	
+	UAnimInstance* Anim = GetMesh()->GetAnimInstance();
+	if (Anim)
+	{
+		Anim->Montage_Stop(0.2f);
+	}
+	
+	AAIController* AIC = Cast<AAIController>(GetController());
+	if (AIC)
+	{
+		AIC->StopMovement();
+		AIC->UnPossess();	// AI 제어권 회수
+	}
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	if (DieMontage)
+	{
+		PlayAnimMontage(DieMontage);
+	}
+	
+}
 
 void ADarkMoon::StartBattleEvent()
 {

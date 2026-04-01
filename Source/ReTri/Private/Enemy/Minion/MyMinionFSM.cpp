@@ -87,7 +87,7 @@ void UMyMinionFSM::MoveState()
 	FVector Dir = PlayerTarget->GetActorLocation() - Me->GetActorLocation();
 	
 	float Distance = Dir.Size();
-	DrawDebugSphere(GetWorld(), Me->GetActorLocation(), AttackRange, 20, FColor::Cyan);
+	//DrawDebugSphere(GetWorld(), Me->GetActorLocation(), AttackRange, 20, FColor::Cyan);
 	
 	if (Distance <= AttackRange)
 	{
@@ -135,10 +135,11 @@ void UMyMinionFSM::DamageState()
 void UMyMinionFSM::DieState()
 {
 	if (bIsDead) return;
-	
+		
 	bIsDead = true;
 	AIC->StopMovement();
 	
+	Me->BroadcastDeath();
 	Me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Me->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
