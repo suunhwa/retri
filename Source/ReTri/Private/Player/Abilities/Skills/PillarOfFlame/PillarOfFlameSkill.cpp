@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Abilities/Skills/PillarOfFire/PillarOfFireSkill.h"
+#include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameSkill.h"
 
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -10,14 +10,14 @@
 #include "Player/PlayerCharacter.h"
 #include "Player/ReTriPlayerController.h"
 #include "Player/Components/StatComponent.h"
-#include "Player/Abilities/Skills/PillarOfFire/PillarOfFireAoE.h"
+#include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameAoE.h"
 
-UPillarOfFireSkill::UPillarOfFireSkill()
+UPillarOfFlameSkill::UPillarOfFlameSkill()
 {
 	Cooldown = 11.f;
 }
 
-void UPillarOfFireSkill::Activate(ACharacter* Owner)
+void UPillarOfFlameSkill::Activate(ACharacter* Owner)
 {
 	AReTriPlayerController* PC = Cast<AReTriPlayerController>(Owner->GetController());
 	if (!PC) return;
@@ -39,7 +39,7 @@ void UPillarOfFireSkill::Activate(ACharacter* Owner)
 		FVector(TargetPoint.X, TargetPoint.Y, Owner->GetActorLocation().Z)
 	);
 
-	APillarOfFireAoE* Pillar = Owner->GetWorld()->SpawnActorDeferred<APillarOfFireAoE>(
+	APillarOfFlameAoE* Pillar = Owner->GetWorld()->SpawnActorDeferred<APillarOfFlameAoE>(
 		PillarAoEClass,
 		SpawnTransform,
 		Owner,

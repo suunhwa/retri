@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Abilities/Skills/GravityReversal/GravityReversalSkill.h"
+#include "Player/Abilities/Skills/AntiGravity/AntiGravitySkill.h"
 
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -10,14 +10,14 @@
 #include "Player/PlayerCharacter.h"
 #include "Player/ReTriPlayerController.h"
 #include "Player/Components/StatComponent.h"
-#include "Player/Abilities/Skills/GravityReversal/GravityReversalAoE.h"
+#include "Player/Abilities/Skills/AntiGravity/AntiGravityAOE.h"
 
-UGravityReversalSkill::UGravityReversalSkill()
+UAntiGravitySkill::UAntiGravitySkill()
 {
 	Cooldown = 14.f;
 }
 
-void UGravityReversalSkill::Activate(ACharacter* Owner)
+void UAntiGravitySkill::Activate(ACharacter* Owner)
 {
 	AReTriPlayerController* PC = Cast<AReTriPlayerController>(Owner->GetController());
 	if (!PC) return;
@@ -25,7 +25,7 @@ void UGravityReversalSkill::Activate(ACharacter* Owner)
 	FVector TargetPoint;
 	if (!PC->GetMouseWorldPosition(TargetPoint)) return;
 
-	if (!GravityReversalAoEClass) return;
+	if (!AntiGravityAoEClass) return;
 
 	float AP = 0.f;
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(Owner))
@@ -39,18 +39,18 @@ void UGravityReversalSkill::Activate(ACharacter* Owner)
 		FVector(TargetPoint.X, TargetPoint.Y, Owner->GetActorLocation().Z)
 	);
 
-	AGravityReversalAoE* GravityReversal = Owner->GetWorld()->SpawnActorDeferred<AGravityReversalAoE>(
-		GravityReversalAoEClass,
+	AAntiGravityAOE* AntiGravity = Owner->GetWorld()->SpawnActorDeferred<AAntiGravityAOE>(
+		AntiGravityAoEClass,
 		SpawnTransform,
 		Owner,
 		Owner,
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
 
-	if (GravityReversal)
+	if (AntiGravity)
 	{
-		GravityReversal->Init(AP, Owner->GetController());
-		UGameplayStatics::FinishSpawningActor(GravityReversal, SpawnTransform);
+		AntiGravity->Init(AP, Owner->GetController());
+		UGameplayStatics::FinishSpawningActor(AntiGravity, SpawnTransform);
 	}
 
 	if (CastEffect)

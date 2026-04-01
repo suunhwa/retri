@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Abilities/Skills/GravityReversal/GravityReversalAoE.h"
+#include "Player/Abilities/Skills/AntiGravity/AntiGravityAOE.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyBase.h"
@@ -11,7 +11,7 @@
 #include "NiagaraComponent.h"
 #include "TimerManager.h"
 
-AGravityReversalAoE::AGravityReversalAoE()
+AAntiGravityAOE::AAntiGravityAOE()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -27,7 +27,7 @@ AGravityReversalAoE::AGravityReversalAoE()
 	GravityEffect->SetAutoActivate(false);
 }
 
-void AGravityReversalAoE::BeginPlay()
+void AAntiGravityAOE::BeginPlay()
 {
 	Super::BeginPlay();
 	
@@ -46,7 +46,7 @@ void AGravityReversalAoE::BeginPlay()
 	// LiftDuration 후 착지 피해
 	GetWorldTimerManager().SetTimer(
 		LandingTimerHandle,
-		this, &AGravityReversalAoE::ApplyLandingDamage,
+		this, &AAntiGravityAOE::ApplyLandingDamage,
 		LiftDuration, false
 	);
 
@@ -54,13 +54,13 @@ void AGravityReversalAoE::BeginPlay()
 	SetLifeSpan(LiftDuration + 0.5f);
 }
 
-void AGravityReversalAoE::Init(float InAbilityPower, AController* InInstigator)
+void AAntiGravityAOE::Init(float InAbilityPower, AController* InInstigator)
 {
 	AbilityPower = InAbilityPower;
 	InstigatorController = InInstigator;
 }
 
-void AGravityReversalAoE::ApplyLift()
+void AAntiGravityAOE::ApplyLift()
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
@@ -103,7 +103,7 @@ void AGravityReversalAoE::ApplyLift()
 	}
 }
 
-void AGravityReversalAoE::ApplyLandingDamage()
+void AAntiGravityAOE::ApplyLandingDamage()
 {
 	const float LandingDamage = AbilityPower * LandingDamageCoeff;
 
