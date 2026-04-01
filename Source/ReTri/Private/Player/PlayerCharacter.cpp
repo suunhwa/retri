@@ -132,9 +132,9 @@ APlayerCharacter::APlayerCharacter()
 	
 	HPBarComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarComp"));
 	HPBarComp->SetupAttachment(GetMesh());
-	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 250.f)); // 머리 위 높이 조절
-	HPBarComp->SetWidgetSpace(EWidgetSpace::World); // 항상 카메라 향함
-	HPBarComp->SetDrawSize(FVector2D(150.f, 20.f));  // 크기 조절
+	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 300.f)); // 머리 위 높이 조절
+	HPBarComp->SetWidgetSpace(EWidgetSpace::Screen); // 항상 카메라 향함
+	HPBarComp->SetDrawSize(FVector2D(100.f, 15.f));  // 크기 조절
 }
 
 // Called when the game starts or when spawned
@@ -154,11 +154,18 @@ void APlayerCharacter::BeginPlay()
 	
 	// OnDeath 델리게이트 바인딩
 	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
-	
+	HPBarComp->InitWidget();
 	if (UHPBar* HPWidget = Cast<UHPBar>(HPBarComp->GetUserWidgetObject()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("[HPBar] 위젯 바인딩 성공"));
 		HealthComp->OnHPChanged.AddDynamic(HPWidget, &UHPBar::OnHPChanged);
+		HPWidget->OnHPChanged(HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[HPBar] 위젯 바인딩 실패 - Widget Class 할당 확인"));
+	}
+	
 	/*// ExpBar 생성 
 	if (ExpBarWidgetClass)
 	{

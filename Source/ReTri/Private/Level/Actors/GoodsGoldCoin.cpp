@@ -39,11 +39,11 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 		GI->GameData->UpdateGold(+GI->GameData->GetRandomGold());
 		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.CurGold += GI->GameData->GetRandomGold();
 
-		if (GI && GI->StatComp)
-		{
-			const int32 Amount = GI->GameData->GetRandomGold();
-			GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
-		}
+		if (!GI || !GI->StatComp) return;
+		
+		const int32 CurrGold = GI->GameData->GetRandomGold();
+		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, CurrGold);
+		
 		
 		if (FloatingUIActorClass)
 		{
