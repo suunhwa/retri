@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 
 #include "Level/Data/InteractableData.h"
+#include "ReTri/ReTri.h"
 #include "MapSubSystem.generated.h"
 
 class AActor;
@@ -47,7 +48,11 @@ public:
 	
 	/** 현재 맵 정보 */
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
-	FMapNodeData GetCurMapData() { return CurMapDatas[CurMapIndex]; }
+	FMapNodeData GetCurMapData()
+	{
+		SCREENLOG("Y? %d", CurMapIndex);
+		return CurMapDatas[CurMapIndex];
+	}
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
 	int32 EnemySpawnerCount = 0;
@@ -65,7 +70,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Map|Flow")
 	void EnterMap(int32 MapIndex);
 	
-
 	// === Helpers / Utilities ===
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
 	TMap<FName, bool> RandomInteractable(int32 RandomNum);
@@ -74,6 +78,10 @@ public:
 	FInteractableData GetRowInteractionData(FName RowName, bool& bSuccess); 
 	
 	// === Level Setting API? ===
+	/** 절차적 맵 생성 (그리드 형태) */
+	UFUNCTION(BlueprintCallable, Category="Map|State")
+	void SetInteractableUsed(FName InRowName);
+	
 	/** Interactable 설치하는 함수 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SpawnInteractable(TArray<AActor*> TargetPoints);

@@ -35,22 +35,14 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 
-		int32 CurGold = GI->GameData->GetRandomDreamPowder();
-		GI->GameData->UpdateGold(+GI->GameData->GetRandomGold());
-		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.CurGold += GI->GameData->GetRandomGold();
-
-		if (GI && GI->StatComp)
-		{
-			const int32 Amount = GI->GameData->GetRandomGold();
-			GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
-		}
+		if (!GI || !GI->StatComp) return;
+		const int32 Amount = GI->GameData->GetRandomGold();
+		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
 		
-		if (FloatingUIActorClass)
-		{
-			AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
-			FString TempStr = FString::Printf(TEXT("골드 +%d"), CurGold);
-			FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
-		}
+		if (!FloatingUIActorClass) return;
+		AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
+		FString TempStr = FString::Printf(TEXT("골드 +%d"), Amount);
+		FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
 		
 		GI->GameData->DebugStat();
 		Destroy();

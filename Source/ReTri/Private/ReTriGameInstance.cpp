@@ -6,7 +6,6 @@
 #include "MapSubSystem.h"
 #include "ReTriGameData.h"
 
-
 void UReTriGameInstance::Init()
 {
 	Super::Init();

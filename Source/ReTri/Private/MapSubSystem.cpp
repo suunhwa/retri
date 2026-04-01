@@ -359,21 +359,20 @@ void UMapSubSystem::EnterMap(int32 MapIndex)
 TMap<FName, bool> UMapSubSystem::RandomInteractable(int32 RandomNum)
 {
 	TArray<FName> RowNames = InteractionData->GetRowNames();
-	RowNames.Remove("Portal");
+	RowNames.Remove("Portal"); // 포탈은 제외
 	
 	TMap<FName, bool> RandomNames;
 	
-	int32 MinCount = FMath::Min(RandomNum, RowNames.Num());
-	
+	int32 Count = FMath::Min(RandomNum, RowNames.Num());
 	if (RowNames.Num() > 0)
 	{
-		while (RandomNum != 0)
+		while (Count != 0)
 		{
 			int32 R = FMath::RandRange(0, RowNames.Num() - 1);
 			if (RandomNames.Contains(RowNames[R])) continue;
 			
 			RandomNames.Add(RowNames[R], false);
-			RandomNum--;
+			Count--;
 			
 			FString RowName = RowNames[R].ToString();
 			UE_LOG(jiwon, Display, TEXT("Interact Name: %s"), *RowName);
@@ -406,6 +405,18 @@ FInteractableData UMapSubSystem::GetRowInteractionData(FName RowName, bool& bSuc
 }
 
 // === Level Setting API? ===
+void UMapSubSystem::SetInteractableUsed(FName InRowName)
+{
+	if (CurMapDatas.IsValidIndex(CurMapIndex))
+	{
+		if (CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Contains(InRowName))
+		{
+			CurMapDatas[CurMapIndex].SpawnInteractableRowNames[InRowName] = true;
+			JIWONLOG("기물 [%s] 사용 완료! 맵에 상태 저장됨.", *InRowName.ToString());
+		}
+	}
+}
+
 void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 {
 	// todo 이미 상호작용한 기물에 대한 업데이트 -> 기물 정보..
@@ -427,14 +438,24 @@ void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 		
 		AInteractableBase* I = GetWorld()->SpawnActor<AInteractableBase>(
 			IData.InteractableClass, 
-			// TargetPoints[i]->GetActorLocation(), 
-			// TargetPoints[i]->GetActorRotation()
 			TPs[i]->GetActorLocation(), 
 			TPs[i]->GetActorRotation()
 		);
 		
-		I->SetIsUsed(*CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Find(RowNames[i]));
-		I->DataInit(IData);
+		bool* bIsUsedPtr = CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Find(RowNames[i]);
+		bool bIsUsed = bIsUsedPtr ? *bIsUsedPtr : false;
+		
+		if (CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Find(RowNames[i]))
+		{
+			JIWONLOG("%s : 활성화 된거래!~~!", *RowNames[i].ToString());
+		}
+		else
+		{
+			JIWONLOG("%s : 활성화 XXX 래!~~!", *RowNames[i].ToString());
+		}
+		
+		I->SetIsUsed(bIsUsed);
+		I->DataInit(RowNames[i], IData);
 	}
 }
 
@@ -455,7 +476,7 @@ void UMapSubSystem::SpawnPortal(AActor* TP)
 		TP->GetActorRotation()
 	);
 		
-	I->DataInit(IData);
+	I->DataInit(TEXT("Portal"),IData);
 }
 
 void UMapSubSystem::SpawnLootPieces(TArray<AActor*> TargetPoints)
@@ -497,10 +518,10 @@ void UMapSubSystem::LevelClear()
 		
 	if (!bSuccess)
 	{
-		JIWONLOG("샤갈 Portal Row 못찾음")
+		JIWONLOG("샤갈 Portal Row 못찾음");
 		return;
 	}
-		
+	
 	CurMapDatas[CurMapIndex].bIsCleared = true;
 	
 	AInteractableBase* I = GetWorld()->SpawnActor<AInteractableBase>(
@@ -509,5 +530,5 @@ void UMapSubSystem::LevelClear()
 		TPs[0]->GetActorRotation()
 	);
 		
-	I->DataInit(IData);
+	I->DataInit(FName("Portal"), IData);
 }

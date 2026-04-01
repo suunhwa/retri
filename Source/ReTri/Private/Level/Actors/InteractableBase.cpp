@@ -8,6 +8,7 @@
 #include "Level/UI/InteractableInfoUI.h"
 #include "Level/UI/InteractableUI.h"
 #include "Level/UI/SelectUI.h"
+#include "MapSubSystem.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/TextBlock.h"
@@ -88,8 +89,9 @@ void AInteractableBase::Tick(float DeltaTime)
 	UIHold();
 }
 
-void AInteractableBase::DataInit(FInteractableData RowData)
+void AInteractableBase::DataInit(FName InRowName, FInteractableData RowData)
 {
+	MyRowName = InRowName;
 	InteractableData = RowData;
 	InteractableType = RowData.InteractableType; 
 	InteractName = RowData.InteractName;
@@ -109,6 +111,26 @@ void AInteractableBase::DataInit(FInteractableData RowData)
 	
 	FVector Pos = GetActorLocation();
 	SetActorLocation(FVector(Pos.X, Pos.Y, Pos.Z+CapsuleComp->GetScaledCapsuleHalfHeight()));
+	
+	if (bIsUsed)
+		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AInteractableBase::SetIsUsed(bool IsUsed)
+{
+	bIsUsed = IsUsed;
+	if (bIsUsed)
+	{
+		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UMapSubSystem* MapSub = GI->GetSubsystem<UMapSubSystem>())
+			{
+				MapSub->SetInteractableUsed(MyRowName);
+			}
+		}
+	}
 }
 
 void AInteractableBase::Hover_Implementation()
@@ -166,13 +188,6 @@ void AInteractableBase::UIHold()
 		InteractInfoUI->SetVisibility(true);
 	else
 		InteractInfoUI->SetVisibility(false);
-}
-
-void AInteractableBase::SetIsUsed(bool IsUsed)
-{
-	bIsUsed = IsUsed;
-	if (bIsUsed)
-		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AInteractableBase::ShowSelectUI()

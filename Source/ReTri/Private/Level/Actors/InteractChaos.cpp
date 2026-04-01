@@ -25,9 +25,19 @@ void AInteractChaos::Interact_Implementation()
 	UE_LOG(jiwon, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
-	FName KeyName(*InteractName);
+	FName KeyName = FName("Chaos");
 	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
-	if (FoundValue) *FoundValue = true; 
+	if (FoundValue)
+	{
+		*FoundValue = true;
+		SCREENLOG("근데 왜 ? tq?");
+	}
+	else
+	{
+		SCREENLOG("Tlqkf 이유좀");
+	}
+	
+	SetIsUsed(true);
 	
 	// todo: 스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!
 	if (!ChaosDataTable)
@@ -76,25 +86,19 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	switch (ChaosData->ChaosType)
 	{
 	case EChaosType::Chaos_Health:
-		// GI->GameData->UpdateHP(+Val);
 		GI->HealthComp->Heal(Val);
 		break;
 	case EChaosType::Chaos_AttackDamage:
-		// GI->GameData->UpdateAttackDamage(+Val);
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Val);
 		break;
 	case EChaosType::Chaos_AbilityPower:
-		// GI->GameData->UpdateAbilityPower(+Val);
 		GI->StatComp->ApplyStatModifier(EStatTypes::SpellPower, Val);
 		break;
 	case EChaosType::Chaos_AttackSpeed:
-		/*Val = GI->GameData->GetCurAttackSpeed() * (Val - 1.0f);
-		GI->GameData->UpdateAttackSpeed(+Val);*/
 		Val = GI->StatComp->GetAttackSpeed() * (Val - 1.0f);
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackSpeed, Val);
 		break;
 	case EChaosType::Chaos_MemoryHaste:
-		// GI->GameData->UpdateCoolTime(+Val);
 		GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, Val);
 		break;
 	}
@@ -102,6 +106,4 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	GI->GameData->DebugStat();
 	
 	HideSelectUI();
-	bIsUsed = true;
-	// todo InteractableData->IsUsed = true;
 }

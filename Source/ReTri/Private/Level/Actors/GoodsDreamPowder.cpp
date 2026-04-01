@@ -36,24 +36,14 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 
-		int32 CurDreamPowder = GI->GameData->GetRandomDreamPowder();
-		GI->GameData->UpdateDreamPowder(+CurDreamPowder);
-
-		/*GI->GameData->UpdateDreamPowder(+GI->GameData->GetRandomDreamPowder());
-		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.DreamPowder += GI->GameData->GetRandomDreamPowder();
-		*/
-		if (GI && GI->StatComp)
-		{
-			const int32 Amount = GI->GameData->GetRandomDreamPowder();
-			GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Amount);
-		}
+		if (!GI || !GI->StatComp) return;
+		const int32 Amount = GI->GameData->GetRandomDreamPowder();
+		GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Amount);
 		
-		if (FloatingUIActorClass)
-		{
-			AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
-			FString TempStr = FString::Printf(TEXT("꿈가루 +%d"), CurDreamPowder);
-			FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(0.053033f, 0.510102f, 1.0f, 1.f));
-		}
+		if (!FloatingUIActorClass) return;
+		AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
+		FString TempStr = FString::Printf(TEXT("꿈가루 +%d"), Amount);
+		FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(0.053033f, 0.510102f, 1.0f, 1.f));
 		
 		GI->GameData->DebugStat();
 		Destroy();
