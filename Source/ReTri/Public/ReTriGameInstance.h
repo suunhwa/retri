@@ -6,6 +6,8 @@
 #include "Engine/GameInstance.h"
 
 #include "Player/Data/PlayerStatData.h"
+#include "Player/Components/StatComponent.h"
+#include "Player/Components/HealthComponent.h"
 #include "ReTriGameInstance.generated.h"
 
 /**
@@ -19,8 +21,24 @@ class RETRI_API UReTriGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	
+	// =========== Player ===============================================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
 	FPlayerStatInfo CurPlayerStats;
+	
+	// 플레이어 컴포넌트 레퍼런스
+	UPROPERTY()
+	TObjectPtr<UStatComponent> StatComp;
+
+	UPROPERTY()
+	TObjectPtr<UHealthComponent> HealthComp;
+	
+	// 스킬 데이터 (DT_PlayerSkills)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Data")
+	UDataTable* SkillDataTable;
+
+	// 레벨/경험치 데이터 (DT_LevelExp)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Data")
+	UDataTable* LevelDataTable;
 	
 	// todo Player Stat 부분 정리 필
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")

@@ -1,148 +1,245 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Player/Components/StatComponent.h"
 #include "Player/Components/HealthComponent.h"
+#include "ReTriGameInstance.h"
 
-
-// Sets default values for this component's properties
 UStatComponent::UStatComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UStatComponent::SyncToGameInstance()
+{
+	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	if (!GI) return;
+	GI->CurPlayerStats = GetStatInfo();
+}
 
-// Called when the game starts
 void UStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	HealthComp = GetOwner()->FindComponentByClass<UHealthComponent>();
+	if (HealthComp)
+	{
+		HealthComp->SetMaxHP(GetMaxHP(), true);
+	}
+
+	SyncToGameInstance();
 }
 
-
-// Called every frame
-void UStatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UStatComponent::BeginBatch()
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	bBatchMode = true;
 }
 
-float UStatComponent::CalcStat(float Base, float Growth, int32 Level)
+void UStatComponent::EndBatch()
 {
-	return Base + Growth * (Level - 1);
+	bBatchMode = false;
+	SyncToGameInstance();
 }
 
 void UStatComponent::ApplyStatModifier(EStatTypes Type, float Delta)
 {
-	float newValue = 0.f;
+	float NewValue = 0.f;
 
 	switch (Type)
 	{
+	case EStatTypes::Gold:
+		Gold = FMath::Max(0, Gold + static_cast<int32>(Delta));
+		NewValue = static_cast<float>(Gold);
+		break;
+
+	case EStatTypes::DreamDust:
+		DreamDust = FMath::Max(0, DreamDust + static_cast<int32>(Delta));
+		NewValue = static_cast<float>(DreamDust);
+		break;
+
 	case EStatTypes::MaxHP:
-		MaxHP = FMath::Max(1.f, MaxHP + Delta);
-		newValue = MaxHP;
+		AddedMaxHP += Delta;
+		NewValue = GetMaxHP();
+		if (HealthComp)
+			HealthComp->SetMaxHP(GetMaxHP(), false);
 		break;
 
-	case EStatTypes::AttackDamage:
-		AttackDamage = FMath::Max(0.f, AttackDamage + Delta);
-		newValue = AttackDamage;
+	case EStatTypes::AttackPower:
+		AddedAttackPower += Delta;
+		NewValue = GetAttackPower();
 		break;
 
-	case EStatTypes::AbilityPower:
-		AbilityPower = FMath::Max(0.f, AbilityPower + Delta);
-		newValue = AbilityPower;
+	case EStatTypes::SpellPower:
+		AddedSpellPower += Delta;
+		NewValue = GetSpellPower();
 		break;
 
 	case EStatTypes::AttackSpeed:
-		AttackSpeed = FMath::Max(0.1f, AttackSpeed + Delta);
-		newValue = AttackSpeed;
+		AddedAttackSpeed += Delta;
+		NewValue = GetAttackSpeed();
 		break;
 
-	case EStatTypes::CritChance:
-		CritChance = FMath::Clamp(CritChance + Delta, 0.f, 100.f);
-		newValue = CritChance;
+	case EStatTypes::CritRate:
+		AddedCritRate += Delta;
+		NewValue = GetCritRate();
 		break;
-		
+
+	case EStatTypes::CritMultiplier:
+		AddedCritMultiplier += Delta;
+		NewValue = GetCritMultiplier();
+		break;
+
 	case EStatTypes::MoveSpeed:
-		MoveSpeed = FMath::Max(0.f, MoveSpeed + Delta);
-		newValue = MoveSpeed;
+		AddedMoveSpeed += Delta;
+		NewValue = GetMoveSpeed();
 		break;
-		
+
 	case EStatTypes::Defense:
-		Defense = FMath::Max(0.f, Defense + Delta);
-		newValue = Defense;
+		AddedDefense += Delta;
+		NewValue = GetDefense();
 		break;
-		
-	case EStatTypes::MemoryHaste:
-		MemoryHaste = FMath::Max(0.f, MemoryHaste + Delta);
-		newValue = MemoryHaste;
+
+	case EStatTypes::MemoryAcceleration:
+		AddedMemoryAcceleration += Delta;
+		NewValue = GetMemoryAcceleration();
 		break;
-		
+
+	case EStatTypes::AttackRange:
+		AddedAttackRange += Delta;
+		NewValue = GetAttackRange();
+		break;
+
+	case EStatTypes::ProjectileSpeed:
+		AddedProjectileSpeed += Delta;
+		NewValue = GetProjectileSpeed();
+		break;
+
+	case EStatTypes::DashCount:
+		AddedDashCount += static_cast<int32>(Delta);
+		NewValue = static_cast<float>(GetDashCount());
+		break;
+
 	case EStatTypes::DashCooldown:
-		DashCooldown = FMath::Max(0.1f, DashCooldown + Delta);
-		newValue = DashCooldown;
+		AddedDashCooldown += Delta;
+		NewValue = GetDashCooldown();
 		break;
-		
-	case EStatTypes::FireDamage:
-		FireDamage = FMath::Max(0.f, FireDamage + Delta);
-		newValue = FireDamage;
+
+	case EStatTypes::BurnDamageBonus:
+		AddedBurnDamageBonus += Delta;
+		NewValue = GetBurnDamageBonus();
 		break;
 	}
 
-	OnStatChanged.Broadcast(Type, newValue);
+	OnStatChanged.Broadcast(Type, NewValue);
+	if (!bBatchMode) SyncToGameInstance();
+}
+
+bool UStatComponent::SpendGold(int32 Cost)
+{
+	if (Gold < Cost) return false;
+	Gold -= Cost;
+	OnStatChanged.Broadcast(EStatTypes::Gold, static_cast<float>(Gold));
+	SyncToGameInstance();
+	return true;
+}
+
+bool UStatComponent::SpendDreamDust(int32 Cost)
+{
+	if (DreamDust < Cost) return false;
+	DreamDust -= Cost;
+	OnStatChanged.Broadcast(EStatTypes::DreamDust, static_cast<float>(DreamDust));
+	SyncToGameInstance();
+	return true;
 }
 
 void UStatComponent::LoadStatsForLevel(int32 Level)
 {
-	if (!StatDataTable || !ExpTable) return;
+	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	if (!GI || !GI->LevelDataTable) return;
 
-	FPlayerStatRow* Base = StatDataTable->FindRow<FPlayerStatRow>(TEXT("Player"), TEXT("LoadStatsForLevel"));
-	if (!Base) return;
+	const FName RowName = FName(*FString::Printf(TEXT("Level_%d"), Level));
+	FPlayerLevelGrowthData* Row = GI->LevelDataTable->FindRow<FPlayerLevelGrowthData>(RowName, TEXT("LoadStatsForLevel"));
+	if (!Row) return;
 
+	// Base만 덮어씀 — Added(성소) 보존
 	CurrentLevel = Level;
-	MaxHP = CalcStat(Base->BaseHP, Base->HPGrowth, Level);
-	AttackDamage = CalcStat(Base->BaseAD, Base->ADGrowth, Level);
-	AbilityPower = CalcStat(Base->BaseAP, Base->APGrowth, Level);
-	AttackSpeed = CalcStat(Base->BaseAS, Base->ASGrowth, Level);
-	CritChance = CalcStat(Base->BaseCrit, Base->CritGrowth, Level);
-	MoveSpeed = CalcStat(Base->BaseMS, Base->MSGrowth, Level);
-	Defense = CalcStat(Base->BaseDefense, Base->DefenseGrowth, Level);
-	MemoryHaste = CalcStat(Base->BaseHaste, Base->HasteGrowth, Level);
-	DashCooldown = CalcStat(Base->BaseDashCooldown, Base->DashCooldownGrowth, Level);
-	FireDamage = CalcStat(Base->BaseFire, Base->FireGrowth, Level);
+	BaseMaxHP = Row->MaxHP;
+	BaseAttackPower = Row->AttackPower;
+	BaseSpellPower = Row->SpellPower;
+	BaseAttackSpeed = Row->AttackSpeed;
+	BaseMoveSpeed = Row->MoveSpeed;
 
-	// HealthComponent MaxHP도 같이 업데이트
-	if (UHealthComponent* HC = GetOwner()->FindComponentByClass<UHealthComponent>())
-	{
-		HC->SetMaxHP(MaxHP, false);
-	}
+	if (HealthComp)
+		HealthComp->SetMaxHP(GetMaxHP(), false);
 
-	OnStatChanged.Broadcast(EStatTypes::MaxHP, MaxHP);
+	BroadcastLevelStatsChanged();
+	// OnStatChanged.Broadcast(EStatTypes::MaxHP, GetMaxHP());
+	SyncToGameInstance();
 }
 
+void UStatComponent::BroadcastLevelStatsChanged()
+{
+	OnStatChanged.Broadcast(EStatTypes::MaxHP, GetMaxHP());
+	OnStatChanged.Broadcast(EStatTypes::AttackPower, GetAttackPower());
+	OnStatChanged.Broadcast(EStatTypes::SpellPower, GetSpellPower());
+	OnStatChanged.Broadcast(EStatTypes::AttackSpeed, GetAttackSpeed());
+	OnStatChanged.Broadcast(EStatTypes::MoveSpeed, GetMoveSpeed());
+}
+
+void UStatComponent::AddExp(int32 Amount)
+{
+	if (Amount <= 0) return;
+	CurrentExp += Amount;
+
+	// 레벨업 체크 — 누적 경험치가 다음 레벨 조건 충족 시 반복 처리
+	int32 NextLevel = CurrentLevel + 1;
+	int32 Required = GetRequiredExpForLevel(NextLevel);
+	while (Required != -1 && CurrentExp >= Required)
+	{
+		LoadStatsForLevel(NextLevel);
+		NextLevel++;
+		Required = GetRequiredExpForLevel(NextLevel);
+	}
+
+	// ExpBar 브로드캐스트: 다음 레벨 필요 경험치 (-1이면 맥스 레벨)
+	const int32 RequiredForNext = GetRequiredExpForLevel(CurrentLevel + 1);
+	
+	UE_LOG(LogTemp, Warning, TEXT("[EXP] Lv.%d | EXP: %d / %d"), CurrentLevel, CurrentExp, RequiredForNext);
+	
+	OnExpChanged.Broadcast(CurrentExp, RequiredForNext, CurrentLevel);
+
+	SyncToGameInstance();
+}
 
 int32 UStatComponent::GetRequiredExpForLevel(int32 Level) const
 {
-	if (!ExpTable) return -1;
+	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	if (!GI || !GI->LevelDataTable) return -1;
 
-	FName RowName = FName(*FString::Printf(TEXT("Level_%d"), Level));
-	FExpTableRow* Row = ExpTable->FindRow<FExpTableRow>(RowName, TEXT("GetRequiredExpForLevel"));
+	const FName RowName = FName(*FString::Printf(TEXT("Level_%d"), Level));
+	FPlayerLevelGrowthData* Row = GI->LevelDataTable->FindRow<FPlayerLevelGrowthData>(RowName, TEXT("GetRequiredExpForLevel"));
 	return Row ? Row->RequiredExp : -1;
 }
 
 FPlayerStatInfo UStatComponent::GetStatInfo() const
 {
 	FPlayerStatInfo Info;
-	Info.MaxHP = MaxHP;
-	Info.AttackDamage = AttackDamage;
-	Info.AbilityPower = AbilityPower;
-	Info.AttackSpeed = AttackSpeed;
-	Info.CritChance = CritChance;
-	Info.MoveSpeed = MoveSpeed;
-	Info.Defense = Defense;
-	Info.MemoryHaste = MemoryHaste;
-	Info.DashCooldown = DashCooldown;
-	Info.FireDamage = FireDamage;
+	Info.Gold = Gold;
+	Info.DreamDust = DreamDust;
+	Info.MaxHP = GetMaxHP();
+	Info.AttackPower = GetAttackPower();
+	Info.SpellPower = GetSpellPower();
+	Info.AttackSpeed = GetAttackSpeed();
+	Info.CritRate = GetCritRate();
+	Info.CritMultiplier = GetCritMultiplier();
+	Info.MoveSpeed = GetMoveSpeed();
+	Info.Defense = GetDefense();
+	Info.MemoryAcceleration = GetMemoryAcceleration();
+	Info.AttackRange = GetAttackRange();
+	Info.ProjectileSpeed = GetProjectileSpeed();
+	Info.DashCount = GetDashCount();
+	Info.DashCooldown = GetDashCooldown();
+	Info.BurnDamageBonus = GetBurnDamageBonus();
 	Info.CurrentLevel = CurrentLevel;
+	Info.CurrentExp = CurrentExp;
 	return Info;
 }

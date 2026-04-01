@@ -1,0 +1,9 @@
+---,SkillID,SkillName,SkillNameKR,SkillType,SkillCategory,CooldownType,Description,BaseDamage,BaseCooldown,ProjectileSpeed,Range,AoeRadius,Duration,MaxCharges,KnockbackForce,AttackSpeedMultiplier,UpgradeCostGold,UpgradeCostDreamDust,MaxUpgradeLevel,Icon
+BasicAttack,basic_attack,BasicAttack,기본 공격,Active,Innate,Cooldown,마우스 방향으로 투사체 발사. 클릭마다 즉시 발사,10.0,0.3,1200.0,1500.0,0.0,0.0,0,0.0,1.0,0,0,0,Texture2D
+SalamanderPowder,salamander_powder,SalamanderPowder,샐러맨더 가루,Passive,Identity,None,매 4번째 기본 공격이 치명타가 되고 폭발하여 광역 화염 피해. 불타는 적에게 폭발 피해 2배,145.0,0.0,0.0,0.0,300.0,0.0,0,0.0,1.15,0,0,0,Texture2D'/Game/Player/UI/Icons/St_D_SalamanderPowder.St_D_SalamanderPowder'
+HandCannon,hand_cannon,HandCannon,핸드캐논,Active,Traveler,Cooldown,화염탄 발사. 시전자 후방 이동. 원거리 피해 80% / 근거리 피해 180% + 밀쳐내기,80.0,5.5,1400.0,2000.0,0.0,0.0,0,1200.0,1.0,0,39,0,Texture2D'/Game/Player/UI/Icons/St_Q_HandCannon.St_Q_HandCannon'
+QuickTrigger,quick_trigger,QuickTrigger,빠른 손,Active,Traveler,Charge,관통탄 3발 연속 발사. 발당 최대 3명 적중. 공격 속도에 비례해 발사 속도 증가,120.0,14.0,1600.0,2000.0,0.0,0.0,3,0.0,1.0,0,39,0,Texture2D'/Game/Player/UI/Icons/St_R_QuickTrigger.St_R_QuickTrigger'
+PillarOfFlame,pillar_of_flame,PillarOfFlame,불기둥,Active,Acquired,Cooldown,지정 지점에 불기둥 소환. 즉발 피해 250% 후 2.4초간 DoT 275%,250.0,11.0,0.0,800.0,350.0,2.4,0,0.0,1.0,0,47,0,Texture2D'/Game/Player/UI/Icons/St_R_PillarOfFlame.St_R_PillarOfFlame'
+AntiGravity,anti_gravity,AntiGravity,중력반전,Active,Acquired,Cooldown,대상 지역 중력 반전. 1.6초 부양(기절) 후 낙하 피해 400%,400.0,14.0,0.0,600.0,400.0,1.6,0,0.0,1.0,0,47,0,Texture2D'/Game/Player/UI/Icons/St_E_AntiGravity.St_E_AntiGravity'
+Acquired1,acquired_1,Acquired1,획득1,Active,Acquired,Cooldown,TBD,0.0,0.0,0.0,0.0,0.0,0.0,0,0.0,1.0,0,47,0,Texture2D
+Acquired2,acquired_2,Acquired2,획득2,Active,Acquired,Cooldown,TBD,0.0,0.0,0.0,0.0,0.0,0.0,0,0.0,1.0,0,47,0,Texture2D

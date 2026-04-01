@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PillarOfFireAoE.generated.h"
+#include "PillarOfFlameAoE.generated.h"
 
 class UCapsuleComponent;
 class UNiagaraComponent;
@@ -15,12 +15,12 @@ class UNiagaraComponent;
  * - DoT: AP × 2.75 / 2.4초
  */
 UCLASS()
-class RETRI_API APillarOfFireAoE : public AActor
+class RETRI_API APillarOfFlameAoE : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	APillarOfFireAoE();
+	APillarOfFlameAoE();
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,27 +43,27 @@ private:
 	float AbilityPower = 0.f;
 
 	// 즉발 계수
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFire")
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
 	float ImmediateDamageCoeff = 2.5f;
 
 	// DoT 총 피해 계수
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFire")
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
 	float DoTDamageCoeff = 2.75f;
 
 	// DoT 지속 시간 (초)
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFire")
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
 	float DoTDuration = 2.4f;
 
 	// DoT 틱 간격
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFire")
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
 	float DoTTickInterval = 0.4f;
 
 	// 경직 지속 시간
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFire")
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
 	float StaggerDuration = 0.25f;
 
 	// AoE 반경
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFire")
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
 	float HitRadius = 200.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")

@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Player/Abilities/Skills/PillarOfFire/PillarOfFireAoE.h"
+#include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameAoE.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyBase.h"
@@ -11,7 +11,7 @@
 #include "NiagaraComponent.h"
 #include "TimerManager.h"
 
-APillarOfFireAoE::APillarOfFireAoE()
+APillarOfFlameAoE::APillarOfFlameAoE()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -27,7 +27,7 @@ APillarOfFireAoE::APillarOfFireAoE()
 	FireEffect->SetAutoActivate(false);
 }
 
-void APillarOfFireAoE::BeginPlay()
+void APillarOfFlameAoE::BeginPlay()
 {
 	Super::BeginPlay();
 	
@@ -50,14 +50,14 @@ void APillarOfFireAoE::BeginPlay()
 
 	GetWorldTimerManager().SetTimer(
 		DoTTimerHandle,
-		this, &APillarOfFireAoE::ApplyDoTTick,
+		this, &APillarOfFlameAoE::ApplyDoTTick,
 		DoTTickInterval, true
 	);
 
 	// DoT 종료 후 Actor 제거
 	GetWorldTimerManager().SetTimer(
 		LifeTimerHandle,
-		this, &APillarOfFireAoE::FinishDoT,
+		this, &APillarOfFlameAoE::FinishDoT,
 		DoTDuration, false
 	);
 
@@ -67,13 +67,13 @@ void APillarOfFireAoE::BeginPlay()
 	}
 }
 
-void APillarOfFireAoE::Init(float InAbilityPower, AController* InInstigator)
+void APillarOfFlameAoE::Init(float InAbilityPower, AController* InInstigator)
 {
 	AbilityPower = InAbilityPower;
 	InstigatorController = InInstigator;
 }
 
-void APillarOfFireAoE::ApplyInitialHit()
+void APillarOfFlameAoE::ApplyInitialHit()
 {
 	const float ImmediateDamage = AbilityPower * ImmediateDamageCoeff;
 
@@ -110,7 +110,7 @@ void APillarOfFireAoE::ApplyInitialHit()
 	}
 }
 
-void APillarOfFireAoE::ApplyDoTTick()
+void APillarOfFlameAoE::ApplyDoTTick()
 {
 	for (TWeakObjectPtr<AActor> WeakEnemy : GetEnemiesInRange())
 	{
@@ -126,13 +126,13 @@ void APillarOfFireAoE::ApplyDoTTick()
 	}
 }
 
-void APillarOfFireAoE::FinishDoT()
+void APillarOfFlameAoE::FinishDoT()
 {
 	GetWorldTimerManager().ClearTimer(DoTTimerHandle);
 	Destroy();
 }
 
-TArray<TWeakObjectPtr<AActor>> APillarOfFireAoE::GetEnemiesInRange() const
+TArray<TWeakObjectPtr<AActor>> APillarOfFlameAoE::GetEnemiesInRange() const
 {
 	TArray<TWeakObjectPtr<AActor>> Result;
 

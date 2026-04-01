@@ -33,6 +33,7 @@ AHandCannonBullet::AHandCannonBullet()
 	MoveComp->SetUpdatedComponent(CollisionComp);
 	MoveComp->InitialSpeed = 1000.f;
 	MoveComp->MaxSpeed = 1000.f;
+	
 	MoveComp->bRotationFollowsVelocity = true;
 	MoveComp->ProjectileGravityScale = 0.f;
 	MoveComp->bSweepCollision = false;

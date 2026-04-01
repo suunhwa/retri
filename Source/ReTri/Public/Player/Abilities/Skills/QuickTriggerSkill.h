@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Player/Abilities/AbilityBase.h"
-#include "QuickHandsSkill.generated.h"
+#include "QuickTriggerSkill.generated.h"
 
 class APiercingBullet;
 class UNiagaraSystem;
@@ -16,12 +16,12 @@ class UNiagaraSystem;
 */
 
 UCLASS()
-class RETRI_API UQuickHandsSkill : public UAbilityBase
+class RETRI_API UQuickTriggerSkill : public UAbilityBase
 {
 	GENERATED_BODY()
 	
 public:
-	UQuickHandsSkill();
+	UQuickTriggerSkill();
 	
 protected:
 	virtual bool CanActivate(ACharacter* Owner) override;

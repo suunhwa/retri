@@ -8,6 +8,8 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyEnums.h"
 #include "Level/Actors/FloatingUIActor.h"
 
+#include "Player/Components/StatComponent.h"
+
 AGoodsDreamPowder::AGoodsDreamPowder()
 {
 	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/gold-star/source/SM_Dream.SM_Dream'"));
@@ -33,9 +35,18 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+
 		int32 CurDreamPowder = GI->GameData->GetRandomDreamPowder();
 		GI->GameData->UpdateDreamPowder(+CurDreamPowder);
+
+		/*GI->GameData->UpdateDreamPowder(+GI->GameData->GetRandomDreamPowder());
 		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.DreamPowder += GI->GameData->GetRandomDreamPowder();
+		*/
+		if (GI && GI->StatComp)
+		{
+			const int32 Amount = GI->GameData->GetRandomDreamPowder();
+			GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Amount);
+		}
 		
 		if (FloatingUIActorClass)
 		{

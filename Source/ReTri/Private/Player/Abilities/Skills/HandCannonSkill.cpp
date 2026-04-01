@@ -49,7 +49,7 @@ void UHandCannonSkill::Activate(ACharacter* Owner)
 			float AP = 0.f;
 			if (APlayerCharacter* Player = Cast<APlayerCharacter>(Owner))
 			{
-				AP = Player->GetStatComponent()->GetAbilityPower();
+				AP = Player->GetStatComponent()->GetSpellPower();
 			}
 			Bullet->SetDamage(AP * NearCoefficient, AP * FarCoefficient);
 		}

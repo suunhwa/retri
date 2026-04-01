@@ -6,6 +6,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "UI/HPBar.h"
+#include "UI/ExpBar.h"
 #include "PlayerCharacter.generated.h"
 
 class USpringArmComponent;
@@ -180,6 +181,18 @@ public:
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UReTriGameData* GD;*/
 	
+	// hp bar
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UWidgetComponent> HPBarComp;
+	
+	// exp bar
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UExpBar> ExpBarWidgetClass;
+	
+	UFUNCTION(Exec)
+	void DebugAddExp(int32 Amount);
+
+private:
+	UPROPERTY()
+	TObjectPtr<UExpBar> ExpBarWidget;
 };
