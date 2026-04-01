@@ -23,7 +23,7 @@ public:
 	// === Infrastructure (UE Overrides) ===
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-    
+	
 public:
 	// === Configuration (Set by GameInstance) ===
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map|Config")
@@ -44,9 +44,16 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
 	int32 CurMapIndex = 0;
-
+	
+	/** 현재 맵 정보 */
+	UFUNCTION(BlueprintCallable, Category="Map|Helper")
+	FMapNodeData GetCurMapData() { return CurMapDatas[CurMapIndex]; }
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
+	int32 EnemySpawnerCount = 0;
+	
 	// === Public API ===
-	/** 맵 생성 (트리 구조) */
+	/** 맵 생성 (트리 구조) XXXX */
 	UFUNCTION(BlueprintCallable, Category="Map|Generation")
 	void GenerateMap();
 	
@@ -57,24 +64,33 @@ public:
 	/** 노드 선택 시 해당 맵으로 진입 */
 	UFUNCTION(BlueprintCallable, Category="Map|Flow")
 	void EnterMap(int32 MapIndex);
+	
 
 	// === Helpers / Utilities ===
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
-	TArray<FName> RandomInteractable(int32 RandomNum);
+	TMap<FName, bool> RandomInteractable(int32 RandomNum);
 	
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
 	FInteractableData GetRowInteractionData(FName RowName, bool& bSuccess); 
-
+	
 	// === Level Setting API? ===
-	// Interactable 설치하는 함수
+	/** Interactable 설치하는 함수 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SpawnInteractable(TArray<AActor*> TargetPoints);
 	
-	// 포탈 설치하는 함수
+	/** 포탈 설치하는 함수 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SpawnPortal(AActor* TP);
 
-	// 금화, 꿈가루 설치하는 함수
+	/** 금화, 꿈가루 설치하는 함수 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SpawnLootPieces(TArray<AActor*> TargetPoints);
+	
+	/** 적 스포너 개수 받아오기 */
+	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
+	void SetEnemySpawnerCount(int32 SpawnerNum);
+	
+	/** 게임 클리어 (포탈 생성 조건) */
+	UFUNCTION(BlueprintCallable, Category="Map|Helper")
+	void LevelClear();
 };

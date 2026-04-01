@@ -3,6 +3,7 @@
 
 #include "Level/Actors/InteractChaos.h"
 
+#include "MapSubSystem.h"
 #include "Level/UI/SelectButtonUI.h"
 #include "Level/UI/SelectUI.h"
 
@@ -17,8 +18,13 @@ void AInteractChaos::BeginPlay()
 void AInteractChaos::Interact_Implementation()
 {
 	Super::Interact_Implementation();
+	
 	UE_LOG(jiwon, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	
+	FName KeyName(*InteractName);
+	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
+	if (FoundValue) *FoundValue = true; 
 	
 	// todo: 스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!
 	if (!ChaosDataTable)

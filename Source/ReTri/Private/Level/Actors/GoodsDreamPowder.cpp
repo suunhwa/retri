@@ -5,6 +5,8 @@
 
 #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyEnums.h"
+#include "Level/Actors/FloatingUIActor.h"
 
 AGoodsDreamPowder::AGoodsDreamPowder()
 {
@@ -31,8 +33,16 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-		GI->GameData->UpdateDreamPowder(+GI->GameData->GetRandomDreamPowder());
+		int32 CurDreamPowder = GI->GameData->GetRandomDreamPowder();
+		GI->GameData->UpdateDreamPowder(+CurDreamPowder);
 		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.DreamPowder += GI->GameData->GetRandomDreamPowder();
+		
+		if (FloatingUIActorClass)
+		{
+			AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
+			FString TempStr = FString::Printf(TEXT("꿈가루 +%d"), CurDreamPowder);
+			FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(0.053033f, 0.510102f, 1.0f, 1.f));
+		}
 		
 		GI->GameData->DebugStat();
 		Destroy();

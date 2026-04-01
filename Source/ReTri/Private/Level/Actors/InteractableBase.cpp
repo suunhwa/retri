@@ -124,8 +124,6 @@ void AInteractableBase::Hover_Implementation()
 void AInteractableBase::Interact_Implementation()
 {
 	IInteractableInterface::Interact_Implementation();
-	
-	// 여기에 Interact F 키 눌렀을 때 플레이어가 실행할 함수 내용 각각 적용
 }
 
 void AInteractableBase::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -168,6 +166,13 @@ void AInteractableBase::UIHold()
 		InteractInfoUI->SetVisibility(true);
 	else
 		InteractInfoUI->SetVisibility(false);
+}
+
+void AInteractableBase::SetIsUsed(bool IsUsed)
+{
+	bIsUsed = IsUsed;
+	if (bIsUsed)
+		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AInteractableBase::ShowSelectUI()

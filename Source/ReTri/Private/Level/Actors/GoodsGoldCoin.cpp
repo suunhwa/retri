@@ -5,6 +5,7 @@
 
 #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
+#include "Level/Actors/FloatingUIActor.h"
 
 
 AGoodsGoldCoin::AGoodsGoldCoin()
@@ -32,8 +33,16 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+		int32 CurGold = GI->GameData->GetRandomDreamPowder();
 		GI->GameData->UpdateGold(+GI->GameData->GetRandomGold());
 		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.CurGold += GI->GameData->GetRandomGold();
+		
+		if (FloatingUIActorClass)
+		{
+			AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
+			FString TempStr = FString::Printf(TEXT("골드 +%d"), CurGold);
+			FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
+		}
 		
 		GI->GameData->DebugStat();
 		Destroy();

@@ -41,7 +41,6 @@ void AGoodsBase::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 	
-
 }
 
 void AGoodsBase::MoveAndRotate(float DeltaTime)
@@ -53,9 +52,7 @@ void AGoodsBase::MoveAndRotate(float DeltaTime)
 		FVector NewLoc = FMath::VInterpTo(CurLoc, TargetLoc, DeltaTime, Speed);
 		SetActorLocation(NewLoc);
 		
-		// Yaw와 Roll 축으로만 회전 값 생성
 		FRotator DeltaRot = FRotator(0.f, YawRotSpeed * DeltaTime, RollRotSpeed * DeltaTime);
-		// 현재 회전에 이만큼을 '더해라' (Local 기준)
 		AddActorLocalRotation(DeltaRot);
 	}
 }
