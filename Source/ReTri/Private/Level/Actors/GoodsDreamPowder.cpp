@@ -45,7 +45,7 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 		FString TempStr = FString::Printf(TEXT("꿈가루 +%d"), Amount);
 		FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(0.053033f, 0.510102f, 1.0f, 1.f));
 		
-		GI->GameData->DebugStat();
+		GI->DebugStat();
 		Destroy();
 	}
 }

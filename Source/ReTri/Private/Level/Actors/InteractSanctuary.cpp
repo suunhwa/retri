@@ -38,7 +38,6 @@ void AInteractSanctuary::Interact_Implementation()
 	FName KeyName = FName("Sanctuary");
 	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
 	if (FoundValue) *FoundValue = true; 
-	else SCREENLOG("Tlqkf 이유좀");
 	SetIsUsed(true);
 	
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);

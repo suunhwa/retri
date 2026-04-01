@@ -44,7 +44,7 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 		FString TempStr = FString::Printf(TEXT("골드 +%d"), Amount);
 		FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
 		
-		GI->GameData->DebugStat();
+		GI->DebugStat();
 		Destroy();
 	}
 }

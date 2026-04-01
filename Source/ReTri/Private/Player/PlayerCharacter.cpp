@@ -480,7 +480,7 @@ void APlayerCharacter::Interaction()
 			IInteractableInterface::Execute_Interact(Interact);
 			
 			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-			GI->GameData->DebugStat();
+			GI->DebugStat();
 			
 			// GD->DebugStat();
 		}
