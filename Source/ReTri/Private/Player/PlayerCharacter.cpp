@@ -145,6 +145,13 @@ void APlayerCharacter::BeginPlay()
 	// CDO에서 실행 방지
 	if (HasAnyFlags(RF_ClassDefaultObject)) return;
 	
+	// game instance에 컴포넌트 등록
+	if (UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetGameInstance()))
+	{
+		GI->StatComp = StatComp;
+		GI->HealthComp = HealthComp;
+	}
+	
 	// OnDeath 델리게이트 바인딩
 	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
 	

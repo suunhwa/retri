@@ -6,6 +6,9 @@
 #include "Level/UI/SelectButtonUI.h"
 #include "Level/UI/SelectUI.h"
 #include "ReTri/ReTri.h"
+#include "ReTriGameInstance.h"
+#include "Player/Components/StatComponent.h"
+#include "Player/Components/HealthComponent.h"
 
 
 void AInteractCurse::BeginPlay()
@@ -62,22 +65,28 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 	int32 RandomReward = FMath::RandRange(0, CurseRewardDatas.Num() - 1);
 	
 	int32 RewardVal = CurseRewardDatas[RandomReward]->RewardLevels[static_cast<int32>(CurseData->CurseType)];
+	if (!GI->StatComp) return;
 	switch (CurseRewardDatas[RandomReward]->RewardType)
 	{
 	case ERewardType::RewardGold:
-		GI->GameData->UpdateGold(+RewardVal);
+		// GI->GameData->UpdateGold(+RewardVal);
+		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, RewardVal);
 		break;
 	case ERewardType::RewardDreamPowder:
-		GI->GameData->UpdateDreamPowder(+RewardVal);
+		// GI->GameData->UpdateDreamPowder(+RewardVal);
+		GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, RewardVal);
 		break;
 	case ERewardType::RewardMaxHP:
-		GI->GameData->UpdateMaxHP(+RewardVal);
+		// GI->GameData->UpdateMaxHP(+RewardVal);
+		GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, RewardVal);
 		break;
 	case ERewardType::RewardAttackDamage:
-		GI->GameData->UpdateAttackDamage(+RewardVal);
+		// GI->GameData->UpdateAttackDamage(+RewardVal);
+		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, RewardVal);
 		break;
 	case ERewardType::RewardMemoryHaste:
-		GI->GameData->UpdateCoolTime(+RewardVal);
+		// GI->GameData->UpdateCoolTime(+RewardVal);
+		GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, RewardVal);
 		break;
 	}
 	

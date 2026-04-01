@@ -5,6 +5,7 @@
 
 #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
+#include "Player/Components/StatComponent.h"
 
 
 AGoodsGoldCoin::AGoodsGoldCoin()
@@ -32,8 +33,13 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-		GI->GameData->UpdateGold(+GI->GameData->GetRandomGold());
-		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.CurGold += GI->GameData->GetRandomGold();
+		/*GI->GameData->UpdateGold(+GI->GameData->GetRandomGold());
+		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.CurGold += GI->GameData->GetRandomGold();*/
+		if (GI && GI->StatComp)
+		{
+			const int32 Amount = GI->GameData->GetRandomGold();
+			GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
+		}
 		
 		GI->GameData->DebugStat();
 		Destroy();

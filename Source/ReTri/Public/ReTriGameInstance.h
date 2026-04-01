@@ -6,6 +6,8 @@
 #include "Engine/GameInstance.h"
 
 #include "Player/Data/PlayerStatData.h"
+#include "Player/Components/StatComponent.h"
+#include "Player/Components/HealthComponent.h"
 #include "ReTriGameInstance.generated.h"
 
 /**
@@ -22,6 +24,13 @@ public:
 	// =========== Player ===============================================
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
 	FPlayerStatInfo CurPlayerStats;
+	
+	// 플레이어 컴포넌트 레퍼런스
+	UPROPERTY()
+	TObjectPtr<UStatComponent> StatComp;
+
+	UPROPERTY()
+	TObjectPtr<UHealthComponent> HealthComp;
 	
 	// 스킬 데이터 (DT_PlayerSkills)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Data")

@@ -5,6 +5,9 @@
 
 #include "Level/UI/SelectButtonUI.h"
 #include "Level/UI/SelectUI.h"
+#include "ReTriGameInstance.h"
+#include "Player/Components/StatComponent.h"
+#include "Player/Components/HealthComponent.h"
 
 
 void AInteractChaos::BeginPlay()
@@ -60,26 +63,33 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	JIWONLOG("선택된 저주: %s", *ChaosData->ChaosName);
 	
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	if (!GI || !GI->StatComp) return;
 	
 	float Val = ChaosData->ChaosValues[ChaosData->ChaosLevel++];
 	// todo: MyPlayer에게 Chaos 효과 적용
 	switch (ChaosData->ChaosType)
 	{
 	case EChaosType::Chaos_Health:
-		GI->GameData->UpdateHP(+Val);
+		// GI->GameData->UpdateHP(+Val);
+		GI->HealthComp->Heal(Val);
 		break;
 	case EChaosType::Chaos_AttackDamage:
-		GI->GameData->UpdateAttackDamage(+Val);
+		// GI->GameData->UpdateAttackDamage(+Val);
+		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Val);
 		break;
 	case EChaosType::Chaos_AbilityPower:
-		GI->GameData->UpdateAbilityPower(+Val);
+		// GI->GameData->UpdateAbilityPower(+Val);
+		GI->StatComp->ApplyStatModifier(EStatTypes::SpellPower, Val);
 		break;
 	case EChaosType::Chaos_AttackSpeed:
-		Val = GI->GameData->GetCurAttackSpeed() * (Val - 1.0f);
-		GI->GameData->UpdateAttackSpeed(+Val);
+		/*Val = GI->GameData->GetCurAttackSpeed() * (Val - 1.0f);
+		GI->GameData->UpdateAttackSpeed(+Val);*/
+		Val = GI->StatComp->GetAttackSpeed() * (Val - 1.0f);
+		GI->StatComp->ApplyStatModifier(EStatTypes::AttackSpeed, Val);
 		break;
 	case EChaosType::Chaos_MemoryHaste:
-		GI->GameData->UpdateCoolTime(+Val);
+		// GI->GameData->UpdateCoolTime(+Val);
+		GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, Val);
 		break;
 	}
 
