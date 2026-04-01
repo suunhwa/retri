@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Player/Data/PlayerStatData.h"
-#include "Player/Data/PlayerLevelData.h"
+#include "Player/Data/PlayerLevelGrowthData.h"
 #include "StatComponent.generated.h"
 
 // 성소/강화에서 올릴 수 있는 스탯 종류
@@ -70,6 +70,8 @@ public:
 	// 레벨업 시 호출 — Base만 덮어씀, Added(성소) 보존
 	UFUNCTION(BlueprintCallable, Category="Stats")
 	void LoadStatsForLevel(int32 Level);
+	
+	void BroadcastLevelStatsChanged();
 
 	// 해당 레벨 도달에 필요한 누적 경험치 (-1: 테이블 미설정 또는 범위 초과)
 	UFUNCTION(BlueprintPure, Category="Stats")
@@ -96,7 +98,7 @@ public:
 	float GetSpellPower() const { return BaseSpellPower + AddedSpellPower; }
 
 	UFUNCTION(BlueprintPure, Category="Stats")
-	float GetAttackSpeed() const { return BaseAttackSpeed + AddedAttackSpeed; }
+	float GetAttackSpeed() const { return FMath::Max(0.1f, BaseAttackSpeed + AddedAttackSpeed); }
 
 	UFUNCTION(BlueprintPure, Category="Stats")
 	float GetCritRate() const { return FMath::Clamp(BaseCritRate + AddedCritRate, 0.f, 1.f); }
@@ -123,7 +125,7 @@ public:
 	int32 GetDashCount() const { return BaseDashCount + AddedDashCount; }
 
 	UFUNCTION(BlueprintPure, Category="Stats")
-	float GetDashCooldown() const { return BaseDashCooldown + AddedDashCooldown; }
+	float GetDashCooldown() const { return FMath::Max(0.1f, BaseDashCooldown + AddedDashCooldown); }
 
 	UFUNCTION(BlueprintPure, Category="Stats")
 	float GetBurnDamageBonus() const { return BaseBurnDamageBonus + AddedBurnDamageBonus; }

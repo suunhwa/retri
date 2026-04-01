@@ -105,4 +105,7 @@ struct RETRI_API FPlayerSkillData : public FTableRowBase
 	// 0 = 무제한
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxUpgradeLevel = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTexture2D> Icon;
 };

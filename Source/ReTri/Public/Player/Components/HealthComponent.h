@@ -44,7 +44,7 @@ public:
 	float GetCurrentHP() const { return CurrentHP; }
 	
 	UFUNCTION(BlueprintPure, Category="Health")
-	float GetMaxHP() const { return MaxHP; }
+	float GetMaxHP() const { return AppliedMaxHP; }
 	
 	UFUNCTION(BlueprintPure, Category="Health")
 	bool IsDead() const { return bIsDead; }
@@ -53,8 +53,11 @@ public:
 	void SetMaxHP(float NewMaxHP, bool bHealToFull = false);
 	
 private:
+	// 현재 체력 시스템에서 사용하는 최대 체력
+	// 실제 원본 스탯은 StatComponent가 관리하며,
+	// 이 값은 최종 MaxHP가 반영된 적용값
 	UPROPERTY(EditAnywhere, Category="Health", meta=(AllowPrivateAccess="true"))
-	float MaxHP = 220.f;
+	float AppliedMaxHP = 220.f;
 	
 	UPROPERTY(EditAnywhere, Category="Health", meta=(AllowPrivateAccess="true"))
 	float CurrentHP = 0;

@@ -1,5 +1,5 @@
 /**
- * FPlayerLevelData
+ * FPlayerLevelGrowthData
  *
  * DataTable row struct for player level definitions.
  * Import DT_LevelExp.csv with this row type.
@@ -12,10 +12,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "PlayerLevelData.generated.h"
+#include "PlayerLevelGrowthData.generated.h"
 
 USTRUCT(BlueprintType)
-struct RETRI_API FPlayerLevelData : public FTableRowBase
+struct RETRI_API FPlayerLevelGrowthData : public FTableRowBase
 {
 	GENERATED_BODY()
 

@@ -18,8 +18,8 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CurrentHP = MaxHP;
-	OnHPChanged.Broadcast(CurrentHP, MaxHP);
+	CurrentHP = AppliedMaxHP;
+	OnHPChanged.Broadcast(CurrentHP, AppliedMaxHP);
 }
 
 
@@ -34,8 +34,8 @@ float UHealthComponent::HandleDamage(float DamageAmount, AController* Instigator
 {
 	if (bIsDead || DamageAmount <= 0.0f) return 0.0f;
 	
-	CurrentHP = FMath::Clamp(CurrentHP - DamageAmount, 0.0f, MaxHP);
-	OnHPChanged.Broadcast(CurrentHP, MaxHP);
+	CurrentHP = FMath::Clamp(CurrentHP - DamageAmount, 0.0f, AppliedMaxHP);
+	OnHPChanged.Broadcast(CurrentHP, AppliedMaxHP);
 	
 	if (CurrentHP <= 0.0f)
 	{
@@ -50,13 +50,15 @@ void UHealthComponent::Heal(float Amount)
 {
 	if (bIsDead || Amount <= 0.0f) return;
 	
-	CurrentHP = FMath::Clamp(CurrentHP + Amount, 0.0f, MaxHP);
-	OnHPChanged.Broadcast(CurrentHP, MaxHP);
+	CurrentHP = FMath::Clamp(CurrentHP + Amount, 0.0f, AppliedMaxHP);
+	OnHPChanged.Broadcast(CurrentHP, AppliedMaxHP);
 }
 
+// StatComponent가 계산한 최종 MaxHP를 Health 시스템에 반영
+// HealthComponent는 MaxHP의 원본 소유자가 아니라 적용 대상
 void UHealthComponent::SetMaxHP(float NewMaxHP, bool bHealToFull)
 {
-	MaxHP = FMath::Max(1.f, NewMaxHP);
-	CurrentHP = bHealToFull ? MaxHP : FMath::Min(CurrentHP, MaxHP);
-	OnHPChanged.Broadcast(CurrentHP, MaxHP);
+	AppliedMaxHP = FMath::Max(1.f, NewMaxHP);
+	CurrentHP = bHealToFull ? AppliedMaxHP : FMath::Min(CurrentHP, AppliedMaxHP);
+	OnHPChanged.Broadcast(CurrentHP, AppliedMaxHP);
 }

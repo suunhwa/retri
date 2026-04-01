@@ -157,7 +157,7 @@ void UStatComponent::LoadStatsForLevel(int32 Level)
 	if (!GI || !GI->LevelDataTable) return;
 
 	const FName RowName = FName(*FString::Printf(TEXT("Level_%d"), Level));
-	FPlayerLevelData* Row = GI->LevelDataTable->FindRow<FPlayerLevelData>(RowName, TEXT("LoadStatsForLevel"));
+	FPlayerLevelGrowthData* Row = GI->LevelDataTable->FindRow<FPlayerLevelGrowthData>(RowName, TEXT("LoadStatsForLevel"));
 	if (!Row) return;
 
 	// Base만 덮어씀 — Added(성소) 보존
@@ -171,8 +171,18 @@ void UStatComponent::LoadStatsForLevel(int32 Level)
 	if (HealthComp)
 		HealthComp->SetMaxHP(GetMaxHP(), false);
 
-	OnStatChanged.Broadcast(EStatTypes::MaxHP, GetMaxHP());
+	BroadcastLevelStatsChanged();
+	// OnStatChanged.Broadcast(EStatTypes::MaxHP, GetMaxHP());
 	SyncToGameInstance();
+}
+
+void UStatComponent::BroadcastLevelStatsChanged()
+{
+	OnStatChanged.Broadcast(EStatTypes::MaxHP, GetMaxHP());
+	OnStatChanged.Broadcast(EStatTypes::AttackPower, GetAttackPower());
+	OnStatChanged.Broadcast(EStatTypes::SpellPower, GetSpellPower());
+	OnStatChanged.Broadcast(EStatTypes::AttackSpeed, GetAttackSpeed());
+	OnStatChanged.Broadcast(EStatTypes::MoveSpeed, GetMoveSpeed());
 }
 
 int32 UStatComponent::GetRequiredExpForLevel(int32 Level) const
@@ -181,7 +191,7 @@ int32 UStatComponent::GetRequiredExpForLevel(int32 Level) const
 	if (!GI || !GI->LevelDataTable) return -1;
 
 	const FName RowName = FName(*FString::Printf(TEXT("Level_%d"), Level));
-	FPlayerLevelData* Row = GI->LevelDataTable->FindRow<FPlayerLevelData>(RowName, TEXT("GetRequiredExpForLevel"));
+	FPlayerLevelGrowthData* Row = GI->LevelDataTable->FindRow<FPlayerLevelGrowthData>(RowName, TEXT("GetRequiredExpForLevel"));
 	return Row ? Row->RequiredExp : -1;
 }
 
