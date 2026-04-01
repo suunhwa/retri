@@ -16,7 +16,7 @@ struct RETRI_API FPlayerStatInfo
 {
 	GENERATED_BODY()
 
-	// ── Currency ──────────────────────────────────────────────────────────
+	// --- Currency --------------------------------------------------------------
 	// 상점 / 성소 / 분해의 성소 등 주 화폐
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Currency")
 	int32 Gold = 0;
@@ -25,11 +25,11 @@ struct RETRI_API FPlayerStatInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Currency")
 	int32 DreamDust = 0;
 
-	// ── Health ────────────────────────────────────────────────────────────
+	// --- Health --------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Health")
 	float MaxHP = 220.f;
 
-	// ── Combat ────────────────────────────────────────────────────────────
+	// --- Combat --------------------------------------------------------------
 	// 기본 공격 피해량 계수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Combat")
 	float AttackPower = 43.f;
@@ -59,7 +59,7 @@ struct RETRI_API FPlayerStatInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Combat")
 	float AttackSpeed = 1.41f;
 
-	// ── Utility ───────────────────────────────────────────────────────────
+	// --- Utility --------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Utility")
 	float MoveSpeed = 520.f;
 
@@ -67,15 +67,22 @@ struct RETRI_API FPlayerStatInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Utility")
 	float MemoryAcceleration = 0.f;
 
-	// ── Elemental ─────────────────────────────────────────────────────────
+	// --- Elemental --------------------------------------------------------------
 	// 화상 피해 보너스 배율 (0.0 = 보너스 없음)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Elemental")
 	float BurnDamageBonus = 0.f;
 
-	// ── Dash ──────────────────────────────────────────────────────────────
+	// --- Dash --------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Dash")
 	int32 DashCount = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Dash")
 	float DashCooldown = 5.f;
+	
+	// --- Level / Exp --------------------------------------------------------------
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Level")
+    int32 CurrentLevel = 1;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Level")
+    int32 CurrentExp = 0;
 };

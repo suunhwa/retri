@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "AntiGravityAOE.generated.h"
+#include "AntiGravityAoE.generated.h"
 
 class UCapsuleComponent;
 class UNiagaraComponent;
@@ -15,12 +15,12 @@ class UNiagaraComponent;
  * - 착지: AP × 4.0
  */
 UCLASS()
-class RETRI_API AAntiGravityAOE : public AActor
+class RETRI_API AAntiGravityAoE : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	AAntiGravityAOE();
+	AAntiGravityAoE();
 
 protected:
 	virtual void BeginPlay() override;

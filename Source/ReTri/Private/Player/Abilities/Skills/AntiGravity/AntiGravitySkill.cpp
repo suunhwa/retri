@@ -10,7 +10,7 @@
 #include "Player/PlayerCharacter.h"
 #include "Player/ReTriPlayerController.h"
 #include "Player/Components/StatComponent.h"
-#include "Player/Abilities/Skills/AntiGravity/AntiGravityAOE.h"
+#include "Player/Abilities/Skills/AntiGravity/AntiGravityAoE.h"
 
 UAntiGravitySkill::UAntiGravitySkill()
 {
@@ -39,7 +39,7 @@ void UAntiGravitySkill::Activate(ACharacter* Owner)
 		FVector(TargetPoint.X, TargetPoint.Y, Owner->GetActorLocation().Z)
 	);
 
-	AAntiGravityAOE* AntiGravity = Owner->GetWorld()->SpawnActorDeferred<AAntiGravityAOE>(
+	AAntiGravityAoE* AntiGravity = Owner->GetWorld()->SpawnActorDeferred<AAntiGravityAoE>(
 		AntiGravityAoEClass,
 		SpawnTransform,
 		Owner,

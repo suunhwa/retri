@@ -31,6 +31,8 @@ enum class EStatTypes : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChanged, EStatTypes, StatType, float, NewValue);
+// CurrentExp, 다음 레벨까지 필요한 누적 경험치, 현재 레벨
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnExpChanged, int32, CurrentExp, int32, RequiredExp, int32, CurrentLevel);
 
 UCLASS(ClassGroup=(Player), meta=(BlueprintSpawnableComponent))
 class RETRI_API UStatComponent : public UActorComponent
@@ -76,6 +78,13 @@ public:
 	// 해당 레벨 도달에 필요한 누적 경험치 (-1: 테이블 미설정 또는 범위 초과)
 	UFUNCTION(BlueprintPure, Category="Stats")
 	int32 GetRequiredExpForLevel(int32 Level) const;
+	
+	// 적 처치 등 외부에서 경험치 추가 시 호출 — 레벨업 자동 처리
+	UFUNCTION(BlueprintCallable, Category="Stats")
+	void AddExp(int32 Amount);
+
+	UFUNCTION(BlueprintPure, Category="Stats")
+	int32 GetCurrentExp() const { return CurrentExp; }
 
 	// 성소 / 레벨 시스템에서 현재 스탯 전체를 읽을 때 사용
 	UFUNCTION(BlueprintPure, Category="Stats")
@@ -136,6 +145,10 @@ public:
 	// 스탯 변경 시 브로드캐스트 — UI / 성소 / 레벨 시스템에서 구독
 	UPROPERTY(BlueprintAssignable, Category="Stats")
 	FOnStatChanged OnStatChanged;
+	
+	// 경험치/레벨 변경 시 브로드캐스트 — ExpBar UI에서 구독
+	UPROPERTY(BlueprintAssignable, Category="Stats")
+	FOnExpChanged OnExpChanged;
 
 private:
 	UPROPERTY()
@@ -145,6 +158,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="Stats|Level", meta=(AllowPrivateAccess=true))
 	int32 CurrentLevel = 1;
+	
+	UPROPERTY(VisibleAnywhere, Category="Stats|Level", meta=(AllowPrivateAccess=true))
+	int32 CurrentExp = 0;
 
 	// ── Currency: 단순 누적 잔액 ──────────────────────────────────────────
 	UPROPERTY(VisibleAnywhere, Category="Stats|Currency", meta=(AllowPrivateAccess=true))

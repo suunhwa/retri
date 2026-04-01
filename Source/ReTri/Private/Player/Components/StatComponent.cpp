@@ -185,6 +185,31 @@ void UStatComponent::BroadcastLevelStatsChanged()
 	OnStatChanged.Broadcast(EStatTypes::MoveSpeed, GetMoveSpeed());
 }
 
+void UStatComponent::AddExp(int32 Amount)
+{
+	if (Amount <= 0) return;
+	CurrentExp += Amount;
+
+	// 레벨업 체크 — 누적 경험치가 다음 레벨 조건 충족 시 반복 처리
+	int32 NextLevel = CurrentLevel + 1;
+	int32 Required = GetRequiredExpForLevel(NextLevel);
+	while (Required != -1 && CurrentExp >= Required)
+	{
+		LoadStatsForLevel(NextLevel);
+		NextLevel++;
+		Required = GetRequiredExpForLevel(NextLevel);
+	}
+
+	// ExpBar 브로드캐스트: 다음 레벨 필요 경험치 (-1이면 맥스 레벨)
+	const int32 RequiredForNext = GetRequiredExpForLevel(CurrentLevel + 1);
+	
+	UE_LOG(LogTemp, Warning, TEXT("[EXP] Lv.%d | EXP: %d / %d"), CurrentLevel, CurrentExp, RequiredForNext);
+	
+	OnExpChanged.Broadcast(CurrentExp, RequiredForNext, CurrentLevel);
+
+	SyncToGameInstance();
+}
+
 int32 UStatComponent::GetRequiredExpForLevel(int32 Level) const
 {
 	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
@@ -214,5 +239,7 @@ FPlayerStatInfo UStatComponent::GetStatInfo() const
 	Info.DashCount = GetDashCount();
 	Info.DashCooldown = GetDashCooldown();
 	Info.BurnDamageBonus = GetBurnDamageBonus();
+	Info.CurrentLevel = CurrentLevel;
+	Info.CurrentExp = CurrentExp;
 	return Info;
 }

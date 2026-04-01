@@ -6,7 +6,7 @@
 #include "Player/Abilities/AbilityBase.h"
 #include "AntiGravitySkill.generated.h"
 
-class AAntiGravityAOE;
+class AAntiGravityAoE;
 class UNiagaraSystem;
 
 /**
@@ -27,7 +27,7 @@ protected:
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category="GravityReversal")
-	TSubclassOf<AAntiGravityAOE> AntiGravityAoEClass;
+	TSubclassOf<AAntiGravityAoE> AntiGravityAoEClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> CastEffect;

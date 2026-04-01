@@ -29,6 +29,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/UI/HPBar.h"
+#include "Player/UI/ExpBar.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -141,6 +142,9 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// CDO에서 실행 방지
+	if (HasAnyFlags(RF_ClassDefaultObject)) return;
+	
 	// OnDeath 델리게이트 바인딩
 	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
 	
@@ -148,6 +152,19 @@ void APlayerCharacter::BeginPlay()
 	{
 		HealthComp->OnHPChanged.AddDynamic(HPWidget, &UHPBar::OnHPChanged);
 	}
+	/*// ExpBar 생성 
+	if (ExpBarWidgetClass)
+	{
+		ExpBarWidget = CreateWidget<UExpBar>(GetWorld(), ExpBarWidgetClass);
+		if (ExpBarWidget)
+		{
+			ExpBarWidget->AddToViewport();
+			StatComp->OnExpChanged.AddDynamic(ExpBarWidget, &UExpBar::OnExpChanged);
+			// 초기값 표시
+			const int32 RequiredForNext = StatComp->GetRequiredExpForLevel(StatComp->GetCurrentLevel() + 1);
+			ExpBarWidget->OnExpChanged(StatComp->GetCurrentExp(), RequiredForNext, StatComp->GetCurrentLevel());
+		}
+	}*/
 	
 	// GD->DebugStat();
 }
@@ -461,4 +478,9 @@ void APlayerCharacter::Interaction()
 			// GD->DebugStat();
 		}
 	}
+}
+
+void APlayerCharacter::DebugAddExp(int32 Amount)
+{
+	StatComp->AddExp(Amount);
 }
