@@ -5,10 +5,10 @@
 
 #include "Level/Actors/LootDreamPowderPillar.h"
 #include "Level/Actors/LootGoldCoinPot.h"
+#include "Level/Actors/InteractableBase.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Level/Actors/InteractableBase.h"
 
 // === Infrastructure (UE Overrides) ===
 void UMapSubSystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -200,7 +200,6 @@ void UMapSubSystem::ProceduralGenerateMap()
 			}
 			NewNode.SpawnInteractableRowNames = RandomInteractable(RandomNum);
 			
-			
 			// 위치 정해진 위치에서 +- 랜덤 위치 (지터링) RandomRange (-40, 40)
 			float X = StartX + (Depth * XSpacing); 
 			float Y = StartY + (W * YSpacing);
@@ -270,6 +269,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 					break;
 				}
 			}
+			
 			// 들어온 선이 1개도 없다면 (길을 잃었다면)
 			if (!bHasIncoming) 
 			{
@@ -356,12 +356,14 @@ void UMapSubSystem::EnterMap(int32 MapIndex)
 }
 
 // === Helpers / Utilities ===
-TArray<FName> UMapSubSystem::RandomInteractable(int32 RandomNum)
+TMap<FName, bool> UMapSubSystem::RandomInteractable(int32 RandomNum)
 {
 	TArray<FName> RowNames = InteractionData->GetRowNames();
 	RowNames.Remove("Portal");
 	
-	TArray<FName> RandomNames;
+	TMap<FName, bool> RandomNames;
+	
+	int32 MinCount = FMath::Min(RandomNum, RowNames.Num());
 	
 	if (RowNames.Num() > 0)
 	{
@@ -370,7 +372,7 @@ TArray<FName> UMapSubSystem::RandomInteractable(int32 RandomNum)
 			int32 R = FMath::RandRange(0, RowNames.Num() - 1);
 			if (RandomNames.Contains(RowNames[R])) continue;
 			
-			RandomNames.Add(RowNames[R]);
+			RandomNames.Add(RowNames[R], false);
 			RandomNum--;
 			
 			FString RowName = RowNames[R].ToString();
@@ -407,25 +409,31 @@ FInteractableData UMapSubSystem::GetRowInteractionData(FName RowName, bool& bSuc
 void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 {
 	// todo 이미 상호작용한 기물에 대한 업데이트 -> 기물 정보..
+	TArray<AActor*> TPs;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Interactable"), TPs);
 	
-	auto InteractableNames = CurMapDatas[CurMapIndex].SpawnInteractableRowNames;
-	for (int i = 0; i < InteractableNames.Num(); i++)
+	TArray<FName> RowNames;
+	CurMapDatas[CurMapIndex].SpawnInteractableRowNames.GetKeys(RowNames);
+	for (int i = 0; i < RowNames.Num(); i++)
 	{
 		bool bSuccess = false;
-		FInteractableData IData = GetRowInteractionData(InteractableNames[i], bSuccess);
+		FInteractableData IData = GetRowInteractionData(RowNames[i], bSuccess);
 		
 		if (!bSuccess)
 		{
-			JIWONLOG("샤갈 %s Row 못찾음", *InteractableNames[i].ToString())
+			JIWONLOG("샤갈 %s Row 못찾음", *RowNames[i].ToString())
 			continue;
 		}
 		
 		AInteractableBase* I = GetWorld()->SpawnActor<AInteractableBase>(
 			IData.InteractableClass, 
-			TargetPoints[i]->GetActorLocation(), 
-			TargetPoints[i]->GetActorRotation()
+			// TargetPoints[i]->GetActorLocation(), 
+			// TargetPoints[i]->GetActorRotation()
+			TPs[i]->GetActorLocation(), 
+			TPs[i]->GetActorRotation()
 		);
 		
+		I->SetIsUsed(*CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Find(RowNames[i]));
 		I->DataInit(IData);
 	}
 }
@@ -452,11 +460,12 @@ void UMapSubSystem::SpawnPortal(AActor* TP)
 
 void UMapSubSystem::SpawnLootPieces(TArray<AActor*> TargetPoints)
 {
-	if (CurMapDatas[CurMapIndex].bIsCleared)
-	{
-		JIWONLOG("이미 클리어 한 맵")
-		return;
-	}
+	// todo 깬 것 만 없애기 ㅠ힝
+	// if (CurMapDatas[CurMapIndex].bIsCleared)
+	// {
+	// 	JIWONLOG("이미 클리어 한 맵")
+	// 	return;
+	// }
 	
 	ALootBase* Loot = nullptr;
 	for (AActor* TP : TargetPoints)
@@ -471,4 +480,34 @@ void UMapSubSystem::SpawnLootPieces(TArray<AActor*> TargetPoints)
 		else
 			JIWONLOG("[UMapSubSystem] Loot 생성 실패: 태그나 클래스 설정을 확인하세요.");
 	}
+}
+
+void UMapSubSystem::SetEnemySpawnerCount(int32 SpawnerNum)
+{
+	EnemySpawnerCount = SpawnerNum;
+}
+
+void UMapSubSystem::LevelClear()
+{
+	TArray<AActor*> TPs;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Portal"), TPs);
+	
+	bool bSuccess = false;
+	FInteractableData IData = GetRowInteractionData(TEXT("Portal"), bSuccess);
+		
+	if (!bSuccess)
+	{
+		JIWONLOG("샤갈 Portal Row 못찾음")
+		return;
+	}
+		
+	CurMapDatas[CurMapIndex].bIsCleared = true;
+	
+	AInteractableBase* I = GetWorld()->SpawnActor<AInteractableBase>(
+		IData.InteractableClass, 
+		TPs[0]->GetActorLocation(), 
+		TPs[0]->GetActorRotation()
+	);
+		
+	I->DataInit(IData);
 }

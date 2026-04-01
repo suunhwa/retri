@@ -10,6 +10,8 @@
 #include "Level/UI/MapLineDrawer.h"
 #include "Level/Data/InteractableData.h"
 #include "MapSubSystem.h"
+#include "ReTriGameInstance.h"
+#include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "ReTri/ReTri.h"
 
@@ -26,7 +28,7 @@ void UMapUI::NativeConstruct()
 		// PC->SetInputMode(InputMode);
 	}
 	
-	auto GI = GetGameInstance();
+	auto GI = Cast<UReTriGameInstance>(GetGameInstance());
 	if (!GI) return;
 	auto MapSub = GI->GetSubsystem<UMapSubSystem>();
 	if (!MapSub) return;
@@ -38,7 +40,6 @@ void UMapUI::NativeConstruct()
 		if (Line)
 		{
 			UCanvasPanelSlot* LineSlot = MapCanvas->AddChildToCanvas(Line);
-		
 			if (LineSlot)
 			{
 				LineSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
@@ -55,27 +56,47 @@ void UMapUI::NativeConstruct()
 	for (FMapNodeData Data : MapSub->CurMapDatas)
 	{
 		FString NodeName = FString::Printf(TEXT("Node_%d"), Data.MapIndex);
-		UMapNode* Node = CreateWidget<UMapNode>(GetWorld(), MapUIClass, FName(*NodeName));
-		Node->NodeIndexNumber = Data.MapIndex;
-		for (FName Name : Data.SpawnInteractableRowNames)
+		UMapNode* MapNode = CreateWidget<UMapNode>(GetWorld(), MapUIClass, FName(*NodeName));
+		MapNode->NodeIndexNumber = Data.MapIndex;
+		
+		FName EnumName = FName(*StaticEnum<EMapNodeType>()->GetNameStringByValue((int64)Data.MapType));
+		FMapUIData* UIData = GI->MapUIData->FindRow<FMapUIData>(EnumName, TEXT("MapNode"));
+		FButtonStyle Style;
+		UTexture2D* Texture = UIData->MapIcon;
+		if (!Texture) SCREENLOG("엥? 그럼 어케 불러옴 ?");
+		else SCREENLOG("에? 근데 왜 안뜸?");
+		Style.Normal.SetResourceObject(UIData->MapIcon);
+		Style.Normal.ImageSize = FVector2D(50.f, 50.f); // 사이즈도 잊지 마십시오!
+		Style.Hovered = Style.Normal;
+		Style.Pressed = Style.Normal;
+		FLinearColor MainColor = UIData->IconColor;
+		Style.Normal.TintColor = MainColor;
+		MainColor += FLinearColor(0.5f, 0.5f, 0.5f, 1.0f);
+		Style.Hovered.TintColor = MainColor;
+		MainColor -= FLinearColor(0.8f, 0.8f, 0.8f, 1.0f);
+		Style.Pressed.TintColor = MainColor;	
+
+		MapNode->Node->SetStyle(Style);
+		
+		for (auto Name : Data.SpawnInteractableRowNames)
 		{
-			if (Name.IsEqual(TEXT("Sanctuary")))
+			if (Name.Key.IsEqual(TEXT("Sanctuary")))
 			{
-				Node->SetSanctuaryVisibility(ESlateVisibility::Visible);
+				MapNode->SetSanctuaryVisibility(ESlateVisibility::Visible);
 			}
-			if (Name.IsEqual(TEXT("Well")))
+			else if (Name.Key.IsEqual(TEXT("Well")))
 			{
-				Node->SetWellVisibility(ESlateVisibility::Visible);
+				MapNode->SetWellVisibility(ESlateVisibility::Visible);
 			}
 		}
 		
 		// 나중에 위치를 찾을 수 있도록 저장
 		// NodeWidgets.Add(Node);
 		
-		if (!Node || !MapCanvas) continue;
+		if (!MapNode || !MapCanvas) continue;
 		
 		//UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MapCanvas->AddChild(Node));
-		UCanvasPanelSlot* CanvasSlot = MapCanvas->AddChildToCanvas(Node);
+		UCanvasPanelSlot* CanvasSlot = MapCanvas->AddChildToCanvas(MapNode);
 		
 		if (CanvasSlot)
 		{

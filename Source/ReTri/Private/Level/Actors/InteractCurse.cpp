@@ -3,6 +3,7 @@
 
 #include "Level/Actors/InteractCurse.h"
 
+#include "MapSubSystem.h"
 #include "Level/UI/SelectButtonUI.h"
 #include "Level/UI/SelectUI.h"
 #include "ReTri/ReTri.h"
@@ -21,6 +22,10 @@ void AInteractCurse::Interact_Implementation()
 	
 	UE_LOG(jiwon, Warning, TEXT("3가지 선택지 UI 띄우기 -> 저주를 받고 스텟 레벨업"));
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	
+	FName KeyName(*InteractName);
+	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
+	if (FoundValue) *FoundValue = true; 
 	
 	// todo: 3가지 선택지 UI 띄우기
 	if (!CurseDataTable)

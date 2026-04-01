@@ -71,6 +71,8 @@ public:
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
 	bool bIsUsed = false;
 	
+	void SetIsUsed(bool IsUsed);
+	
 	// Interaction Object 이름과 상호작용을 띄울 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UWidgetComponent* InteractUI;	

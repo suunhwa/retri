@@ -162,7 +162,7 @@ public:
 	
 	// 상호작용 기물 배열
 	UPROPERTY(BlueprintReadWrite)
-	TArray<FName> SpawnInteractableRowNames;
+	TMap<FName, bool> SpawnInteractableRowNames;
 	
 	// 현재 방 번호
 	UPROPERTY(BlueprintReadWrite)
