@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "UI/HPBar.h"
 #include "UI/ExpBar.h"
+#include "UI/PlayerHUD.h"
 #include "PlayerCharacter.generated.h"
 
 class USpringArmComponent;
@@ -189,10 +190,17 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<UExpBar> ExpBarWidgetClass;
 	
+	// 화면 좌하단 HUD
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UPlayerHUD> PlayerHUDClass;
+	
 	UFUNCTION(Exec)
 	void DebugAddExp(int32 Amount);
 
 private:
 	UPROPERTY()
 	TObjectPtr<UExpBar> ExpBarWidget;
+	
+	UPROPERTY()
+	TObjectPtr<UPlayerHUD> PlayerHUDWidget;
 };

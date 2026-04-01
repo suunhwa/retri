@@ -21,7 +21,6 @@
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
-// #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
 #include "Level/Actors/InteractableBase.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -30,6 +29,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/UI/HPBar.h"
 #include "Player/UI/ExpBar.h"
+#include "Player/UI/PlayerHUD.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -164,6 +164,23 @@ void APlayerCharacter::BeginPlay()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("[HPBar] 위젯 바인딩 실패 - Widget Class 할당 확인"));
+	}
+	
+	// PlayerHUD 생성 (화면 좌하단)
+	if (PlayerHUDClass)
+	{
+		PlayerHUDWidget = CreateWidget<UPlayerHUD>(GetWorld(), PlayerHUDClass);
+		if (PlayerHUDWidget)
+		{
+			PlayerHUDWidget->AddToViewport();
+			HealthComp->OnHPChanged.AddDynamic(PlayerHUDWidget, &UPlayerHUD::OnHPChanged);
+			StatComp->OnStatChanged.AddDynamic(PlayerHUDWidget, &UPlayerHUD::OnStatChanged);
+			StatComp->OnExpChanged.AddDynamic(PlayerHUDWidget, &UPlayerHUD::OnExpChanged);
+			// 초기값 표시
+			PlayerHUDWidget->OnHPChanged(HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
+			const int32 RequiredExp = StatComp->GetRequiredExpForLevel(StatComp->GetCurrentLevel() + 1);
+			PlayerHUDWidget->OnExpChanged(StatComp->GetCurrentExp(), RequiredExp, StatComp->GetCurrentLevel());
+		}
 	}
 	
 	/*// ExpBar 생성 
