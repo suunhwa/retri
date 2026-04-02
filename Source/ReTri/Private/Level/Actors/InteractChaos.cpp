@@ -99,7 +99,7 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 		break;
 	}
 
-	GI->GameData->DebugStat();
+	// GI->GameData->DebugStat();
 	
 	HideSelectUI();
 	bIsUsed = true;

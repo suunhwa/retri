@@ -35,18 +35,11 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+		
+		if (!GI || !GI->StatComp) return;
 
-		int32 CurDreamPowder = GI->GameData->GetRandomDreamPowder();
-		GI->GameData->UpdateDreamPowder(+CurDreamPowder);
-
-		/*GI->GameData->UpdateDreamPowder(+GI->GameData->GetRandomDreamPowder());
-		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.DreamPowder += GI->GameData->GetRandomDreamPowder();
-		*/
-		if (GI && GI->StatComp)
-		{
-			const int32 Amount = GI->GameData->GetRandomDreamPowder();
-			GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Amount);
-		}
+		const int32 CurDreamPowder = GI->GameData->GetRandomDreamPowder();
+		GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, CurDreamPowder);
 		
 		if (FloatingUIActorClass)
 		{
@@ -55,7 +48,7 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 			FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(0.053033f, 0.510102f, 1.0f, 1.f));
 		}
 		
-		GI->GameData->DebugStat();
+		// GI->GameData->DebugStat();
 		Destroy();
 	}
 }

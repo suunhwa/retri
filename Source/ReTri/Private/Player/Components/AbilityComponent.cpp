@@ -3,6 +3,7 @@
 
 #include "Player/Components/AbilityComponent.h"
 
+#include "ReTriGameInstance.h"
 #include "GameFramework/Character.h"
 #include "Player/Abilities/AbilityBase.h"
 
@@ -21,7 +22,23 @@ UAbilityComponent::UAbilityComponent()
 void UAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 
+	// 레벨 이동 시 저장된 슬롯 매핑 복원
+	if (GI)
+	{
+		if (GI->bHasSavedStats && GI->SavedSkillSlots.Num() > 0)
+		{
+			for (auto& Pair : GI->SavedSkillSlots)
+			{
+				EAbilitySlot Slot = static_cast<EAbilitySlot>(Pair.Key);
+				if (Pair.Value)
+					RegisterAbility(Slot, Pair.Value);
+			}
+			return; // 복원 완료, 아래 기본 등록 스킵
+		}
+	}
 	RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);
 	RegisterAbility(EAbilitySlot::TravelerMemory1, TravelerMemory1Class);
 	RegisterAbility(EAbilitySlot::SkillQ, SkillQClass);
@@ -60,6 +77,17 @@ UAbilityBase* UAbilityComponent::GetAbility(EAbilitySlot Slot) const
 {
 	const TObjectPtr<UAbilityBase>* Found = Abilities.Find(Slot);
 	return Found ? Found->Get() : nullptr;
+}
+
+void UAbilityComponent::SetSkill(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass)
+{
+	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	// 전체 슬롯 매핑 GI에 저장
+	if (GI)
+	{
+		GI->SavedSkillSlots.Add(static_cast<uint8>(Slot), AbilityClass);
+	}
+	RegisterAbility(Slot, AbilityClass);
 }
 
 void UAbilityComponent::RegisterAbility(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass)

@@ -6,7 +6,6 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "UI/HPBar.h"
-#include "UI/ExpBar.h"
 #include "UI/PlayerHUD.h"
 #include "PlayerCharacter.generated.h"
 
@@ -179,16 +178,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Interaction();
 	
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UReTriGameData* GD;*/
-	
 	// hp bar
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UWidgetComponent> HPBarComp;
-	
-	// exp bar
-	UPROPERTY(EditDefaultsOnly, Category="UI")
-	TSubclassOf<UExpBar> ExpBarWidgetClass;
 	
 	// 화면 좌하단 HUD
 	UPROPERTY(EditDefaultsOnly, Category="UI")
@@ -198,9 +190,6 @@ public:
 	void DebugAddExp(int32 Amount);
 
 private:
-	UPROPERTY()
-	TObjectPtr<UExpBar> ExpBarWidget;
-	
 	UPROPERTY()
 	TObjectPtr<UPlayerHUD> PlayerHUDWidget;
 };

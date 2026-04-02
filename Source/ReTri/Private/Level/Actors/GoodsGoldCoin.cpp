@@ -34,16 +34,15 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-
-		int32 CurGold = GI->GameData->GetRandomDreamPowder();
-		GI->GameData->UpdateGold(+GI->GameData->GetRandomGold());
-		//todo 선화가 만든 Stat으로 바꿔야함 GI->CurPlayerStat.CurGold += GI->GameData->GetRandomGold();
-
+		
 		if (!GI || !GI->StatComp) return;
-		
-		const int32 CurrGold = GI->GameData->GetRandomGold();
-		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, CurrGold);
-		
+
+		const int32 CurGold = GI->GameData->GetRandomGold();
+		const int32 GoldBefore = GI->StatComp->GetGold();
+		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, CurGold);
+		const int32 GoldAfter = GI->StatComp->GetGold();
+		UE_LOG(LogTemp, Warning, TEXT("[GoldCoin] CurGold=%d | Before=%d | After=%d | Delta=%d"),
+			CurGold, GoldBefore, GoldAfter, GoldAfter - GoldBefore);
 		
 		if (FloatingUIActorClass)
 		{
@@ -52,7 +51,7 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 			FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
 		}
 		
-		GI->GameData->DebugStat();
+		// GI->GameData->DebugStat();
 		Destroy();
 	}
 }

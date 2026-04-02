@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ReTriGameInstance.h"
 #include "Components/ActorComponent.h"
 #include "AbilityComponent.generated.h"
 
@@ -45,6 +46,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Ability")
 	UAbilityBase* GetAbility(EAbilitySlot Slot) const;
 	
+	// GI에 스킬 데이터 저장
+	UFUNCTION(BlueprintCallable, Category="Ability")
+	void SetSkill(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass);
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
 	TSubclassOf<UAbilityBase> DashAbilityClass;
@@ -65,5 +70,4 @@ private:
 	TMap<EAbilitySlot, TObjectPtr<UAbilityBase>> Abilities;
 	
 	void RegisterAbility(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass);
-	
 };
