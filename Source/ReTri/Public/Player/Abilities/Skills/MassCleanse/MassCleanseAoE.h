@@ -1,0 +1,78 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "MassCleanseAoE.generated.h"
+
+class UCapsuleComponent;
+class UNiagaraComponent;
+
+UCLASS()
+class RETRI_API AMassCleanseAoE : public AActor
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this actor's properties
+	AMassCleanseAoE();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
+	/** 스킬 발동 전 AbilityPower 주입 */
+	void Init(float InAbilityPower, AController* InInstigator);
+
+private:
+	void ApplyInitialHit();
+	void ApplyDoTTick();
+	void FinishDoT();
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCapsuleComponent> HitVolume;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UNiagaraComponent> CleanseEffect;
+
+	float AbilityPower = 0.f;
+
+	// 즉발 계수
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
+	float ImmediateDamageCoeff = 2.5f;
+
+	// DoT 총 피해 계수
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
+	float DoTDamageCoeff = 2.75f;
+
+	// DoT 지속 시간 (초)
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
+	float DoTDuration = 2.4f;
+
+	// DoT 틱 간격
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
+	float DoTTickInterval = 0.4f;
+
+	// 경직 지속 시간
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
+	float StaggerDuration = 0.25f;
+
+	// AoE 반경
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
+	float HitRadius = 200.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<USoundBase> ImpactSound;
+
+	TWeakObjectPtr<AController> InstigatorController;
+
+	FTimerHandle DoTTimerHandle;
+	FTimerHandle LifeTimerHandle;
+
+	float DoTDamagePerTick = 0.f;
+
+	/** 현재 범위 내 적 수집 */
+	TArray<TWeakObjectPtr<AActor>> GetEnemiesInRange() const;
+};

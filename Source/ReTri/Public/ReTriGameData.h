@@ -150,7 +150,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stats|Elemental")
 	void UpdateFireDamage(float Amount) { PlayerStats.FireDamage += Amount; }
 	
-	void DebugStat() const
+	/*void DebugStat() const
 	{
 		UE_LOG(jiwon, Log, TEXT("==================== Player Stats ===================="));
 		// 기본 스탯
@@ -162,5 +162,5 @@ public:
 		UE_LOG(jiwon, Log, TEXT("[Utility] MoveSpeed: %.2f"), PlayerStats.MoveSpeed);
 		UE_LOG(jiwon, Log, TEXT("[Elemental] FireDamage: %.2f"), PlayerStats.FireDamage);
 		UE_LOG(jiwon, Log, TEXT("======================================================"));
-	}
+	}*/
 };

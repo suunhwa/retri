@@ -21,7 +21,6 @@
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
-// #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
 #include "Level/Actors/InteractableBase.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -29,158 +28,186 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/UI/HPBar.h"
-#include "Player/UI/ExpBar.h"
+#include "Player/UI/PlayerHUD.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonRevenant/Characters/Heroes/Revenant/Meshes/Revenant.Revenant'"));
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(TEXT(
+		"/Script/Engine.SkeletalMesh'/Game/ParagonRevenant/Characters/Heroes/Revenant/Meshes/Revenant.Revenant'"));
 	if (CharacterMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMesh.Object);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
 	}
-	
-	ConstructorHelpers::FClassFinder<UAnimInstance> AnimBP(TEXT("/Game/Player/Animations/ABP_Player.ABP_Player_C")); 
+
+	ConstructorHelpers::FClassFinder<UAnimInstance> AnimBP(TEXT("/Game/Player/Animations/ABP_Player.ABP_Player_C"));
 	if (AnimBP.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(AnimBP.Class);
 	}
-	
-	HealthComp  = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
-	StatComp    = CreateDefaultSubobject<UStatComponent>(TEXT("StatComp"));
+
+	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+	StatComp = CreateDefaultSubobject<UStatComponent>(TEXT("StatComp"));
 	AbilityComp = CreateDefaultSubobject<UAbilityComponent>(TEXT("AbilityComp"));
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	SpringArmComp->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-	SpringArmComp->TargetArmLength = 2700.f;   
+	SpringArmComp->TargetArmLength = 2700.f;
 	SpringArmComp->bUsePawnControlRotation = false; // 카메라 고정
 	SpringArmComp->bInheritPitch = false;
 	SpringArmComp->bInheritYaw = false;
 	SpringArmComp->bInheritRoll = false;
-	SpringArmComp->bDoCollisionTest = false;  
+	SpringArmComp->bDoCollisionTest = false;
 	bUseControllerRotationYaw = false; // 캐릭터 컨트롤러 안 따라감
-	GetCharacterMovement()->bOrientRotationToMovement = true; 
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
 	GetCharacterMovement()->bCanWalkOffLedges = false;
 	GetCharacterMovement()->NavAgentProps.bCanWalk = true;
-	
+
 	CamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CamComp"));
 	CamComp->SetupAttachment(SpringArmComp);
 	CamComp->SetFieldOfView(70.f);
-	
+
 	// GD = CreateDefaultSubobject<UReTriGameData>(TEXT("GameData"));
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempMoveInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Move.IA_Move'"));
+
+	ConstructorHelpers::FObjectFinder<UInputAction> TempMoveInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Move.IA_Move'"));
 	if (TempMoveInput.Succeeded())
 	{
 		ia_Move = TempMoveInput.Object;
 	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempAttackInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Attack.IA_Attack'"));
+
+	ConstructorHelpers::FObjectFinder<UInputAction> TempAttackInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Attack.IA_Attack'"));
 	if (TempAttackInput.Succeeded())
 	{
 		ia_Attack = TempAttackInput.Object;
 	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempTM1Input(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_TravelerMemory1.IA_TravelerMemory1'"));
+
+	ConstructorHelpers::FObjectFinder<UInputAction> TempTM1Input(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_TravelerMemory1.IA_TravelerMemory1'"));
 	if (TempTM1Input.Succeeded())
 	{
 		ia_TravelerMemory1 = TempTM1Input.Object;
 	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempSkillQInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_SkillQ.IA_SkillQ'"));
+
+	ConstructorHelpers::FObjectFinder<UInputAction> TempSkillQInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_SkillQ.IA_SkillQ'"));
 	if (TempSkillQInput.Succeeded())
 	{
 		ia_SkillQ = TempSkillQInput.Object;
 	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempSkillEInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_SkillE.IA_SkillE'"));
+
+	ConstructorHelpers::FObjectFinder<UInputAction> TempSkillEInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_SkillE.IA_SkillE'"));
 	if (TempSkillEInput.Succeeded())
 	{
 		ia_SkillE = TempSkillEInput.Object;
 	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempTM2Input(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_TravelerMemory2.IA_TravelerMemory2'"));
+
+	ConstructorHelpers::FObjectFinder<UInputAction> TempTM2Input(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_TravelerMemory2.IA_TravelerMemory2'"));
 	if (TempTM2Input.Succeeded())
 	{
 		ia_TravelerMemory2 = TempTM2Input.Object;
 	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempDashInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Dash.IA_Dash'"));
+
+	ConstructorHelpers::FObjectFinder<UInputAction> TempDashInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Dash.IA_Dash'"));
 	if (TempDashInput.Succeeded())
 	{
 		ia_Dash = TempDashInput.Object;
 	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempInteractionInput(TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Interaction.IA_Interaction'"));
+
+	ConstructorHelpers::FObjectFinder<UInputAction> TempInteractionInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Interaction.IA_Interaction'"));
 	if (TempInteractionInput.Succeeded())
 	{
 		ia_Interaction = TempInteractionInput.Object;
 	}
 
-	ConstructorHelpers::FObjectFinder<UInputMappingContext> TempIMC(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Inputs/IMC_Player.IMC_Player'"));
+	ConstructorHelpers::FObjectFinder<UInputMappingContext> TempIMC(
+		TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Inputs/IMC_Player.IMC_Player'"));
 	if (TempIMC.Succeeded())
 	{
 		imc_Player = TempIMC.Object;
 	}
-	
+
 	HPBarComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarComp"));
 	HPBarComp->SetupAttachment(GetMesh());
-	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 250.f)); // 머리 위 높이 조절
-	HPBarComp->SetWidgetSpace(EWidgetSpace::World); // 항상 카메라 향함
-	HPBarComp->SetDrawSize(FVector2D(150.f, 20.f));  // 크기 조절
+	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 300.f)); // 머리 위 높이 조절
+	HPBarComp->SetWidgetSpace(EWidgetSpace::Screen); // 항상 카메라 향함
+	HPBarComp->SetDrawSize(FVector2D(100.f, 15.f)); // 크기 조절
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	// CDO에서 실행 방지
 	if (HasAnyFlags(RF_ClassDefaultObject)) return;
-	
+
 	// game instance에 컴포넌트 등록
 	if (UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetGameInstance()))
 	{
 		GI->StatComp = StatComp;
 		GI->HealthComp = HealthComp;
 	}
-	
+
 	// OnDeath 델리게이트 바인딩
 	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
-	
-	if (UHPBar* HPWidget = Cast<UHPBar>(HPBarComp->GetUserWidgetObject()))
+	// 메인 메뉴에서는 UI 표시 안 함
+	const bool bIsMainMenu = GetWorld()->GetMapName().Contains(TEXT("Lv_Main"));
+	if (bIsMainMenu)
 	{
-		HealthComp->OnHPChanged.AddDynamic(HPWidget, &UHPBar::OnHPChanged);
+		HPBarComp->SetVisibility(false);
 	}
-	/*// ExpBar 생성 
-	if (ExpBarWidgetClass)
+	if (!bIsMainMenu)
 	{
-		ExpBarWidget = CreateWidget<UExpBar>(GetWorld(), ExpBarWidgetClass);
-		if (ExpBarWidget)
+		HPBarComp->InitWidget();
+		if (UHPBar* HPWidget = Cast<UHPBar>(HPBarComp->GetUserWidgetObject()))
 		{
-			ExpBarWidget->AddToViewport();
-			StatComp->OnExpChanged.AddDynamic(ExpBarWidget, &UExpBar::OnExpChanged);
-			// 초기값 표시
-			const int32 RequiredForNext = StatComp->GetRequiredExpForLevel(StatComp->GetCurrentLevel() + 1);
-			ExpBarWidget->OnExpChanged(StatComp->GetCurrentExp(), RequiredForNext, StatComp->GetCurrentLevel());
+			// UE_LOG(LogTemp, Warning, TEXT("[HPBar] 위젯 바인딩 성공"));
+			HealthComp->OnHPChanged.AddDynamic(HPWidget, &UHPBar::OnHPChanged);
+			HPWidget->OnHPChanged(HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
 		}
-	}*/
-	
-	// GD->DebugStat();
+
+		// PlayerHUD 생성 (화면 좌하단)
+		if (PlayerHUDClass)
+		{
+			PlayerHUDWidget = CreateWidget<UPlayerHUD>(GetWorld(), PlayerHUDClass);
+			if (PlayerHUDWidget)
+			{
+				PlayerHUDWidget->AddToViewport();
+				HealthComp->OnHPChanged.AddDynamic(PlayerHUDWidget, &UPlayerHUD::OnHPChanged);
+				StatComp->OnStatChanged.AddDynamic(PlayerHUDWidget, &UPlayerHUD::OnStatChanged);
+				StatComp->OnExpChanged.AddDynamic(PlayerHUDWidget, &UPlayerHUD::OnExpChanged);
+				// 초기값 표시
+				PlayerHUDWidget->OnHPChanged(HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
+				const int32 RequiredExp = StatComp->GetRequiredExpForLevel(StatComp->GetCurrentLevel() + 1);
+				PlayerHUDWidget->OnExpChanged(StatComp->GetCurrentExp(), RequiredExp, StatComp->GetCurrentLevel());
+			
+				// 초기 재화 표시
+				const FPlayerStatInfo InitStat = StatComp->GetStatInfo();
+				PlayerHUDWidget->OnStatChanged(EStatTypes::Gold, InitStat.Gold);
+				PlayerHUDWidget->OnStatChanged(EStatTypes::DreamDust, InitStat.DreamDust);
+			}
+		}
+	}
 }
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	if (bIsCombat)
 	{
 		const float CurrentTime = GetWorld()->GetTimeSeconds();
@@ -221,16 +248,22 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		{
 			subsystem->AddMappingContext(imc_Player, 0);
 		}
-		
+
 		auto playerInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 		if (playerInput)
 		{
 			playerInput->BindAction(ia_Move, ETriggerEvent::Triggered, this, &APlayerCharacter::OnMove);
 			playerInput->BindAction(ia_Attack, ETriggerEvent::Started, this, &APlayerCharacter::OnAttack);
-			playerInput->BindAction(ia_TravelerMemory1, ETriggerEvent::Started, this, &APlayerCharacter::OnTravelerMemory1);
+			playerInput->BindAction(ia_TravelerMemory1,
+			                        ETriggerEvent::Started,
+			                        this,
+			                        &APlayerCharacter::OnTravelerMemory1);
 			playerInput->BindAction(ia_SkillQ, ETriggerEvent::Started, this, &APlayerCharacter::OnSkillQ);
 			playerInput->BindAction(ia_SkillE, ETriggerEvent::Started, this, &APlayerCharacter::OnSkillE);
-			playerInput->BindAction(ia_TravelerMemory2, ETriggerEvent::Started, this, &APlayerCharacter::OnTravelerMemory2);
+			playerInput->BindAction(ia_TravelerMemory2,
+			                        ETriggerEvent::Started,
+			                        this,
+			                        &APlayerCharacter::OnTravelerMemory2);
 			playerInput->BindAction(ia_Dash, ETriggerEvent::Started, this, &APlayerCharacter::OnDash);
 			playerInput->BindAction(ia_Interaction, ETriggerEvent::Started, this, &APlayerCharacter::OnInteraction);
 		}
@@ -254,25 +287,25 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 {
 	if (!bCanAttack) return;
 	EnterCombat();
-	
+
 	// UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
-	
+
 	// 클릭한 위치 방향 계산
 	AReTriPlayerController* pc = Cast<AReTriPlayerController>(Controller);
 	if (!pc) return;
-	
+
 	FVector TargetPoint;
 	if (!pc->GetMouseWorldPosition(TargetPoint)) return;
-	
+
 	FVector Direction = TargetPoint - GetActorLocation();
 	Direction.Z = 0.f;
 	if (Direction.IsNearlyZero()) return;
 	Direction.Normalize();
-	
+
 	// 방향 검증 통과 후 쿨타임
 	bCanAttack = false;
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayerCharacter::ResetAttack, AttackInterval, false);
-	
+
 	// 클릭한 방향으로 플레이어 회전
 	SetActorRotation(FRotator(0.f, Direction.Rotation().Yaw, 0.f));
 
@@ -284,16 +317,16 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	}
 
 	if (!BulletClass) return;
-	
+
 	// 4탄마다 강화탄
 	AttackCount++;
-    bool bIsEnhancedShot = (AttackCount >= 4);
-	
+	bool bIsEnhancedShot = (AttackCount >= 4);
+
 	if (bIsEnhancedShot)
 	{
 		AttackCount = 0;
 	}
-	
+
 	FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
 	// UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
 	/*FVector Direction = GetActorForwardVector();
@@ -312,12 +345,12 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 		Direction.Rotation(),
 		SpawnParams
 	);
-	
+
 	if (SpawnedBullet && bIsEnhancedShot)
 	{
 		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
 		UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
-		
+
 		if (EnhancedShotEffect)
 		{
 			if (UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAttached(
@@ -388,15 +421,21 @@ void APlayerCharacter::OnInteraction(const struct FInputActionValue& inputValue)
 	Interaction();
 }
 
-float APlayerCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent,
-                                   AController* EventInstigator, AActor* DamageCauser)
+float APlayerCharacter::TakeDamage(float DamageAmount,
+                                   const FDamageEvent& DamageEvent,
+                                   AController* EventInstigator,
+                                   AActor* DamageCauser)
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	HealthComp->HandleDamage(Damage, EventInstigator);
 
-	UE_LOG(LogTemp, Warning, TEXT("[Hit] Damage: %.1f | HP: %.1f / %.1f"),
-		Damage, HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
+	UE_LOG(LogTemp,
+	       Warning,
+	       TEXT("[Hit] Damage: %.1f | HP: %.1f / %.1f"),
+	       Damage,
+	       HealthComp->GetCurrentHP(),
+	       HealthComp->GetMaxHP());
 
 	if (!HealthComp->IsDead() && HitMontage)
 	{
@@ -414,7 +453,7 @@ void APlayerCharacter::OnDash(const struct FInputActionValue& inputValue)
 void APlayerCharacter::HandleDeath(AController* Killer)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[Death] 플레이어 사망"));
-	
+
 	// 입력 차단
 	DisableInput(Cast<APlayerController>(Controller));
 
@@ -433,10 +472,13 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 
 	// 일정 시간 후 레벨 재시작
 	FTimerHandle DeathTimerHandle;
-	GetWorldTimerManager().SetTimer(DeathTimerHandle, [this]()
-	{
-		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
-	}, 3.f, false);
+	GetWorldTimerManager().SetTimer(DeathTimerHandle,
+	                                [this]()
+	                                {
+		                                UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+	                                },
+	                                3.f,
+	                                false);
 }
 
 void APlayerCharacter::HoverInteractable()
@@ -444,9 +486,10 @@ void APlayerCharacter::HoverInteractable()
 	// 감지하고자 하는 오브젝트 타입들을 배열에 담기.
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
-	
+
 	FHitResult HitResult;
-	bool bHit = GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResult);
+	bool bHit = GetWorld()->GetFirstPlayerController()->
+	                        GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResult);
 	if (bHit && HitResult.GetActor()->Implements<UInteractableInterface>())
 	{
 		IInteractableInterface::Execute_Hover(HitResult.GetActor());
@@ -456,21 +499,27 @@ void APlayerCharacter::HoverInteractable()
 void APlayerCharacter::Interaction()
 {
 	// F 키를 눌렀을 때 오브젝트 들과 상호작용 할 수 있도록 
-	
+
 	// 감지하고자 하는 오브젝트 타입
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
-	
+
 	// 제외할 Actors 
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(this);
-	
+
 	DrawDebugSphere(GetWorld(), GetActorLocation(), 42.f, 16, FColor::Red);
-	
+
 	// 근처에 Interaction Object가 있는지 감지 
 	TArray<AActor*> OutActors;
-	bool bHit = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), 42.f, ObjectTypes, AActor::StaticClass(), IgnoreActors,OutActors);
-	
+	bool bHit = UKismetSystemLibrary::SphereOverlapActors(GetWorld(),
+	                                                      GetActorLocation(),
+	                                                      42.f,
+	                                                      ObjectTypes,
+	                                                      AActor::StaticClass(),
+	                                                      IgnoreActors,
+	                                                      OutActors);
+
 	if (!bHit) return;
 	for (AActor* Actor : OutActors)
 	{
@@ -478,11 +527,6 @@ void APlayerCharacter::Interaction()
 		if (Interact)
 		{
 			IInteractableInterface::Execute_Interact(Interact);
-			
-			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-			GI->GameData->DebugStat();
-			
-			// GD->DebugStat();
 		}
 	}
 }

@@ -85,4 +85,47 @@ struct RETRI_API FPlayerStatInfo
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Level")
     int32 CurrentExp = 0;
+	
+	// --- Added: 성소/강화에서 누적, 레벨업 후에도 유지 ----------------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedMaxHP = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedAttackPower = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedSpellPower = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedAttackSpeed = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedCritRate = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedCritMultiplier = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedMoveSpeed = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedDefense = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedMemoryAcceleration = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedAttackRange = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedProjectileSpeed = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	int32 AddedDashCount = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedDashCooldown = 0.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stats|Added")
+	float AddedBurnDamageBonus = 0.f;
 };

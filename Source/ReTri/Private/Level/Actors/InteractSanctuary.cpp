@@ -5,6 +5,7 @@
 
 #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
+#include "Player/Components/StatComponent.h"
 
 
 void AInteractSanctuary::BeginPlay()
@@ -23,10 +24,10 @@ void AInteractSanctuary::Interact_Implementation()
 	// todo 플레이어 회복
 	
 	auto GI = Cast<UReTriGameInstance>(GetGameInstance());
-	if (GI->GameData->GetCurGold() < Cost) return;
-	GI->GameData->UpdateGold(-Cost);
+	if (!GI || !GI->StatComp) return;
+	if (!GI->StatComp->SpendGold(static_cast<int32>(Cost))) return;
 	GI->GameData->UpdateHP(+HealHP);
 	
-	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	Super::Interact_Implementation();
 }

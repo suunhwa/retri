@@ -6,10 +6,10 @@
 #include "Engine/GameInstance.h"
 
 #include "Player/Data/PlayerStatData.h"
-#include "Player/Components/StatComponent.h"
-#include "Player/Components/HealthComponent.h"
 #include "ReTriGameInstance.generated.h"
 
+class UStatComponent;
+class UHealthComponent;
 /**
  * 
  */
@@ -39,6 +39,14 @@ public:
 	// 레벨/경험치 데이터 (DT_LevelExp)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Data")
 	UDataTable* LevelDataTable;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
+	bool bHasSavedStats = false;
+	
+	// 스킬 슬롯 매핑 저장 (드래그 앤 드롭으로 위치 바뀌어도 유지)
+	// Key: EAbilitySlot, Value: 해당 슬롯에 장착된 스킬 클래스
+	UPROPERTY()
+	TMap<uint8, UClass*> SavedSkillSlots;
 	
 	// todo Player Stat 부분 정리 필
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")

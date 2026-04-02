@@ -3,6 +3,7 @@
 #include "Player/Components/StatComponent.h"
 #include "Player/Components/HealthComponent.h"
 #include "ReTriGameInstance.h"
+#include "Elements/Columns/TypedElementRevisionControlColumns.h"
 
 UStatComponent::UStatComponent()
 {
@@ -14,6 +15,13 @@ void UStatComponent::SyncToGameInstance()
 	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI) return;
 	GI->CurPlayerStats = GetStatInfo();
+	GI->bHasSavedStats = true;
+
+	UE_LOG(LogTemp,
+	       Warning,
+	       TEXT("[StatSync] Gold: %d | DreamDust: %d"),
+	       GI->CurPlayerStats.Gold,
+	       GI->CurPlayerStats.DreamDust);
 }
 
 void UStatComponent::BeginPlay()
@@ -21,6 +29,35 @@ void UStatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	HealthComp = GetOwner()->FindComponentByClass<UHealthComponent>();
+	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+
+	if (GI && GI->bHasSavedStats)
+	{
+		const FPlayerStatInfo& SavedInfo = GI->CurPlayerStats;
+
+		Gold = SavedInfo.Gold;
+		DreamDust = SavedInfo.DreamDust;
+		CurrentLevel = SavedInfo.CurrentLevel;
+		CurrentExp = SavedInfo.CurrentExp;
+		// Base 스탯을 현재 레벨로 복원
+		LoadStatsForLevel(CurrentLevel);
+
+		AddedMaxHP = SavedInfo.AddedMaxHP;
+		AddedAttackPower = SavedInfo.AddedAttackPower;
+		AddedSpellPower = SavedInfo.AddedSpellPower;
+		AddedAttackSpeed = SavedInfo.AddedAttackSpeed;
+		AddedCritRate = SavedInfo.AddedCritRate;
+		AddedCritMultiplier = SavedInfo.AddedCritMultiplier;
+		AddedMoveSpeed = SavedInfo.AddedMoveSpeed;
+		AddedDefense = SavedInfo.AddedDefense;
+		AddedMemoryAcceleration = SavedInfo.AddedMemoryAcceleration;
+		AddedAttackRange = SavedInfo.AddedAttackRange;
+		AddedProjectileSpeed = SavedInfo.AddedProjectileSpeed;
+		AddedDashCount = SavedInfo.AddedDashCount;
+		AddedDashCooldown = SavedInfo.AddedDashCooldown;
+		AddedBurnDamageBonus = SavedInfo.AddedBurnDamageBonus;
+	}
+
 	if (HealthComp)
 	{
 		HealthComp->SetMaxHP(GetMaxHP(), true);
@@ -157,7 +194,9 @@ void UStatComponent::LoadStatsForLevel(int32 Level)
 	if (!GI || !GI->LevelDataTable) return;
 
 	const FName RowName = FName(*FString::Printf(TEXT("Level_%d"), Level));
-	FPlayerLevelGrowthData* Row = GI->LevelDataTable->FindRow<FPlayerLevelGrowthData>(RowName, TEXT("LoadStatsForLevel"));
+	FPlayerLevelGrowthData* Row = GI->LevelDataTable->FindRow<FPlayerLevelGrowthData>(
+		RowName,
+		TEXT("LoadStatsForLevel"));
 	if (!Row) return;
 
 	// Base만 덮어씀 — Added(성소) 보존
@@ -202,9 +241,9 @@ void UStatComponent::AddExp(int32 Amount)
 
 	// ExpBar 브로드캐스트: 다음 레벨 필요 경험치 (-1이면 맥스 레벨)
 	const int32 RequiredForNext = GetRequiredExpForLevel(CurrentLevel + 1);
-	
+
 	UE_LOG(LogTemp, Warning, TEXT("[EXP] Lv.%d | EXP: %d / %d"), CurrentLevel, CurrentExp, RequiredForNext);
-	
+
 	OnExpChanged.Broadcast(CurrentExp, RequiredForNext, CurrentLevel);
 
 	SyncToGameInstance();
@@ -216,7 +255,9 @@ int32 UStatComponent::GetRequiredExpForLevel(int32 Level) const
 	if (!GI || !GI->LevelDataTable) return -1;
 
 	const FName RowName = FName(*FString::Printf(TEXT("Level_%d"), Level));
-	FPlayerLevelGrowthData* Row = GI->LevelDataTable->FindRow<FPlayerLevelGrowthData>(RowName, TEXT("GetRequiredExpForLevel"));
+	FPlayerLevelGrowthData* Row = GI->LevelDataTable->FindRow<FPlayerLevelGrowthData>(
+		RowName,
+		TEXT("GetRequiredExpForLevel"));
 	return Row ? Row->RequiredExp : -1;
 }
 
@@ -241,5 +282,21 @@ FPlayerStatInfo UStatComponent::GetStatInfo() const
 	Info.BurnDamageBonus = GetBurnDamageBonus();
 	Info.CurrentLevel = CurrentLevel;
 	Info.CurrentExp = CurrentExp;
+
+	// Added 스탯 저장
+	Info.AddedMaxHP = AddedMaxHP;
+	Info.AddedAttackPower = AddedAttackPower;
+	Info.AddedSpellPower = AddedSpellPower;
+	Info.AddedAttackSpeed = AddedAttackSpeed;
+	Info.AddedCritRate = AddedCritRate;
+	Info.AddedCritMultiplier = AddedCritMultiplier;
+	Info.AddedMoveSpeed = AddedMoveSpeed;
+	Info.AddedDefense = AddedDefense;
+	Info.AddedMemoryAcceleration = AddedMemoryAcceleration;
+	Info.AddedAttackRange = AddedAttackRange;
+	Info.AddedProjectileSpeed = AddedProjectileSpeed;
+	Info.AddedDashCount = AddedDashCount;
+	Info.AddedDashCooldown = AddedDashCooldown;
+	Info.AddedBurnDamageBonus = AddedBurnDamageBonus;
 	return Info;
 }

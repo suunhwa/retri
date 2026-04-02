@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ReTriGameInstance.h"
 #include "Components/ActorComponent.h"
 #include "Player/Data/PlayerStatData.h"
 #include "Player/Data/PlayerLevelGrowthData.h"
