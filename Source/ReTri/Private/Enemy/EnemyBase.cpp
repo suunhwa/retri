@@ -164,6 +164,10 @@ void AEnemyBase::BroadcastDeath()
 	OnMinionDieDelegate.Broadcast();
 }
 
+void AEnemyBase::ExecuteJumpDownDamage()
+{
+}
+
 void AEnemyBase::StartCharging(AActor* NewTarget)
 {
 	if (NewTarget)
