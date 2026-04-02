@@ -8,7 +8,9 @@
 #include "GameFramework/Actor.h"
 #include "Enemy/EnemyData.h"
 #include "AIController.h"
+#include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "ReTri/ReTri.h"
 
@@ -21,7 +23,7 @@ UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer
 EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::EnterState(Context, Transition);
-	//UE_LOG(LogTemp, Warning, TEXT("==== Boss Attack Task 시작! ===="));
+	// UE_LOG(LogTemp, Warning, TEXT("==== Boss Attack Task 시작! ===="));
 	
 	
 	SkillWaitTime = 0.0f;	// 다음 스킬 대기 시간
@@ -90,12 +92,16 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		if (Distance >= 400.f && Distance <= 1000.f)
 		{
 			// 중거리면 돌진, 점프만
-			SkillPool = { 1 }; // 1, 1, 3
+			SkillPool = { 3 }; // 1, 1, 3
+		}
+		else if (Distance < 400.f)
+		{
+			// 가까우면 모든 스킬
+			SkillPool = { 0, 1 };	//0, 1, 1, 2, 2, 3, 3
 		}
 		else
 		{
-			// 가까우면 모든 스킬
-			SkillPool = { 0, 1, 1};	//0, 1, 1, 2, 2, 3, 3
+			SkillPool = { 1 };
 		}
 	}
 	
@@ -172,8 +178,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 			}
 		}
 	}
-	
-	return EStateTreeRunStatus::Failed;
+    return EStateTreeRunStatus::Failed;
 }
 
 
@@ -195,15 +200,11 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 	{
 		if (Boss->GetCurrentMontage() != nullptr) return EStateTreeRunStatus::Running;
 		
+		SkillWaitTime += DeltaTime;
+		if (SkillWaitTime < 1.5f) return  EStateTreeRunStatus::Running;
+		
 		if (Boss->GetCurrentMontage() == nullptr)
 		{
-			SkillWaitTime += DeltaTime;
-			
-			if (SkillWaitTime < 1.5f)
-			{
-				return  EStateTreeRunStatus::Running;
-			}
-			
 			//UE_LOG(LogTemp, Warning, TEXT("공격 끗"))
 			SkillWaitTime = 0.0f;
 			Boss->RotateToTarget(DeltaTime, 3.0f);
@@ -254,6 +255,29 @@ void UBP_StateTreeTask::ExecuteFlash(AEnemyBase* Boss, ACharacter* Player, UAnim
 
 void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
 {
+	if (!Boss || !Player || !Montage) return;
+	
+	// 플레이어 위치
+	LandingPosition = Player->GetActorLocation();
+	Boss->bIsJumpDownAttacking = true;
+	
+	Boss->PlayAnimMontage(Montage);
+	
+	// 올라가는 이펙트 생성
+	
+	Boss->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	Boss->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    
+	FVector SkyLoc = Boss->GetActorLocation() + FVector(0, 0, 3000.f); 
+	Boss->SetActorLocation(SkyLoc);
+	Boss->SetActorHiddenInGame(true); // 보스 숨기기
+	
+	
+	// 보스야 장판 생성해
+	Boss->SpawnJumpDecal(LandingPosition, JumpCircleDecal);
+	
+	
+	
 }
 
 void UBP_StateTreeTask::ExecuteMirrorBlade(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)

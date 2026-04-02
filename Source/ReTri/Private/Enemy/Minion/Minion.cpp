@@ -2,8 +2,11 @@
 
 
 #include "Enemy/Minion/Minion.h"
+
+#include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyBase.h"
 #include "Enemy/Minion/MyMinionFSM.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AMinion::AMinion()
@@ -95,8 +98,31 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 	return ActualDamage;
 }
 
+void AMinion::OnAttackOverlap(AActor* OtherActor)
+{
+	ACharacter* Player = Cast<ACharacter>(OtherActor);
+	if (Player)
+	{
+		UGameplayStatics::ApplyDamage
+		(
+			OtherActor,           // 맞는 대상
+			1.0f,   
+			GetController(),      // 보스의 컨트롤러
+			this,                 // 미니언 자신
+			nullptr               // 특별한 타입 없으면 null
+		);
+		
+		bHasHitTarget = true;
+
+		//UE_LOG(LogTemp, Warning, TEXT("플레이어에게 %f 데미지를 입혔다!"), 1.0f);
+	}
+}
+
 void AMinion::DoRagdoll()
 {
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	GetMesh()->SetSimulatePhysics(true);
 }

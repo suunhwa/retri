@@ -9,6 +9,9 @@
 #include "BP_StateTreeTask.generated.h"
 
 class ADarkMoon;
+class ACharacter;
+class UAnimMontage;
+class AenemyBase;
 
 UENUM(BlueprintType)
 enum class EDarkMoonSkillType : uint8
@@ -49,9 +52,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Settings)
 	float SkillWaitTime = 0.0f;
 	
-	UPROPERTY(EditAnywhere, Category = Settings)
+public:
+	// ----------- Dash -----------
+	UPROPERTY(EditAnywhere, Category = Skill)
 	float DashSpeed = 10000;
 
+	// ----------- JumpDown -----------
+	FVector LandingPosition;
+	UPROPERTY(EditAnywhere, Category = Skill)
+	UMaterialInterface* JumpCircleDecal;
+	
+	
 	
 
 private:
