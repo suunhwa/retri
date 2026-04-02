@@ -1,14 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Enemy/EnemyBase.h"
-#include <Codecapi.h>
 
 #include "AIController.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 #include "Components/CapsuleComponent.h"
+
+#include "Components/DecalComponent.h"
+#include "Enemy/DarkMoon/DarkMoon.h"
+#include "Enemy/BP_StateTreeTask.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+
 
 // Sets default values
 AEnemyBase::AEnemyBase()
@@ -60,6 +64,14 @@ void AEnemyBase::BeginPlay()
 			}
 		}
 	}, 0.2f, false);
+}
+
+void AEnemyBase::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	
+	bIsJumpDownAttacking = false;
+	
 }
 
 // Called every frame
@@ -183,4 +195,93 @@ void AEnemyBase::RotateToTarget(float DeltaTime, float InterpSpeed)
 	FRotator NewRot = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, InterpSpeed);
         
 	SetActorRotation(NewRot);
+}
+
+void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Decal)
+{
+	CircleDecal = UGameplayStatics::SpawnDecalAtLocation
+		(
+		GetWorld(),
+		Decal,
+		FVector(700.f,700.f,700.f),
+		Location,
+		FRotator(-90, 0, 0),
+		2.0f
+		);
+	
+	if (CircleDecal)
+	{
+		UMaterialInstanceDynamic* LocalDynamicDecal = CircleDecal->CreateDynamicMaterialInstance();
+		
+		float UpdateInterval = 0.02f;
+		
+		// FTimerHandle TimerHandle;
+		
+		// 1. 스마트 포인터를 사용하여 타이머 핸들을 생성 (람다 내부에서 자신의 타이머를 올바르게 Clear하기 위함)
+		TSharedPtr<FTimerHandle> TimerHandlePtr = MakeShared<FTimerHandle>();
+		// 2. 타이머 대기 도중 보스가 파괴(사망)될 때 생기는 크래시 방지용 약포인터
+		TWeakObjectPtr<AEnemyBase> WeakThis = this;
+		UWorld* WorldContext = GetWorld(); // 보스가 파괴된 후에도 타이머 관리자에 접근해 타이머를 끄기 위해 미리 캐싱
+		
+		
+		// Progress 업데이트
+		// 람다 캡쳐
+		// GetWorldTimerManager().SetTimer(TimerHandle, [this, LocalDynamicDecal, Progress=0.0f, TimerHandle, Location]() mutable
+		
+		
+		// Progress 업데이트 (TimerHandlePtr를 캡처)
+		WorldContext->GetTimerManager().SetTimer(*TimerHandlePtr, [WeakThis, WorldContext, LocalDynamicDecal, Progress=0.0f, TimerHandlePtr, Location]() mutable
+		{
+			
+			// 보스가 이미 파괴되었거나 유효하지 않으면 타이머 즉시 종료!
+			if (!WeakThis.IsValid())
+			{
+				if (IsValid(WorldContext))
+				{
+					WorldContext->GetTimerManager().ClearTimer(*TimerHandlePtr);
+				}
+				return;
+			}
+			
+			AEnemyBase* Boss = WeakThis.Get();
+			
+			
+			
+			
+			
+			
+			if (!IsValid(LocalDynamicDecal))
+			{
+				Boss->GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
+				return;
+			}
+			
+			Progress += (0.5f / (1.0f / 0.02f));
+			float ClampedProgress = FMath::Min(Progress,0.5f);
+			
+			if (LocalDynamicDecal)
+			{
+				LocalDynamicDecal->SetScalarParameterValue("Progress Circle", ClampedProgress);
+			}
+			
+			
+			if (Progress >= 0.5f) // 0.5 크기까지 커지면 
+			{
+				
+				// Progress = 0.0f; // 초기화
+				Boss->GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
+				
+				FVector DownStartLoc = Location + FVector(0.0f, 0.0f, 1500.0f);
+				Boss->SetActorLocation(DownStartLoc, false);
+				
+				Boss->SetActorHiddenInGame(false);
+				Boss->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+				Boss->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+				
+				Boss->LaunchCharacter(FVector(0, 0, -5000.f), true, true);
+				
+				Boss->PlayAnimMontage(Boss->DownMontage, 1.0f);
+			}
+		}, UpdateInterval, true);
+	}
 }

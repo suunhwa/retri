@@ -40,11 +40,12 @@ public:
 protected:
 	void CheckDistanceAndMove(float DeltaTime);
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-	void DoRagdoll();
 	
 public:
 	FEnemyDataTableRow* GetStatInfo() { return MyStatInfo; }
 	
+	virtual void OnAttackOverlap(AActor* OtherActor);
+	void DoRagdoll();
 	void PlayMontage(UAnimMontage* MontageToPlay);
 
 private:

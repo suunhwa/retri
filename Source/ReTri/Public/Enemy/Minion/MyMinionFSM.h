@@ -72,7 +72,7 @@ public:
 	UPROPERTY()
 	class AAIController* AIC;
 	UPROPERTY(EditAnywhere, Category = FSM)
-	float AttackRange = 250.0f;
+	float AttackRange = 300.0f;
 
 	// Die
 	bool bIsDead = false;

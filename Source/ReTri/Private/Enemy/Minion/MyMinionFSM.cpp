@@ -106,6 +106,8 @@ void UMyMinionFSM::AttackState()
 		return;
 	}
 	
+	Me->OnAttackOverlap(PlayerTarget);
+	
 	float Distance = Me->GetDistanceTo(PlayerTarget);
 
 	if (Distance > AttackRange)
@@ -139,9 +141,9 @@ void UMyMinionFSM::DieState()
 	bIsDead = true;
 	AIC->StopMovement();
 	
+	Me->DoRagdoll();
+	
 	Me->BroadcastDeath();
-	Me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Me->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	if (DieAnim)
 	{

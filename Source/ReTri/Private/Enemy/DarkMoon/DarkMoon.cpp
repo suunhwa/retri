@@ -23,16 +23,24 @@ ADarkMoon::ADarkMoon()
 	
 	
 	SwordCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordCollision"));
-	SwordCollision->SetupAttachment(GetMesh(), TEXT("SwordSocket"));
-	SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SwordCollision->SetRelativeLocation(FVector(0.000000,65.000000,0.000000));
-	SwordCollision->SetBoxExtent(FVector(14.175652,58.968844,10.359240));
-	SwordCollision->SetGenerateOverlapEvents(true);
+	
+	if (GetMesh())
+	{
+		SwordCollision->SetupAttachment(GetMesh(), TEXT("SwordSocket"));
+		SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SwordCollision->SetRelativeLocation(FVector(0.000000,65.000000,0.000000));
+		SwordCollision->SetBoxExtent(FVector(14.175652,58.968844,10.359240));
+		SwordCollision->SetGenerateOverlapEvents(true);
+	}
 }
 
 void ADarkMoon::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	SwordCollision->AttachToComponent(GetMesh(), 
+		FAttachmentTransformRules::KeepRelativeTransform, 
+		TEXT("SwordSocket"));
 	
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ADarkMoon::OnOverlapBegin);
 	SwordCollision->OnComponentBeginOverlap.AddDynamic(this, &ADarkMoon::OnSwordOverlap);
@@ -48,7 +56,7 @@ void ADarkMoon::BeginPlay()
 			
 			BossSkills = Data->BossSkillsID;
 			
-			UE_LOG(LogTemp, Warning, TEXT("%s 등장 스킬 %d종류 장착"), *EnemyRowName.ToString(), BossSkills.Num());
+			//UE_LOG(LogTemp, Warning, TEXT("%s 등장 스킬 %d종류 장착"), *EnemyRowName.ToString(), BossSkills.Num());
 		}
 		else
 		{
@@ -195,7 +203,7 @@ void ADarkMoon::StartBattleEvent()
 void ADarkMoon::OnSwordCollision()
 {
 	if (SwordCollision)
-	{
+	{	
 		SwordCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 }
@@ -204,6 +212,8 @@ void ADarkMoon::OffSwordCollision()
 {
 	if (SwordCollision)
 	{
+		// ZW 콜리젼
+		bHasHitTarget = false;
 		SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }

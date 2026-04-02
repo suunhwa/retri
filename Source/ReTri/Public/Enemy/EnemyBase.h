@@ -28,6 +28,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Landed(const FHitResult& Hit) override;
 
 public:	
 	// Called every frame
@@ -72,6 +73,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
 	class UAnimMontage* DieMontage;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
+	class UAnimMontage* JumpMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
+	class UAnimMontage* DownMontage;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
 	TSubclassOf<class UCameraShakeBase> DeathCameraShake;
 	
@@ -81,12 +88,19 @@ public:
 	
 	
 public:
+	// 스킬 사용 중인지
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsSkillExecuting = false;
+	
 	// (1스킬) 차징 상태인지
 	bool bIsCharging = false;
 	
 	// (1스킬) 차징하면서 바라볼 상대
 	UPROPERTY()
 	AActor* TargetActor = nullptr;
+	
+	// (3스킬)
+	bool bIsJumpDownAttacking = false;
 	
 	// 이미 누군가를 때렸는지
 	bool bHasHitTarget = false;
@@ -102,6 +116,25 @@ public:
 	bool bIsDead = false; // 보스 죽었는지 여부
 	
 
+	// ----------- JumpDown -----------
+	// 에디터에서 원본 머티리얼이나 인스턴스를 할당받는 용도
+	UPROPERTY(EditAnywhere, Category = Skill)
+	UMaterialInterface* JumpCircleDecal;
+	
+	// BaseMaterial을 복사해서 메모리에 올리고 실시간으로 값을 수정할 때 사용
+	UPROPERTY()
+	UMaterialInstanceDynamic* DynamicJumpCircleDecal;
+	
+	UPROPERTY()
+	UDecalComponent* CircleDecal;
+	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float JumpDownBaseDamage = 50.0f; // 가할 데미지량
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float JumpDownDamageRadius = 700.0f; // 장판(데칼)의 크기와 비슷하게 맞춤
+	
+	
 public:
 	// 공격 시작 시 호출
 	void ResetAttackHit() { bHasHitTarget = false; }
@@ -121,12 +154,17 @@ public:
 	void SetCurrentSkillDamage(float NewDamage) {CurrentSkillDamage = NewDamage;} // 스킬 대미지 설정
 
 public:
-	void StartCharging(AActor* NewTarget);	// Task에서 호출할 함수
+	void StartCharging(AActor* NewTarget);	// Task에서 호출할 차징 함수
 	void StopCharging();					// 차징 스탑! (돌진 직전에 호출)
 	void RotateToTarget(float DeltaTime, float InterpSpeed);	// 플레이어 바라보는 함수
 	
+	void SpawnJumpDecal(FVector Location, class UMaterialInterface* JumpCircleDecal);
+	
 	void PlayDeathEffect();
 	void BroadcastDeath();
+	
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void ExecuteJumpDownDamage();
 	
 protected:
 	virtual void UpdatePhase() { }
