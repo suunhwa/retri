@@ -94,7 +94,7 @@ struct RETRI_API FPlayerSkillData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackSpeedMultiplier = 1.f;
 
-	// 현재 미사용 (0으로 고정). 추후 골드 강화 비용 도입 시 사용
+	// 현재 미사용 (0으로 고정). 상점에서 스킬 구매 시 사용
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 UpgradeCostGold = 0;
 
