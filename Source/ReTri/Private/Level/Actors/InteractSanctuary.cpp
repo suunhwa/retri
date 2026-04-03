@@ -6,6 +6,7 @@
 #include "MapSubSystem.h"
 #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
+#include "Player/Components/HealthComponent.h"
 #include "Player/Components/StatComponent.h"
 
 
@@ -31,6 +32,7 @@ void AInteractSanctuary::Interact_Implementation()
 		SCREENLOG("돈없음!!");
 		return;
 	}
+	
 	GI->HealthComp->Heal(HealHP);
 	
 	FName KeyName = FName("Sanctuary");

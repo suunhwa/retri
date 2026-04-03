@@ -29,7 +29,7 @@ void AInteractCurse::Interact_Implementation()
 	FName KeyName = FName("Curse");
 	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
 	if (FoundValue) *FoundValue = true; 
-	else SCREENLOG("Tlqkf 이유좀");
+	
 	SetIsUsed(true);
 	
 	// todo: 3가지 선택지 UI 띄우기
