@@ -26,9 +26,11 @@ void AInteractCurse::Interact_Implementation()
 	UE_LOG(jiwon, Warning, TEXT("3가지 선택지 UI 띄우기 -> 저주를 받고 스텟 레벨업"));
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
-	FName KeyName(*InteractName);
+	FName KeyName = FName("Curse");
 	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
 	if (FoundValue) *FoundValue = true; 
+	else SCREENLOG("Tlqkf 이유좀");
+	SetIsUsed(true);
 	
 	// todo: 3가지 선택지 UI 띄우기
 	if (!CurseDataTable)
@@ -52,7 +54,6 @@ void AInteractCurse::Interact_Implementation()
 
 void AInteractCurse::OnCurseSelected(int32 Index)
 {
-	//todo 저주를 받고 스텟 레벨업
 	FCurseData* CurseData = CurseDatas[Index];
 	JIWONLOG("선택된 저주: %s", *CurseData->CurseName);
 	
@@ -74,23 +75,18 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 	switch (CurseRewardDatas[RandomReward]->RewardType)
 	{
 	case ERewardType::RewardGold:
-		// GI->GameData->UpdateGold(+RewardVal);
 		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, RewardVal);
 		break;
 	case ERewardType::RewardDreamPowder:
-		// GI->GameData->UpdateDreamPowder(+RewardVal);
 		GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, RewardVal);
 		break;
 	case ERewardType::RewardMaxHP:
-		// GI->GameData->UpdateMaxHP(+RewardVal);
 		GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, RewardVal);
 		break;
 	case ERewardType::RewardAttackDamage:
-		// GI->GameData->UpdateAttackDamage(+RewardVal);
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, RewardVal);
 		break;
 	case ERewardType::RewardMemoryHaste:
-		// GI->GameData->UpdateCoolTime(+RewardVal);
 		GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, RewardVal);
 		break;
 	}
@@ -100,6 +96,4 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 	JIWONLOG("%s", *CurseRewardDatas[RandomReward]->Info);
 	
 	HideSelectUI();
-	bIsUsed = true;
-	// todo InteractableData->IsUsed = true;
 }

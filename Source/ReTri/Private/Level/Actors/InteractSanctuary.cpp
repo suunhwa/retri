@@ -3,6 +3,7 @@
 
 #include "Level/Actors/InteractSanctuary.h"
 
+#include "MapSubSystem.h"
 #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
 #include "Player/Components/StatComponent.h"
@@ -24,9 +25,18 @@ void AInteractSanctuary::Interact_Implementation()
 	// todo 플레이어 회복
 	
 	auto GI = Cast<UReTriGameInstance>(GetGameInstance());
-	if (!GI || !GI->StatComp) return;
-	if (!GI->StatComp->SpendGold(static_cast<int32>(Cost))) return;
-	GI->GameData->UpdateHP(+HealHP);
+
+	if (!GI->StatComp->SpendGold(Cost))
+	{
+		SCREENLOG("돈없음!!");
+		return;
+	}
+	GI->HealthComp->Heal(HealHP);
+	
+	FName KeyName = FName("Sanctuary");
+	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
+	if (FoundValue) *FoundValue = true; 
+	SetIsUsed(true);
 	
 	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	Super::Interact_Implementation();

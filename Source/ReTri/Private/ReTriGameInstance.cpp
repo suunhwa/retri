@@ -6,7 +6,6 @@
 #include "MapSubSystem.h"
 #include "ReTriGameData.h"
 
-
 void UReTriGameInstance::Init()
 {
 	Super::Init();
@@ -21,6 +20,8 @@ void UReTriGameInstance::Init()
 	{
 		MapSub->InteractionData = this->InteractionData;
 		MapSub->MapUIData = this->MapUIData;
+		MapSub->SkillDataTable = this->SkillDataTable;
+		
 		MapSub->GoldCoinPotClass = this->GoldCoinPotClass;
 		MapSub->DreamPowderClass = this->DreamPowderClass;
 		

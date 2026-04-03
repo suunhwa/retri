@@ -28,7 +28,7 @@ public:
 	FOnSelectButtonClicked OnSelectClicked;
 
 	UFUNCTION()
-	void HandleClicked();
+	void OnClicked();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetTextTitle(FString Title, FLinearColor Color = FLinearColor(0.022000f, 0.002732f, 0.002428f, 1.000000f));

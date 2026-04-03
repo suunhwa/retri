@@ -25,9 +25,19 @@ void AInteractChaos::Interact_Implementation()
 	UE_LOG(jiwon, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
-	FName KeyName(*InteractName);
+	FName KeyName = FName("Chaos");
 	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
-	if (FoundValue) *FoundValue = true; 
+	if (FoundValue)
+	{
+		*FoundValue = true;
+		SCREENLOG("근데 왜 ? tq?");
+	}
+	else
+	{
+		SCREENLOG("Tlqkf 이유좀");
+	}
+	
+	SetIsUsed(true);
 	
 	// todo: 스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!
 	if (!ChaosDataTable)
@@ -47,9 +57,6 @@ void AInteractChaos::Interact_Implementation()
 		int32 R = FMath::RandRange(0, i);
 		AllChaos.Swap(i, R);
 	}
-	
-	// UI띄우기
-	ShowSelectUI();
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -61,6 +68,9 @@ void AInteractChaos::Interact_Implementation()
 		USelectButtonUI* Button = SelectUIInstance->AddButton(AllChaos[i]->ChaosName, Info, i);
 		Button->OnSelectClicked.AddDynamic(this, &AInteractChaos::OnChaosSelected);
 	}
+	
+	// UI띄우기
+	ShowSelectUI();
 }
 
 void AInteractChaos::OnChaosSelected(int32 Index)
@@ -71,37 +81,30 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI || !GI->StatComp) return;
 	
-	float Val = ChaosData->ChaosValues[ChaosData->ChaosLevel++];
 	// todo: MyPlayer에게 Chaos 효과 적용
+	
+	float Val = ChaosData->ChaosValues[ChaosData->ChaosLevel++];
 	switch (ChaosData->ChaosType)
 	{
 	case EChaosType::Chaos_Health:
-		// GI->GameData->UpdateHP(+Val);
 		GI->HealthComp->Heal(Val);
 		break;
 	case EChaosType::Chaos_AttackDamage:
-		// GI->GameData->UpdateAttackDamage(+Val);
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Val);
 		break;
 	case EChaosType::Chaos_AbilityPower:
-		// GI->GameData->UpdateAbilityPower(+Val);
 		GI->StatComp->ApplyStatModifier(EStatTypes::SpellPower, Val);
 		break;
 	case EChaosType::Chaos_AttackSpeed:
-		/*Val = GI->GameData->GetCurAttackSpeed() * (Val - 1.0f);
-		GI->GameData->UpdateAttackSpeed(+Val);*/
 		Val = GI->StatComp->GetAttackSpeed() * (Val - 1.0f);
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackSpeed, Val);
 		break;
 	case EChaosType::Chaos_MemoryHaste:
-		// GI->GameData->UpdateCoolTime(+Val);
 		GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, Val);
 		break;
 	}
 
-	// GI->GameData->DebugStat();
+	GI->DebugStat();
 	
 	HideSelectUI();
-	bIsUsed = true;
-	// todo InteractableData->IsUsed = true;
 }

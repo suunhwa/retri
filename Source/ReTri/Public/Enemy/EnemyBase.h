@@ -85,8 +85,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
 	class UNiagaraSystem* DeathVFX;
 	
-	
-	
 public:
 	// 스킬 사용 중인지
 	UPROPERTY(BlueprintReadOnly)
@@ -145,7 +143,6 @@ public:
 	
 	UPROPERTY(EditdefaultsOnly, Category = StateTree);
 	class UStateTreeComponent* StateTreeComponent;
-	
 	
 	UFUNCTION()
 	// virtual void OnCapsuleOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
