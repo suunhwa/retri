@@ -115,7 +115,7 @@ public:
 	
 
 	// ----------- JumpDown -----------
-	// 에디터에서 원본 머티리얼이나 인스턴스를 할당받는 용도
+	// 에디터에서 원본 머티리얼이나 인스턴스를 할당받는 용도w
 	UPROPERTY(EditAnywhere, Category = Skill)
 	UMaterialInterface* JumpCircleDecal;
 	
@@ -127,8 +127,6 @@ public:
 	UDecalComponent* CircleDecal;
 	
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float JumpDownBaseDamage = 50.0f; // 가할 데미지량
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float JumpDownDamageRadius = 700.0f; // 장판(데칼)의 크기와 비슷하게 맞춤
 	
