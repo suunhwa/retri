@@ -234,11 +234,11 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 		// GetWorldTimerManager().SetTimer(TimerHandle, [this, LocalDynamicDecal, Progress=0.0f, TimerHandle, Location]() mutable
 		
 		
-		// Progress 업데이트 (TimerHandlePtr를 캡처)
+		// Progress 업데이트 (TimerHandlePtr 캡처)
 		WorldContext->GetTimerManager().SetTimer(*TimerHandlePtr, [WeakThis, WorldContext, LocalDynamicDecal, Progress=0.0f, TimerHandlePtr, Location]() mutable
 		{
 			
-			// 보스가 이미 파괴되었거나 유효하지 않으면 타이머 즉시 종료!
+			// 보스가 이미 파괴되었거나 유효하지 않으면 타이머 즉시 종료
 			if (!WeakThis.IsValid())
 			{
 				if (IsValid(WorldContext))
@@ -249,9 +249,6 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 			}
 			
 			AEnemyBase* Boss = WeakThis.Get();
-			
-			
-			
 			
 			
 			
@@ -289,4 +286,26 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 			}
 		}, UpdateInterval, true);
 	}
+}
+
+void AEnemyBase::ExecuteJumpDownDamage()
+{
+	FVector ImpactLocation = GetActorLocation();
+	
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+	
+	bool bHit = UGameplayStatics::ApplyRadialDamage(
+		GetWorld(),
+		CurrentSkillDamage,
+		ImpactLocation,
+		JumpDownDamageRadius,
+		nullptr,
+		IgnoreActors,
+		this,
+		GetInstigatorController(),
+		false
+		);
+	
+	DrawDebugSphere(GetWorld(), ImpactLocation, JumpDownDamageRadius, 24, bHit ? FColor::Red : FColor::Green, false, 2.0f);
 }
