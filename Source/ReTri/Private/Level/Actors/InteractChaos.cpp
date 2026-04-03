@@ -57,9 +57,6 @@ void AInteractChaos::Interact_Implementation()
 		int32 R = FMath::RandRange(0, i);
 		AllChaos.Swap(i, R);
 	}
-	
-	// UI띄우기
-	ShowSelectUI();
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -71,6 +68,9 @@ void AInteractChaos::Interact_Implementation()
 		USelectButtonUI* Button = SelectUIInstance->AddButton(AllChaos[i]->ChaosName, Info, i);
 		Button->OnSelectClicked.AddDynamic(this, &AInteractChaos::OnChaosSelected);
 	}
+	
+	// UI띄우기
+	ShowSelectUI();
 }
 
 void AInteractChaos::OnChaosSelected(int32 Index)
@@ -81,8 +81,9 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI || !GI->StatComp) return;
 	
-	float Val = ChaosData->ChaosValues[ChaosData->ChaosLevel++];
 	// todo: MyPlayer에게 Chaos 효과 적용
+	
+	float Val = ChaosData->ChaosValues[ChaosData->ChaosLevel++];
 	switch (ChaosData->ChaosType)
 	{
 	case EChaosType::Chaos_Health:

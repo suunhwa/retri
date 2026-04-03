@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Subsystems/GameInstanceSubsystem.h"
-
-#include "Level/Data/InteractableData.h"
 #include "ReTri/ReTri.h"
+#include "ReTriGameData.h"
+#include "Level/Data/InteractableData.h"
+
+#include "Subsystems/GameInstanceSubsystem.h"
 #include "MapSubSystem.generated.h"
 
 class AActor;
@@ -33,6 +34,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map|Config")
 	UDataTable* InteractionData;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map|Config")
+	UDataTable* SkillDataTable;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Map|Config")
 	TSubclassOf<ALootGoldCoinPot> GoldCoinPotClass;
 
@@ -44,13 +48,15 @@ public:
 	TArray<FMapNodeData> CurMapDatas;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
+	TMap<int32, FShopItemSkillData> MerchantItemDatas;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
 	int32 CurMapIndex = 0;
 	
 	/** 현재 맵 정보 */
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
 	FMapNodeData GetCurMapData()
 	{
-		SCREENLOG("Y? %d", CurMapIndex);
 		return CurMapDatas[CurMapIndex];
 	}
 	
@@ -78,7 +84,7 @@ public:
 	FInteractableData GetRowInteractionData(FName RowName, bool& bSuccess); 
 	
 	// === Level Setting API? ===
-	/** 절차적 맵 생성 (그리드 형태) */
+	/** 사용된 Interactable 저장 */
 	UFUNCTION(BlueprintCallable, Category="Map|State")
 	void SetInteractableUsed(FName InRowName);
 	
@@ -93,6 +99,9 @@ public:
 	/** 금화, 꿈가루 설치하는 함수 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SpawnLootPieces(TArray<AActor*> TargetPoints);
+	
+	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
+	void SetMerchantItemList();
 	
 	/** 적 스포너 개수 받아오기 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")

@@ -15,18 +15,6 @@ AGoodsGoldCoin::AGoodsGoldCoin()
 	if (TempMesh.Succeeded()) MeshComp->SetStaticMesh(TempMesh.Object);
 }
 
-void AGoodsGoldCoin::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void AGoodsGoldCoin::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-}
-
 void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
@@ -40,7 +28,7 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
 		
 		if (!FloatingUIActorClass) return;
-		AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
+		AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), FRotator::ZeroRotator);
 		FString TempStr = FString::Printf(TEXT("골드 +%d"), Amount);
 		FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
 		
@@ -48,4 +36,3 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 		Destroy();
 	}
 }
-

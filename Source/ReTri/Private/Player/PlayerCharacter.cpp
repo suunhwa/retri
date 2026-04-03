@@ -474,15 +474,14 @@ void APlayerCharacter::Interaction()
 	if (!bHit) return;
 	for (AActor* Actor : OutActors)
 	{
-		AInteractableBase* Interact = Cast<AInteractableBase>(Actor);
-		if (Interact)
+		if (Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
 		{
-			IInteractableInterface::Execute_Interact(Interact);
+			IInteractableInterface::Execute_Interact(Actor);
 			
 			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 			GI->DebugStat();
 			
-			// GD->DebugStat();
+			return;
 		}
 	}
 }

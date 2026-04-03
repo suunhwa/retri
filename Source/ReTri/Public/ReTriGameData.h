@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ReTri/ReTri.h"
+#include "Player/Data/PlayerSkillData.h"
 #include "ReTriGameData.generated.h"
 
 //! PlayerStats 
@@ -48,6 +48,17 @@ public:
 	int32 MinDreamPowder = 20;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxDreamPowder = 100;
+};
+
+//! Shop Item Info 
+USTRUCT(BlueprintType)
+struct FShopItemSkillData
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FPlayerSkillData> ItemSkillDatas;
 };
 
 

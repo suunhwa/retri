@@ -24,6 +24,11 @@ void UMapSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 		JIWONLOG("[UMapSubSystem] MapUIData 로드완료/ 행 수:%d", MapUIData->GetRowNames().Num())
 	else
 		JIWONLOG("[UMapSubSystem] MapUIData 할당안됨")
+	
+	if (MapUIData)
+		JIWONLOG("[UMapSubSystem] MapUIData 로드완료/ 행 수:%d", MapUIData->GetRowNames().Num())
+	else
+		JIWONLOG("[UMapSubSystem] MapUIData 할당안됨")
 }
 
 void UMapSubSystem::Deinitialize()
@@ -194,18 +199,19 @@ void UMapSubSystem::ProceduralGenerateMap()
 				RandomNum = 3;
 				break;
 			case EMapNodeType::Merchant:
+				SetMerchantItemList();
 				RandomNum = 2;
 				break;
 			default: break;
 			}
 			NewNode.SpawnInteractableRowNames = RandomInteractable(RandomNum);
 			
-			// 위치 정해진 위치에서 +- 랜덤 위치 (지터링) RandomRange (-40, 40)
 			float X = StartX + (Depth * XSpacing); 
 			float Y = StartY + (W * YSpacing);
 		
 			// UE_LOG(LogTemp, Display, TEXT("StartX: %f, StartY: %f"), X, Y);
 		
+			// 위치 정해진 위치에서 +- 랜덤 위치 (지터링) RandomRange (-40, 40)
 			float JitterX = FMath::RandRange(-40.f, 40.f);			
 			float JitterY = FMath::RandRange(-40.f, 40.f);
 			NewNode.UIPosition = FVector2D(X + JitterX, Y + JitterY);
@@ -294,6 +300,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 		
 		// 시작방을 현재 방으로 설정
 		CurMapIndex = StartIdxCandidate; 
+		UE_LOG(jiwon, Error, TEXT("CurMapIndex: %d"), CurMapIndex);
 	}
 	
 	// 보스방 지정 -> Depth 마지막 라인에서 선택 
@@ -419,7 +426,6 @@ void UMapSubSystem::SetInteractableUsed(FName InRowName)
 
 void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 {
-	// todo 이미 상호작용한 기물에 대한 업데이트 -> 기물 정보..
 	TArray<AActor*> TPs;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Interactable"), TPs);
 	
@@ -501,6 +507,53 @@ void UMapSubSystem::SpawnLootPieces(TArray<AActor*> TargetPoints)
 		else
 			JIWONLOG("[UMapSubSystem] Loot 생성 실패: 태그나 클래스 설정을 확인하세요.");
 	}
+}
+
+void UMapSubSystem::SetMerchantItemList()
+{
+	TArray<FPlayerSkillData*> AllSkills; 
+	if (SkillDataTable)
+	{
+		SkillDataTable->GetAllRows<FPlayerSkillData>(TEXT("AllSkills"), AllSkills);
+	}
+    
+	TArray<FPlayerSkillData*> AcquiredSkills; 
+	for (auto Skill : AllSkills)
+	{
+		if (Skill->SkillCategory == ESkillCategory::Acquired)
+		{
+			AcquiredSkills.Add(Skill);
+		}
+	}
+	
+	if (AcquiredSkills.Num() > 0)
+	{
+		int32 LastIndex = AcquiredSkills.Num() - 1;
+		for (int32 i = 0; i <= LastIndex; ++i)
+		{
+			int32 RandomIndex = FMath::RandRange(i, LastIndex);
+        
+			if (i != RandomIndex)
+			{
+				AcquiredSkills.Swap(i, RandomIndex);
+			}
+		}
+	}
+	
+	UE_LOG(jiwon, Display, TEXT("CurMapIndex: %d"), CurMapIndex);
+	
+	FShopItemSkillData TempSkillData;
+	int32 PickCount = FMath::RandRange(4, 6); 
+	if (PickCount < AcquiredSkills.Num()) PickCount = AcquiredSkills.Num();
+	for (int32 i = 0; i < PickCount; ++i)
+	{
+		TempSkillData.ItemSkillDatas.Add(*AcquiredSkills[i]);
+		
+		UE_LOG(jiwon, Display, TEXT("Acquired Skill: %s"), *AcquiredSkills[i]->SkillNameKR);
+	}
+
+	// 최종 상점에 등록!
+	MerchantItemDatas.Add(CurMapIndex, TempSkillData);
 }
 
 void UMapSubSystem::SetEnemySpawnerCount(int32 SpawnerNum)

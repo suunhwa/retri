@@ -78,8 +78,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
 	class UNiagaraSystem* DeathVFX;
 	
-	
-	
 public:
 	// (1스킬) 차징 상태인지
 	bool bIsCharging = false;
@@ -112,7 +110,6 @@ public:
 	
 	UPROPERTY(EditdefaultsOnly, Category = StateTree);
 	class UStateTreeComponent* StateTreeComponent;
-	
 	
 	UFUNCTION()
 	// virtual void OnCapsuleOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

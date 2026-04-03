@@ -22,11 +22,11 @@ AInteractableBase::AInteractableBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("BoxComp"));
+	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComp"));
 	SetRootComponent(CapsuleComp);
 	CapsuleComp->SetCollisionProfileName(TEXT("Interaction"));
-	// CapsuleComp->SetCapsuleHalfHeight(200.f);
-	// CapsuleComp->SetCapsuleRadius(150.f);
+	CapsuleComp->SetCapsuleHalfHeight(200.f);
+	CapsuleComp->SetCapsuleRadius(150.f);
 	
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(CapsuleComp);	
@@ -92,7 +92,7 @@ void AInteractableBase::Tick(float DeltaTime)
 void AInteractableBase::DataInit(FName InRowName, FInteractableData RowData)
 {
 	MyRowName = InRowName;
-	InteractableData = RowData;
+	//InteractableData = RowData;
 	InteractableType = RowData.InteractableType; 
 	InteractName = RowData.InteractName;
 	Description = RowData.Description;

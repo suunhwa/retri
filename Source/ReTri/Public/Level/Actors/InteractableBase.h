@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 
-#include "ReTri/ReTri.h"
-#include "ReTriGameData.h"
-#include "ReTriGameInstance.h"
 #include "GameFramework/Actor.h"
 #include "Level/Data/InteractableData.h"
 #include "Level/Interfaces/InteractableInterface.h"
@@ -59,10 +56,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* MeshComp;
 	
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractableType InteractableType;
-	FInteractableData InteractableData;
+	//FInteractableData InteractableData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interaction")
 	FName MyRowName;
 	
