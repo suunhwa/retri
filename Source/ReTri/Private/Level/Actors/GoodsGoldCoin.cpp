@@ -15,18 +15,6 @@ AGoodsGoldCoin::AGoodsGoldCoin()
 	if (TempMesh.Succeeded()) MeshComp->SetStaticMesh(TempMesh.Object);
 }
 
-void AGoodsGoldCoin::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void AGoodsGoldCoin::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-}
-
 void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
@@ -37,22 +25,17 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 		
 		if (!GI || !GI->StatComp) return;
 
-		const int32 CurGold = GI->GameData->GetRandomGold();
-		const int32 GoldBefore = GI->StatComp->GetGold();
-		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, CurGold);
-		const int32 GoldAfter = GI->StatComp->GetGold();
-		UE_LOG(LogTemp, Warning, TEXT("[GoldCoin] CurGold=%d | Before=%d | After=%d | Delta=%d"),
-			CurGold, GoldBefore, GoldAfter, GoldAfter - GoldBefore);
+		if (!GI || !GI->StatComp) return;
+		const int32 Amount = GI->GameData->GetRandomGold();
+		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
 		
-		if (FloatingUIActorClass)
-		{
-			AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
-			FString TempStr = FString::Printf(TEXT("골드 +%d"), CurGold);
-			FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
-		}
+		if (!FloatingUIActorClass) return;
+		AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), FRotator::ZeroRotator);
+		FString TempStr = FString::Printf(TEXT("골드 +%d"), Amount);
+		FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
+
+		GI->DebugStat();
 		
-		// GI->GameData->DebugStat();
 		Destroy();
 	}
 }
-

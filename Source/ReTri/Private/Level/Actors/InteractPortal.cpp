@@ -25,7 +25,6 @@ void AInteractPortal::Interact_Implementation()
 		MapUI->AddToViewport(10);
 	}
 	
-	// todo: 메뉴 UI띄우기
 	UE_LOG(jiwon, Warning, TEXT("메뉴 UI띄우기"));
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 }

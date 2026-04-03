@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 
-#include "ReTri/ReTri.h"
-#include "ReTriGameData.h"
-#include "ReTriGameInstance.h"
 #include "GameFramework/Actor.h"
 #include "Level/Data/InteractableData.h"
 #include "Level/Interfaces/InteractableInterface.h"
@@ -42,7 +39,10 @@ public:
 	virtual void Interact_Implementation() override;
 	
 	UFUNCTION(BlueprintCallable)
-	void DataInit(struct FInteractableData RowData);
+	void DataInit(FName InRowName, struct FInteractableData RowData);
+	
+	UFUNCTION(BlueprintCallable)
+	void SetIsUsed(bool IsUsed);
 	
 	UFUNCTION()
 	void UIFocus();
@@ -58,8 +58,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractableType InteractableType;
-	
-	FInteractableData InteractableData;
+	//FInteractableData InteractableData;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interaction")
+	FName MyRowName;
 	
 	// 상호작용 중인지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
@@ -70,8 +71,6 @@ public:
 	// 사용 했는지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
 	bool bIsUsed = false;
-	
-	void SetIsUsed(bool IsUsed);
 	
 	// Interaction Object 이름과 상호작용을 띄울 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -100,4 +99,5 @@ protected:
 	FString InteractName;
 	FString Description;
 	float Probability;
+	
 };

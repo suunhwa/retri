@@ -12,10 +12,10 @@ void USelectButtonUI::NativeConstruct()
 	Super::NativeConstruct();
 	
 	if (ButtonSelect)
-		ButtonSelect->OnClicked.AddDynamic(this, &USelectButtonUI::HandleClicked);
+		ButtonSelect->OnClicked.AddDynamic(this, &USelectButtonUI::OnClicked);
 }
 
-void USelectButtonUI::HandleClicked()
+void USelectButtonUI::OnClicked()
 {
 	OnSelectClicked.Broadcast(ThisIndex);
 }

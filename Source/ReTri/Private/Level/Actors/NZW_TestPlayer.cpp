@@ -36,7 +36,7 @@ void ANZW_TestPlayer::BeginPlay()
 	// FrozenDamage = 50;
 	// exp = 0;
 	
-	// GD->DebugStat();
+	//GD->DebugStat();
 }
 
 // Called every frame
@@ -93,7 +93,7 @@ void ANZW_TestPlayer::Interaction()
 		{
 			IInteractableInterface::Execute_Interact(Interact);
 			
-			// GD->DebugStat();
+			//GD->DebugStat();
 		}
 	}
 }

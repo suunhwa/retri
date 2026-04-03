@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ReTri/ReTri.h"
+#include "Player/Data/PlayerSkillData.h"
 #include "ReTriGameData.generated.h"
 
 //! PlayerStats 
@@ -48,6 +48,17 @@ public:
 	int32 MinDreamPowder = 20;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxDreamPowder = 100;
+};
+
+//! Shop Item Info 
+USTRUCT(BlueprintType)
+struct FShopItemSkillData
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FPlayerSkillData> ItemSkillDatas;
 };
 
 
@@ -150,17 +161,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stats|Elemental")
 	void UpdateFireDamage(float Amount) { PlayerStats.FireDamage += Amount; }
 	
-	/*void DebugStat() const
-	{
-		UE_LOG(jiwon, Log, TEXT("==================== Player Stats ===================="));
-		// 기본 스탯
-		UE_LOG(jiwon, Log, TEXT("[Base Stats] HP: %.2f / AD: %.2f / AP: %.2f"), PlayerStats.CurrentHP, PlayerStats.AttackPower, PlayerStats.AbilityPower);
-		UE_LOG(jiwon, Log, TEXT("[Base Stats] Gold: %d / DreamPowder: %d / Exp: %.2f"), PlayerStats.Gold, PlayerStats.DreamPowder, PlayerStats.Exp);
-		// 보조 스탯
-		UE_LOG(jiwon, Log, TEXT("[Secondary Stats] AS: %.2f / CoolTime: %.2f"), PlayerStats.AttackSpeed, PlayerStats.CoolTime);
-		// 유틸리티 및 원소 스탯
-		UE_LOG(jiwon, Log, TEXT("[Utility] MoveSpeed: %.2f"), PlayerStats.MoveSpeed);
-		UE_LOG(jiwon, Log, TEXT("[Elemental] FireDamage: %.2f"), PlayerStats.FireDamage);
-		UE_LOG(jiwon, Log, TEXT("======================================================"));
-	}*/
+	// void DebugStat() const
+	// {
+	// 	UE_LOG(jiwon, Log, TEXT("==================== Player Stats ===================="));
+	// 	// 기본 스탯
+	// 	UE_LOG(jiwon, Log, TEXT("[Base Stats] HP: %.2f / AD: %.2f / AP: %.2f"), PlayerStats.CurrentHP, PlayerStats.AttackPower, PlayerStats.AbilityPower);
+	// 	UE_LOG(jiwon, Log, TEXT("[Base Stats] Gold: %d / DreamPowder: %d / Exp: %.2f"), PlayerStats.Gold, PlayerStats.DreamPowder, PlayerStats.Exp);
+	// 	// 보조 스탯
+	// 	UE_LOG(jiwon, Log, TEXT("[Secondary Stats] AS: %.2f / CoolTime: %.2f"), PlayerStats.AttackSpeed, PlayerStats.CoolTime);
+	// 	// 유틸리티 및 원소 스탯
+	// 	UE_LOG(jiwon, Log, TEXT("[Utility] MoveSpeed: %.2f"), PlayerStats.MoveSpeed);
+	// 	UE_LOG(jiwon, Log, TEXT("[Elemental] FireDamage: %.2f"), PlayerStats.FireDamage);
+	// 	UE_LOG(jiwon, Log, TEXT("======================================================"));
+	// }
 };

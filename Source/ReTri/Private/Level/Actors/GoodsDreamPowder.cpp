@@ -38,17 +38,17 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 		
 		if (!GI || !GI->StatComp) return;
 
-		const int32 CurDreamPowder = GI->GameData->GetRandomDreamPowder();
-		GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, CurDreamPowder);
+		if (!GI || !GI->StatComp) return;
+		const int32 Amount = GI->GameData->GetRandomDreamPowder();
+		GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Amount);
 		
-		if (FloatingUIActorClass)
-		{
-			AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
-			FString TempStr = FString::Printf(TEXT("꿈가루 +%d"), CurDreamPowder);
-			FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(0.053033f, 0.510102f, 1.0f, 1.f));
-		}
+		if (!FloatingUIActorClass) return;
+		AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
+		FString TempStr = FString::Printf(TEXT("꿈가루 +%d"), Amount);
+		FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(0.053033f, 0.510102f, 1.0f, 1.f));
 		
-		// GI->GameData->DebugStat();
+		GI->DebugStat();
+		
 		Destroy();
 	}
 }
