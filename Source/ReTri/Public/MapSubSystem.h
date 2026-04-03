@@ -101,7 +101,7 @@ public:
 	void SpawnLootPieces(TArray<AActor*> TargetPoints);
 	
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
-	void SetMerchantItemList();
+	void SetMerchantItemList(int32 MapIndex);
 	
 	/** 적 스포너 개수 받아오기 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")

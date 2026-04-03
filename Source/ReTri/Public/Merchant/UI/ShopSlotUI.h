@@ -29,8 +29,11 @@ public:
 	void OnClicked();
 	
 	UFUNCTION(BlueprintCallable)
-	void SetGoldText(FString Gold, FLinearColor Color = FLinearColor(0.022000f, 0.002732f, 0.002428f, 1.000000f));
+	void SetGoldText(int32 Gold, FLinearColor Color = FLinearColor(0.8f, 0.8f, 0.5f, 1.0f));
 
+	UFUNCTION(BlueprintCallable)
+	void SetItemIcon(UTexture2D* Texture);
+	
 	UPROPERTY(meta=(BindWidget))
 	UButton* ItemSlotButton;
 	

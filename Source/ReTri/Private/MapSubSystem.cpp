@@ -187,7 +187,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 			
 			// 맵테마 설정 (전투 80% / 상점 20%)
 			int32 RandomMapType = FMath::RandRange(1, 10);
-			NewNode.MapType = (RandomMapType <= 2) ? EMapNodeType::Merchant : EMapNodeType::Combat;
+			NewNode.MapType = (RandomMapType <= 5) ? EMapNodeType::Merchant : EMapNodeType::Combat;
 			NewNode.bIsCleared = false;
 				
 			// 상호작용 기물 스폰 랜덤 정하기
@@ -199,7 +199,6 @@ void UMapSubSystem::ProceduralGenerateMap()
 				RandomNum = 3;
 				break;
 			case EMapNodeType::Merchant:
-				SetMerchantItemList();
 				RandomNum = 2;
 				break;
 			default: break;
@@ -219,6 +218,12 @@ void UMapSubSystem::ProceduralGenerateMap()
 			// 전역 배열에 맵추가 CurMapDatas
 			int32 NewNodeIndex = CurMapDatas.Add(NewNode);
 			CurMapDatas[NewNodeIndex].MapIndex = NewNodeIndex;
+			
+			if (CurMapDatas[NewNodeIndex].MapType == EMapNodeType::Merchant)
+			{
+				SetMerchantItemList(NewNodeIndex);
+			}
+			
 			// 깊이에도 저장 NodeGrid[Depth].Add
 			NodeGrid[Depth].Add(NewNodeIndex);
 	
@@ -509,7 +514,7 @@ void UMapSubSystem::SpawnLootPieces(TArray<AActor*> TargetPoints)
 	}
 }
 
-void UMapSubSystem::SetMerchantItemList()
+void UMapSubSystem::SetMerchantItemList(int32 MapIndex)
 {
 	TArray<FPlayerSkillData*> AllSkills; 
 	if (SkillDataTable)
@@ -540,20 +545,21 @@ void UMapSubSystem::SetMerchantItemList()
 		}
 	}
 	
-	UE_LOG(jiwon, Display, TEXT("CurMapIndex: %d"), CurMapIndex);
+	UE_LOG(jiwon, Display, TEXT("Generating Merchant Data For MapIndex: %d"), MapIndex);
 	
 	FShopItemSkillData TempSkillData;
 	int32 PickCount = FMath::RandRange(4, 6); 
-	if (PickCount < AcquiredSkills.Num()) PickCount = AcquiredSkills.Num();
+	if (PickCount > AcquiredSkills.Num()) PickCount = AcquiredSkills.Num();
 	for (int32 i = 0; i < PickCount; ++i)
 	{
 		TempSkillData.ItemSkillDatas.Add(*AcquiredSkills[i]);
 		
 		UE_LOG(jiwon, Display, TEXT("Acquired Skill: %s"), *AcquiredSkills[i]->SkillNameKR);
 	}
+	UE_LOG(jiwon, Display, TEXT("ItemSkillDatas: %d"), TempSkillData.ItemSkillDatas.Num());
 
 	// 최종 상점에 등록!
-	MerchantItemDatas.Add(CurMapIndex, TempSkillData);
+	MerchantItemDatas.Add(MapIndex, TempSkillData);
 }
 
 void UMapSubSystem::SetEnemySpawnerCount(int32 SpawnerNum)

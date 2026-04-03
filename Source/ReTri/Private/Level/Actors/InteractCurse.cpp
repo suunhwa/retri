@@ -32,7 +32,6 @@ void AInteractCurse::Interact_Implementation()
 	
 	SetIsUsed(true);
 	
-	// todo: 3가지 선택지 UI 띄우기
 	if (!CurseDataTable)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Curse Data Table 할당 되지 않음"));
@@ -57,6 +56,7 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 	FCurseData* CurseData = CurseDatas[Index];
 	JIWONLOG("선택된 저주: %s", *CurseData->CurseName);
 	
+	// todo: 저주 UI 띄우기 
 	int32 RandomCurse = FMath::RandRange(0, 1);
 	if (RandomCurse == 0)
 	{
@@ -66,6 +66,7 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 	{
 		SCREENLOG("맵을 %d구역 클리어하세요!", CurseData->CurseMap);
 	}
+	
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	CurseRewardDataTable->GetAllRows<FCurseRewardData>(TEXT("Curse::Select"), CurseRewardDatas);
 	int32 RandomReward = FMath::RandRange(0, CurseRewardDatas.Num() - 1);

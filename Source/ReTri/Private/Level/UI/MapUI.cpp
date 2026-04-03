@@ -61,10 +61,10 @@ void UMapUI::NativeConstruct()
 		
 		FName EnumName = FName(*StaticEnum<EMapNodeType>()->GetNameStringByValue((int64)Data.MapType));
 		FMapUIData* UIData = GI->MapUIData->FindRow<FMapUIData>(EnumName, TEXT("MapNode"));
-		FButtonStyle Style;
 		UTexture2D* Texture = UIData->MapIcon;
 		if (!Texture) SCREENLOG("엥? 그럼 어케 불러옴 ?");
 		else SCREENLOG("에? 근데 왜 안뜸?");
+		FButtonStyle Style;
 		Style.Normal.SetResourceObject(UIData->MapIcon);
 		Style.Normal.ImageSize = FVector2D(50.f, 50.f); // 사이즈도 잊지 마십시오!
 		Style.Hovered = Style.Normal;

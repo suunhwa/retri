@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ShopBGUI.generated.h"
 
+class UImage;
 class UWrapBox;
 class UShopSlotUI;
 
@@ -23,7 +24,7 @@ public:
 	
 	// t	
 	UFUNCTION(BlueprintCallable)
-	UShopSlotUI* AddButton(FString Title, FString Info, int32 Index, FLinearColor Color = FLinearColor(0.022000f, 0.002732f, 0.002428f, 1.000000f));
+	UShopSlotUI* AddButton(UTexture2D* ItemIcon, int32 GoldText, FLinearColor Color = FLinearColor(0.022000f, 0.002732f, 0.002428f, 1.000000f));
 	
 	UFUNCTION(BlueprintCallable)
 	void ClearButtons();

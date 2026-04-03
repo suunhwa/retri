@@ -7,9 +7,11 @@
 #include "Level/Interfaces/InteractableInterface.h"
 #include "Merchant.generated.h"
 
+class USphereComponent;
 class UWidgetComponent;
 class UUserWidget;
-class USelectUI;
+class UShopBGUI;
+class UShopSlotUI;
 
 struct FInteractableData;
 
@@ -46,7 +48,7 @@ public:
 public:
 	// 상인 일 때
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class USphereComponent* MerchantCollision;
+	USphereComponent* MerchantCollision;
 	
 	// Interaction Object 이름과 상호작용을 띄울 UI (Overlap)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -56,19 +58,15 @@ public:
 	
 	// 상점 UI 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UWidgetComponent* MerchantUI;
+	UShopBGUI* MerchantUIInstance;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> MerchantUIClass;
+	TSubclassOf<UShopBGUI> MerchantUIClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> MerchantSlotClass;
+	TSubclassOf<UShopSlotUI> MerchantSlotClass;
 	
-	// === [ Select ] ===
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SelectUI")
-	TSubclassOf<USelectUI> SelectUIClass;
+	void ShowMerchantUI();
+	void HideMerchantUI();
 	
-	UPROPERTY()
-	USelectUI* SelectUIInstance;
-	
-	void ShowSelectUI();
-	void HideSelectUI();
+	UFUNCTION()
+	void OnClickedMerchantSlotUI();
 };
