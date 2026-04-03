@@ -166,6 +166,7 @@ void AEnemyBase::BroadcastDeath()
 
 void AEnemyBase::ExecuteJumpDownDamage()
 {
+
 }
 
 void AEnemyBase::StartCharging(AActor* NewTarget)
