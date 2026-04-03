@@ -263,7 +263,7 @@ void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UA
 	
 	Boss->PlayAnimMontage(Montage);
 	
-	// 올라가는 이펙트 생성
+	// 올라가는 이펙트 생성 필요 ==============!!!!!! ================
 	
 	Boss->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	Boss->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -275,13 +275,15 @@ void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UA
 	
 	// 보스야 장판 생성해
 	Boss->SpawnJumpDecal(LandingPosition, JumpCircleDecal);
-	
-	
-	
 }
 
 void UBP_StateTreeTask::ExecuteMirrorBlade(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
 {
+	if (!Boss || !Player || !Montage) return;
+	
+	Boss->SpawnClones();
+	
+	
 }
 
 void UBP_StateTreeTask::ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)

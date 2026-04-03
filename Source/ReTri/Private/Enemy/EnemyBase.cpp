@@ -3,12 +3,11 @@
 #include "Enemy/EnemyBase.h"
 
 #include "AIController.h"
+#include "AudioDevice.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 #include "Components/CapsuleComponent.h"
-
 #include "Components/DecalComponent.h"
-#include "Enemy/DarkMoon/DarkMoon.h"
 #include "Enemy/BP_StateTreeTask.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,9 +16,14 @@
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
+	BoxDecalComp = CreateDefaultSubobject<UDecalComponent>(TEXT("BoxDecalComp"));
+	BoxDecalComp->SetupAttachment(RootComponent);
+	
+	BoxDecalComp->SetVisibility(false);
+	BoxDecalComp->SetComponentTickEnabled(false);
 }
 
 // Called when the game starts or when spawned
@@ -92,7 +96,7 @@ void AEnemyBase::Tick(float DeltaTime)
 	{
 		RotateToTarget(DeltaTime, 10.0f);
 	}
-
+	
 }
 
 // Called to bind functionality to input
@@ -199,7 +203,7 @@ void AEnemyBase::RotateToTarget(float DeltaTime, float InterpSpeed)
 
 void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Decal)
 {
-	CircleDecal = UGameplayStatics::SpawnDecalAtLocation
+	CircleDecalComp = UGameplayStatics::SpawnDecalAtLocation
 		(
 		GetWorld(),
 		Decal,
@@ -209,9 +213,9 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 		2.0f
 		);
 	
-	if (CircleDecal)
+	if (CircleDecalComp)
 	{
-		UMaterialInstanceDynamic* LocalDynamicDecal = CircleDecal->CreateDynamicMaterialInstance();
+		UMaterialInstanceDynamic* LocalDynamicDecal = CircleDecalComp->CreateDynamicMaterialInstance();
 		
 		float UpdateInterval = 0.02f;
 		
@@ -280,6 +284,75 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 				Boss->PlayAnimMontage(Boss->DownMontage, 1.0f);
 			}
 		}, UpdateInterval, true);
+	}
+}
+
+void AEnemyBase::SpawnClones()
+{
+	// 기존 분신 있다면 제거
+	for (AEnemyBase* Clone : ActiveClones)
+	{
+		if (Clone) Clone->Destroy();
+	}
+	ActiveClones.Empty();
+	
+	// 소환
+	int32 CloneCount = 7;
+	float Radius = 2100.f;
+	
+	for (int32 i = 0; i < CloneCount; i++)
+	{
+		float Angle = (360.f / CloneCount) * i;
+		FVector Offset = FVector(FMath::Cos(FMath::DegreesToRadians(Angle)), FMath::Sin(FMath::DegreesToRadians(Angle)), 0.f) * Radius;
+		FVector SpawnLoc = GetActorLocation() + Offset;
+		
+		ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+		AEnemyBase* NewClone = GetWorld()->SpawnActor<AEnemyBase>(CloneClass, SpawnLoc, FRotator::ZeroRotator);
+		
+		if (NewClone)
+		{
+			if (Player)
+			{
+				FVector DirToPlayer = (Player->GetActorLocation() - SpawnLoc).GetSafeNormal();
+				DirToPlayer.Z = 0.f;
+				NewClone->SetActorRotation(DirToPlayer.Rotation());
+			}
+
+			// 장판 초기화
+			NewClone->InitCloneDecal(200.f, 1500.f);
+            
+			// TArray에 담는당!!
+			ActiveClones.Add(NewClone);
+		}
+	}
+	
+}
+
+void AEnemyBase::InitCloneDecal(float Width, float Length)
+{
+	if (BoxDecal && BoxDecalComp)
+	{
+		// 생성
+		if (!DynamicBoxDecal) 
+		{
+			DynamicBoxDecal = UMaterialInstanceDynamic::Create(BoxDecal, this);
+			BoxDecalComp->SetDecalMaterial(DynamicBoxDecal);
+		}
+		
+		// 설정
+		BoxDecalComp->DecalSize = FVector(700.f, Width, Length);
+		BoxDecalComp->SetRelativeRotation(FRotator(-90, 0, 0));
+		
+		BoxDecalComp->SetVisibility(true);
+		UpdateBoxDecalProgress(0.f);
+	}
+}
+
+void AEnemyBase::UpdateBoxDecalProgress(float Progress)
+{
+	if (DynamicBoxDecal)
+	{
+		DynamicBoxDecal->SetScalarParameterValue("BoxProgress", Progress);
 	}
 }
 

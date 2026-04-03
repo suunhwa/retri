@@ -103,6 +103,9 @@ public:
 	// 이미 누군가를 때렸는지
 	bool bHasHitTarget = false;
 	
+	// (4스킬)
+	bool bIsMirrorPatternActive = false;
+	
 	// 바라보면서 회전할지 여부
 	UPROPERTY(BlueprintReadWrite, Category = "Boss")
 	bool bCanRotate = true;
@@ -124,11 +127,28 @@ public:
 	UMaterialInstanceDynamic* DynamicJumpCircleDecal;
 	
 	UPROPERTY()
-	UDecalComponent* CircleDecal;
-	
+	UDecalComponent* CircleDecalComp;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float JumpDownDamageRadius = 700.0f; // 장판(데칼)의 크기와 비슷하게 맞춤
+	
+	
+	// ----------- MirrorBlade -----------
+	UPROPERTY(EditAnywhere, Category = Skill)
+	UMaterialInterface* BoxDecal;
+	
+	UPROPERTY()
+	UMaterialInstanceDynamic* DynamicBoxDecal;
+	
+	UPROPERTY()
+	UDecalComponent* BoxDecalComp;
+	
+	UPROPERTY()
+	TArray<AEnemyBase*> ActiveClones; // 분신 관리 배열
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Skill)
+	TSubclassOf<AEnemyBase> CloneClass;
+	
 	
 	
 public:
@@ -154,6 +174,10 @@ public:
 	void RotateToTarget(float DeltaTime, float InterpSpeed);	// 플레이어 바라보는 함수
 	
 	void SpawnJumpDecal(FVector Location, class UMaterialInterface* JumpCircleDecal);
+	
+	void SpawnClones();
+	void InitCloneDecal(float Width, float Length);	// 장판
+	void UpdateBoxDecalProgress(float Progress);
 	
 	void PlayDeathEffect();
 	void BroadcastDeath();
