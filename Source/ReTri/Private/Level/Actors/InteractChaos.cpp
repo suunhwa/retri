@@ -27,15 +27,7 @@ void AInteractChaos::Interact_Implementation()
 	
 	FName KeyName = FName("Chaos");
 	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
-	if (FoundValue)
-	{
-		*FoundValue = true;
-		SCREENLOG("근데 왜 ? tq?");
-	}
-	else
-	{
-		SCREENLOG("Tlqkf 이유좀");
-	}
+	if (FoundValue) *FoundValue = true;
 	
 	SetIsUsed(true);
 	
@@ -58,6 +50,9 @@ void AInteractChaos::Interact_Implementation()
 		AllChaos.Swap(i, R);
 	}
 
+	// UI띄우기
+	ShowSelectUI();
+	
 	for (int i = 0; i < 3; i++)
 	{
 		PickedChaoses.Add(AllChaos[i]);
@@ -68,9 +63,6 @@ void AInteractChaos::Interact_Implementation()
 		USelectButtonUI* Button = SelectUIInstance->AddButton(AllChaos[i]->ChaosName, Info, i);
 		Button->OnSelectClicked.AddDynamic(this, &AInteractChaos::OnChaosSelected);
 	}
-	
-	// UI띄우기
-	ShowSelectUI();
 }
 
 void AInteractChaos::OnChaosSelected(int32 Index)
