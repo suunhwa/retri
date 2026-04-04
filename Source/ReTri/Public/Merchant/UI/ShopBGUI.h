@@ -22,9 +22,8 @@ public:
 	UPROPERTY(EditAnywhere, Category="MapUI")
 	TSubclassOf<UShopSlotUI> ShopSlotUIClass;
 	
-	// t	
 	UFUNCTION(BlueprintCallable)
-	UShopSlotUI* AddButton(UTexture2D* ItemIcon, int32 GoldText, FLinearColor Color = FLinearColor(0.022000f, 0.002732f, 0.002428f, 1.000000f));
+	UShopSlotUI* AddButton(int32 Number, UTexture2D* ItemIcon, int32 GoldText, FLinearColor Color = FLinearColor(0.022000f, 0.002732f, 0.002428f, 1.000000f));
 	
 	UFUNCTION(BlueprintCallable)
 	void ClearButtons();

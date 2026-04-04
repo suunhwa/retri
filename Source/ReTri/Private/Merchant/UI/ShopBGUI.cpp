@@ -7,7 +7,7 @@
 #include "Components/WrapBox.h"
 #include "Merchant/UI/ShopSlotUI.h"
 
-UShopSlotUI* UShopBGUI::AddButton(UTexture2D* ItemIcon, int32 GoldText, FLinearColor Color)
+UShopSlotUI* UShopBGUI::AddButton(int32 Number, UTexture2D* ItemIcon, int32 GoldText, FLinearColor Color)
 {
 	if (!ShopSlotUIClass)
 	{
@@ -19,6 +19,7 @@ UShopSlotUI* UShopBGUI::AddButton(UTexture2D* ItemIcon, int32 GoldText, FLinearC
 	ShopSlot->ClearFlags(RF_Transactional); // PIE World Leak 방지
 	ShopSlot->SetItemIcon(ItemIcon);
 	ShopSlot->SetGoldText(GoldText, Color);
+	ShopSlot->SlotNumber = Number;
 	
 	ItemWrapBox->AddChildToWrapBox(ShopSlot);
 	

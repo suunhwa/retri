@@ -3,7 +3,6 @@
 
 #include "Level/Actors/InteractableBase.h"
 
-#include "Level/Actors/NZW_TestPlayer.h"
 #include "Level/Data/InteractableData.h"
 #include "Level/UI/InteractableInfoUI.h"
 #include "Level/UI/InteractableUI.h"
@@ -36,9 +35,9 @@ AInteractableBase::AInteractableBase()
 	
 	InteractUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractUI"));
 	InteractUI->SetupAttachment(CapsuleComp);
-	InteractUI->SetWidgetSpace(EWidgetSpace::Screen); //! EWidgetSpace::World
+	InteractUI->SetWidgetSpace(EWidgetSpace::World); //! EWidgetSpace::World
 	InteractUI->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
-	InteractUI->SetRelativeScale3D(FVector(0.8f, 0.8f, 0.8f));
+	//InteractUI->SetRelativeScale3D(FVector(0.8f, 0.8f, 0.8f));
 	ConstructorHelpers::FClassFinder<UInteractableUI> TempUI(TEXT("/Game/LevelInteraction/01_UI/WBP_InteractableUI.WBP_InteractableUI_C"));
 	if (TempUI.Succeeded()) InteractUI->SetWidgetClass(TempUI.Class);
 	InteractUI->SetVisibility(false);
@@ -85,7 +84,7 @@ void AInteractableBase::Tick(float DeltaTime)
 		bIsHovering = false;
 	}
 	
-	//UIFocus();
+	UIFocus();
 	UIHold();
 }
 

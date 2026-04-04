@@ -416,6 +416,40 @@ FInteractableData UMapSubSystem::GetRowInteractionData(FName RowName, bool& bSuc
 	return FInteractableData();
 }
 
+TArray<FPlayerSkillData*> UMapSubSystem::GetRandomAcquiredItemList()
+{
+	TArray<FPlayerSkillData*> AllSkills; 
+	if (SkillDataTable)
+	{
+		SkillDataTable->GetAllRows<FPlayerSkillData>(TEXT("AllSkills"), AllSkills);
+	}
+    
+	TArray<FPlayerSkillData*> AcquiredSkills; 
+	for (auto Skill : AllSkills)
+	{
+		if (Skill->SkillCategory == ESkillCategory::Acquired)
+		{
+			AcquiredSkills.Add(Skill);
+		}
+	}
+	
+	if (AcquiredSkills.Num() > 0)
+	{
+		int32 LastIndex = AcquiredSkills.Num() - 1;
+		for (int32 i = 0; i <= LastIndex; ++i)
+		{
+			int32 RandomIndex = FMath::RandRange(i, LastIndex);
+        
+			if (i != RandomIndex)
+			{
+				AcquiredSkills.Swap(i, RandomIndex);
+			}
+		}
+	}
+	
+	return AcquiredSkills;
+}
+
 // === Level Setting API? ===
 void UMapSubSystem::SetInteractableUsed(FName InRowName)
 {
@@ -516,34 +550,7 @@ void UMapSubSystem::SpawnLootPieces(TArray<AActor*> TargetPoints)
 
 void UMapSubSystem::SetMerchantItemList(int32 MapIndex)
 {
-	TArray<FPlayerSkillData*> AllSkills; 
-	if (SkillDataTable)
-	{
-		SkillDataTable->GetAllRows<FPlayerSkillData>(TEXT("AllSkills"), AllSkills);
-	}
-    
-	TArray<FPlayerSkillData*> AcquiredSkills; 
-	for (auto Skill : AllSkills)
-	{
-		if (Skill->SkillCategory == ESkillCategory::Acquired)
-		{
-			AcquiredSkills.Add(Skill);
-		}
-	}
-	
-	if (AcquiredSkills.Num() > 0)
-	{
-		int32 LastIndex = AcquiredSkills.Num() - 1;
-		for (int32 i = 0; i <= LastIndex; ++i)
-		{
-			int32 RandomIndex = FMath::RandRange(i, LastIndex);
-        
-			if (i != RandomIndex)
-			{
-				AcquiredSkills.Swap(i, RandomIndex);
-			}
-		}
-	}
+	TArray<FPlayerSkillData*> AcquiredSkills = GetRandomAcquiredItemList();
 	
 	UE_LOG(jiwon, Display, TEXT("Generating Merchant Data For MapIndex: %d"), MapIndex);
 	
@@ -562,32 +569,34 @@ void UMapSubSystem::SetMerchantItemList(int32 MapIndex)
 	MerchantItemDatas.Add(MapIndex, TempSkillData);
 }
 
-void UMapSubSystem::SetEnemySpawnerCount(int32 SpawnerNum)
+void UMapSubSystem::RemoveMerchantItemList(int32 CurrentMap,int32 RemoveItemSlotNum)
 {
-	EnemySpawnerCount = SpawnerNum;
+	FShopItemSkillData* SkillDatas = MerchantItemDatas.Find(CurrentMap);
+	SkillDatas->ItemSkillDatas.RemoveAt(RemoveItemSlotNum);
+	SCREENLOG("현재 상점 아이템 개수: %d", SkillDatas->ItemSkillDatas.Num());
+}
+
+void UMapSubSystem::SetMinionSpawnerCount()
+{
+	TArray<AActor*> MinionSpawners;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("MinionSpawner"), MinionSpawners);
+	
+	MinionSpawnerCount = MinionSpawners.Num();
+	
+	SCREENLOG("미니언 스포너 개수: %d", MinionSpawnerCount);
 }
 
 void UMapSubSystem::LevelClear()
 {
+	CurClearSpawnerCount++;
+	if (MinionSpawnerCount > CurClearSpawnerCount) return;
+	SCREENLOG("전투맵 클리어!");
+
 	TArray<AActor*> TPs;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Portal"), TPs);
-	
-	bool bSuccess = false;
-	FInteractableData IData = GetRowInteractionData(TEXT("Portal"), bSuccess);
+
+	SpawnPortal(TPs[0]);
 		
-	if (!bSuccess)
-	{
-		JIWONLOG("샤갈 Portal Row 못찾음");
-		return;
-	}
-	
 	CurMapDatas[CurMapIndex].bIsCleared = true;
-	
-	AInteractableBase* I = GetWorld()->SpawnActor<AInteractableBase>(
-		IData.InteractableClass, 
-		TPs[0]->GetActorLocation(), 
-		TPs[0]->GetActorRotation()
-	);
-		
-	I->DataInit(FName("Portal"), IData);
+	CurClearSpawnerCount = 0;
 }

@@ -85,7 +85,6 @@ public:
 	// === [ Select ] ===
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SelectUI")
 	TSubclassOf<USelectUI> SelectUIClass;
-	
 	UPROPERTY()
 	USelectUI* SelectUIInstance;
 	

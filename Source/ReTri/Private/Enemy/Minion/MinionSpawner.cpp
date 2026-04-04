@@ -5,6 +5,7 @@
 
 #include "Enemy/Minion/MinionSpawner.h"
 
+#include "MapSubSystem.h"
 #include "Components/BoxComponent.h"
 #include "Enemy/Minion/Minion.h"
 #include "Kismet/GameplayStatics.h"
@@ -74,6 +75,14 @@ void AMinionSpawner::AddMinionDeathCount()
 	if (CurrentDeathCount >= MaxlMinionCount)
 	{
 		SCREENLOG("전멸.");
+		
+		if (auto GI = UGameplayStatics::GetGameInstance(GetWorld()))
+		{
+			if (auto MapSub = GI->GetSubsystem<UMapSubSystem>())
+			{
+				MapSub->LevelClear();
+			}
+		}
 	}
 }
 

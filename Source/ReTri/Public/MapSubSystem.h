@@ -13,9 +13,7 @@
 class AActor;
 class ALootGoldCoinPot;
 class ALootDreamPowderPillar;
-/**
- * 
- */
+
 UCLASS()
 class RETRI_API UMapSubSystem : public UGameInstanceSubsystem
 {
@@ -61,7 +59,8 @@ public:
 	}
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
-	int32 EnemySpawnerCount = 0;
+	int32 MinionSpawnerCount = 0;
+	int32 CurClearSpawnerCount = 0;
 	
 	// === Public API ===
 	/** 맵 생성 (트리 구조) XXXX */
@@ -83,6 +82,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
 	FInteractableData GetRowInteractionData(FName RowName, bool& bSuccess); 
 	
+	TArray<FPlayerSkillData*> GetRandomAcquiredItemList();
 	// === Level Setting API? ===
 	/** 사용된 Interactable 저장 */
 	UFUNCTION(BlueprintCallable, Category="Map|State")
@@ -100,14 +100,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SpawnLootPieces(TArray<AActor*> TargetPoints);
 	
+	/** 상점 맵 마다 상인 상점 목록 생성 함수 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SetMerchantItemList(int32 MapIndex);
+	void RemoveMerchantItemList(int32 CurrentMap,int32 RemoveItemSlotNum);
 	
 	/** 적 스포너 개수 받아오기 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
-	void SetEnemySpawnerCount(int32 SpawnerNum);
+	void SetMinionSpawnerCount();
 	
 	/** 게임 클리어 (포탈 생성 조건) */
-	UFUNCTION(BlueprintCallable, Category="Map|Helper")
+	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void LevelClear();
 };

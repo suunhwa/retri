@@ -12,6 +12,7 @@ class UWidgetComponent;
 class UUserWidget;
 class UShopBGUI;
 class UShopSlotUI;
+class AItemBase;
 
 struct FInteractableData;
 
@@ -42,8 +43,8 @@ public:
 	UFUNCTION()
 	void MerchantEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
-	UFUNCTION(BlueprintCallable)
-	void DataInit(FName InRowName, FInteractableData RowData);
+	// UFUNCTION(BlueprintCallable)
+	// void DataInit(FName InRowName, FInteractableData RowData);
 	
 public:
 	// 상인 일 때
@@ -67,6 +68,9 @@ public:
 	void ShowMerchantUI();
 	void HideMerchantUI();
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AItemBase> ItemClass;
+	
 	UFUNCTION()
-	void OnClickedMerchantSlotUI();
+	void OnClickedMerchantSlotUI(int32 SlotNum);
 };
