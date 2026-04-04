@@ -16,12 +16,12 @@ void USkillSlotUI::NativeConstruct()
 }
 
 void USkillSlotUI::InitSlot(EAbilitySlot InSlot, bool bInFixed, UTexture2D* InKeyIcon,
-                            UAbilityBase* InAbility, USkillBarUI* InOwningBar,
-                            UTexture2D* InFallbackIcon)
+                             UAbilityBase* InAbility, USkillBarUI* InOwningBar,
+                             UTexture2D* InFallbackIcon)
 {
-	LinkedSlot = InSlot;
-	bFixed = bInFixed;
-	OwningBar = InOwningBar;
+	LinkedSlot   = InSlot;
+	bFixed       = bInFixed;
+	OwningBar    = InOwningBar;
 	FallbackIcon = InFallbackIcon;
 
 	// 키 아이콘 이미지 설정
@@ -67,7 +67,7 @@ void USkillSlotUI::SetSkill(UAbilityBase* NewAbility)
 // ============================================================
 
 FReply USkillSlotUI::NativeOnMouseButtonDown(const FGeometry& InGeometry,
-                                             const FPointerEvent& InMouseEvent)
+                                              const FPointerEvent& InMouseEvent)
 {
 	if (bFixed)
 		return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
@@ -81,14 +81,14 @@ FReply USkillSlotUI::NativeOnMouseButtonDown(const FGeometry& InGeometry,
 }
 
 void USkillSlotUI::NativeOnDragDetected(const FGeometry& InGeometry,
-                                        const FPointerEvent& InMouseEvent,
-                                        UDragDropOperation*& OutOperation)
+                                         const FPointerEvent& InMouseEvent,
+                                         UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 	USkillDragDrop* Op = NewObject<USkillDragDrop>(this);
 	Op->SourceSlot = this;
-	Op->Pivot = EDragPivot::MouseDown;
+	Op->Pivot      = EDragPivot::MouseDown;
 
 	if (IconImg)
 	{
@@ -101,8 +101,8 @@ void USkillSlotUI::NativeOnDragDetected(const FGeometry& InGeometry,
 }
 
 bool USkillSlotUI::NativeOnDrop(const FGeometry& InGeometry,
-                                const FDragDropEvent& InDragDropEvent,
-                                UDragDropOperation* InOperation)
+                                 const FDragDropEvent& InDragDropEvent,
+                                 UDragDropOperation* InOperation)
 {
 	USkillDragDrop* SkillOp = Cast<USkillDragDrop>(InOperation);
 	if (!SkillOp || !SkillOp->SourceSlot || SkillOp->SourceSlot == this)
@@ -121,7 +121,7 @@ bool USkillSlotUI::NativeOnDrop(const FGeometry& InGeometry,
 }
 
 void USkillSlotUI::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent,
-                                         UDragDropOperation* InOperation)
+                                          UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
 
@@ -132,6 +132,7 @@ void USkillSlotUI::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent,
 
 void USkillSlotUI::OnCooldownChanged(float Remaining, float Total)
 {
+	UE_LOG(LogTemp, Warning, TEXT("OnCooldownChanged: Remaining=%.2f, Total=%.2f"), Remaining, Total);
 	UpdateCooldownDisplay(Remaining > 0.f, Remaining, Total);
 }
 
@@ -145,16 +146,20 @@ void USkillSlotUI::SetupMaterials()
 	}
 
 	// ---- 쿨다운 라디알 MID ----
+	UE_LOG(LogTemp, Warning, TEXT("SetupMaterials: CooldownOverlayImg=%s, MCooldownRadial=%s"),
+		CooldownOverlayImg ? TEXT("OK") : TEXT("NULL"),
+		MCooldownRadial ? TEXT("OK") : TEXT("NULL"));
 	if (CooldownOverlayImg && MCooldownRadial)
 	{
 		CooldownMI = UMaterialInstanceDynamic::Create(MCooldownRadial, this);
 		CooldownOverlayImg->SetBrushFromMaterial(CooldownMI);
+		UE_LOG(LogTemp, Warning, TEXT("SetupMaterials: CooldownMI created OK"));
 	}
 
-	// ---- 테두리 glow MID ----
-	if (BorderImg && MBorderGlow)
+	// ---- 테두리 쿨다운 링 MID (CooldownOverlay와 같은 머티리얼) ----
+	if (BorderImg && MCooldownRadial)
 	{
-		BorderMI = UMaterialInstanceDynamic::Create(MBorderGlow, this);
+		BorderMI = UMaterialInstanceDynamic::Create(MCooldownRadial, this);
 		BorderImg->SetBrushFromMaterial(BorderMI);
 	}
 }
@@ -179,25 +184,29 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 {
 	// ---- 라디알 쿨다운 재질 파라미터 갱신 ----
 	// CooldownRatio: 1.0 = 막 발동(완전히 어두운 원), 0.0 = 준비완료(투명)
-	const float Ratio = (Total > 0.f) ? FMath::Clamp(Remaining / Total, 0.f, 1.f) : 0.f;
+	const float Ratio = (bOnCooldown && Total > 0.f) ? FMath::Clamp(1.f - Remaining / Total, 0.f, 1.f) : 0.f;
 
 	if (CooldownMI)
 	{
 		CooldownMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
+		UE_LOG(LogTemp, Warning, TEXT("CooldownMI set Ratio=%.2f"), Ratio);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CooldownMI is NULL"));
 	}
 
 	// 재질 없으면 Visibility로 폴백
 	if (!CooldownMI && CooldownOverlayImg)
 	{
-		CooldownOverlayImg->SetVisibility(bOnCooldown
-			                                  ? ESlateVisibility::HitTestInvisible
-			                                  : ESlateVisibility::Collapsed);
+		CooldownOverlayImg->SetVisibility(bOnCooldown ? ESlateVisibility::HitTestInvisible
+		                                               : ESlateVisibility::Collapsed);
 	}
 
-	// ---- 테두리 glow: 준비완료면 1, 쿨다운 중이면 0 ----
+	// ---- 테두리 쿨다운 링 ----
 	if (BorderMI)
 	{
-		BorderMI->SetScalarParameterValue(TEXT("IsReady"), bOnCooldown ? 0.f : 1.f);
+		BorderMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
 	}
 
 	// ---- 남은 초 텍스트 ----
@@ -207,8 +216,8 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 		{
 			// 1초 이하면 소수점 1자리, 이상이면 정수
 			const FText TimeText = (Remaining < 1.f)
-				                       ? FText::AsNumber(FMath::RoundToFloat(Remaining * 10.f) / 10.f)
-				                       : FText::AsNumber(FMath::CeilToInt(Remaining));
+				? FText::AsNumber(FMath::RoundToFloat(Remaining * 10.f) / 10.f)
+				: FText::AsNumber(FMath::CeilToInt(Remaining));
 			CooldownText->SetText(TimeText);
 			CooldownText->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
@@ -222,7 +231,7 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 void USkillSlotUI::UnbindCooldown()
 {
 	if (LinkedSkill &&
-		LinkedSkill->OnCooldownChanged.IsAlreadyBound(this, &USkillSlotUI::OnCooldownChanged))
+	    LinkedSkill->OnCooldownChanged.IsAlreadyBound(this, &USkillSlotUI::OnCooldownChanged))
 	{
 		LinkedSkill->OnCooldownChanged.RemoveDynamic(this, &USkillSlotUI::OnCooldownChanged);
 	}
