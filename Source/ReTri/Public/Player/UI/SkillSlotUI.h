@@ -11,11 +11,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SkillBarUI.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Player/Components/AbilityComponent.h"
 #include "SkillSlotUI.generated.h"
+
+class USkillBarUI;
 
 UCLASS()
 class RETRI_API USkillSlotUI : public UUserWidget
@@ -58,11 +60,20 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> KeyImg;
 
+	// 쿨타임 남은 초 텍스트 (선택적 — BP에서 없어도 됨)
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UTextBlock> CooldownText;
+
+	UPROPERTY(EditDefaultsOnly, Category="SkillSlot|Materials")
+	TObjectPtr<UMaterialInterface> MIconCircle;
+
 	UPROPERTY(EditDefaultsOnly, Category="SkillSlot|Materials")
 	TObjectPtr<UMaterialInterface> MCooldownRadial;
 
 	UPROPERTY(EditDefaultsOnly, Category="SkillSlot|Materials")
 	TObjectPtr<UMaterialInterface> MBorderGlow;
+
+	virtual void NativeConstruct() override;
 
 	/* Drag & Drop */
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -70,36 +81,40 @@ protected:
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry,
 	                                  const FPointerEvent& InMouseEvent,
 	                                  UDragDropOperation*& OutOperation) override;
-	
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
+	                          UDragDropOperation* InOperation) override;
+
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 private:
 	EAbilitySlot LinkedSlot = EAbilitySlot::SkillQ;
 	bool bFixed = false;
-	
+
 	UPROPERTY()
 	TObjectPtr<UAbilityBase> LinkedSkill;
-	
+
 	UPROPERTY()
 	TObjectPtr<USkillBarUI> OwningBar;
-	
+
 	UPROPERTY()
 	TObjectPtr<UTexture2D> FallbackIcon;
-	
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> IconMI;
+
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> CooldownMI;
-	
+
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> BorderMI;
-	
+
 public:
 	void SetupMaterials();
 	void UpdateIconDisplay();
 	void UpdateCooldownDisplay(bool bOnCooldown, float Remaining, float Total);
 	void UnbindCooldown();
-	
+
 	UFUNCTION()
 	void OnCooldownChanged(float Remaining, float Total);
 };

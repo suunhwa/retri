@@ -37,6 +37,9 @@ public:
 	UFUNCTION(BlueprintPure, Category="Ability")
 	float GetTotalCooldown() const { return Cooldown; }
 	
+	UFUNCTION(BlueprintPure, Category="Ability")
+	UTexture2D* GetIcon() const { return Icon; }
+	
 	// 외부에서 쿨다운 수치 변경 시 호출
 	void SetCooldown(float NewCooldown) { Cooldown = FMath::Max(0.1f, NewCooldown); }
 	

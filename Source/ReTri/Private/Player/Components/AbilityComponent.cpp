@@ -88,6 +88,7 @@ void UAbilityComponent::SetSkill(EAbilitySlot Slot, TSubclassOf<UAbilityBase> Ab
 		GI->SavedSkillSlots.Add(static_cast<uint8>(Slot), AbilityClass);
 	}
 	RegisterAbility(Slot, AbilityClass);
+	OnSkillSlotChanged.Broadcast(Slot);
 }
 
 void UAbilityComponent::RegisterAbility(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass)

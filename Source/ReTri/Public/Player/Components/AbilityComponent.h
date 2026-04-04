@@ -19,6 +19,8 @@ enum class EAbilitySlot : uint8
 	TravelerMemory2,  // R 고유스킬 (빠른 손)
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkillSlotChanged, EAbilitySlot, ChangedSlot);
+
 UCLASS(ClassGroup=(Player), meta=(BlueprintSpawnableComponent))
 class RETRI_API UAbilityComponent : public UActorComponent
 {
@@ -38,7 +40,9 @@ public:
 							   FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	// 
+	UPROPERTY(BlueprintAssignable, Category="Ability")
+	FOnSkillSlotChanged OnSkillSlotChanged;
+	
 	UFUNCTION(BlueprintCallable, Category="Ability")
 	bool TryActivate(EAbilitySlot Slot);
 	

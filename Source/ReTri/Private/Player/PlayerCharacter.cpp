@@ -193,11 +193,14 @@ void APlayerCharacter::BeginPlay()
 				PlayerHUDWidget->OnHPChanged(HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
 				const int32 RequiredExp = StatComp->GetRequiredExpForLevel(StatComp->GetCurrentLevel() + 1);
 				PlayerHUDWidget->OnExpChanged(StatComp->GetCurrentExp(), RequiredExp, StatComp->GetCurrentLevel());
-			
+
 				// 초기 재화 표시
 				const FPlayerStatInfo InitStat = StatComp->GetStatInfo();
 				PlayerHUDWidget->OnStatChanged(EStatTypes::Gold, InitStat.Gold);
 				PlayerHUDWidget->OnStatChanged(EStatTypes::DreamDust, InitStat.DreamDust);
+
+				// 스킬바 초기화
+				PlayerHUDWidget->InitSkillBar(AbilityComp);
 			}
 		}
 	}
@@ -526,10 +529,10 @@ void APlayerCharacter::Interaction()
 		if (Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
 		{
 			IInteractableInterface::Execute_Interact(Actor);
-			
+
 			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 			GI->DebugStat();
-			
+
 			return;
 		}
 	}
