@@ -3,17 +3,32 @@
 
 #include "MapSubSystem.h"
 
+#include "ReTriGameInstance.h"
 #include "Level/Actors/LootDreamPowderPillar.h"
 #include "Level/Actors/LootGoldCoinPot.h"
 #include "Level/Actors/InteractableBase.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/Components/StatComponent.h"
 
 // === Infrastructure (UE Overrides) ===
 void UMapSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+	
+	// Subsystem은 GameInstance의 자식 → 직접 참조 가능
+	if (UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetGameInstance()))
+	{
+		InteractionData = GI->InteractionData;
+		MapUIData = GI->MapUIData;
+		SkillDataTable = GI->SkillDataTable;
+		
+		GoldCoinPotClass = GI->GoldCoinPotClass;
+		DreamPowderClass = GI->DreamPowderClass;
+		
+		ProceduralGenerateMap();
+	}
 	
 	if (InteractionData)
 		JIWONLOG("[UMapSubSystem] InteractionData 로드완료/ 행 수:%d", InteractionData->GetRowNames().Num())
@@ -25,10 +40,10 @@ void UMapSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 	else
 		JIWONLOG("[UMapSubSystem] MapUIData 할당안됨")
 	
-	if (MapUIData)
-		JIWONLOG("[UMapSubSystem] MapUIData 로드완료/ 행 수:%d", MapUIData->GetRowNames().Num())
+	if (SkillDataTable)
+		JIWONLOG("[UMapSubSystem] SkillData 로드완료/ 행 수:%d", SkillDataTable->GetRowNames().Num())
 	else
-		JIWONLOG("[UMapSubSystem] MapUIData 할당안됨")
+		JIWONLOG("[UMapSubSystem] SkillData 할당안됨")
 }
 
 void UMapSubSystem::Deinitialize()
@@ -465,6 +480,7 @@ void UMapSubSystem::SetInteractableUsed(FName InRowName)
 
 void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 {
+	// todo 레벨 블루프린트에 연결 되어있는거 해제 하고 이걸 쓸건지 
 	TArray<AActor*> TPs;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Interactable"), TPs);
 	
@@ -472,6 +488,8 @@ void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 	CurMapDatas[CurMapIndex].SpawnInteractableRowNames.GetKeys(RowNames);
 	for (int i = 0; i < RowNames.Num(); i++)
 	{
+		if (!TPs[i]) continue;
+		
 		bool bSuccess = false;
 		FInteractableData IData = GetRowInteractionData(RowNames[i], bSuccess);
 		
@@ -480,6 +498,7 @@ void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 			JIWONLOG("샤갈 %s Row 못찾음", *RowNames[i].ToString())
 			continue;
 		}
+		
 		
 		AInteractableBase* I = GetWorld()->SpawnActor<AInteractableBase>(
 			IData.InteractableClass, 
@@ -490,14 +509,10 @@ void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 		bool* bIsUsedPtr = CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Find(RowNames[i]);
 		bool bIsUsed = bIsUsedPtr ? *bIsUsedPtr : false;
 		
-		if (CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Find(RowNames[i]))
-		{
-			JIWONLOG("%s : 활성화 된거래!~~!", *RowNames[i].ToString());
-		}
+		if (bIsUsed)
+			JIWONLOG("%s : 활성화 된거래!~~!", *RowNames[i].ToString())
 		else
-		{
-			JIWONLOG("%s : 활성화 XXX 래!~~!", *RowNames[i].ToString());
-		}
+			JIWONLOG("%s : 활성화 XXX 래!~~!", *RowNames[i].ToString())
 		
 		I->SetIsUsed(bIsUsed);
 		I->DataInit(RowNames[i], IData);
@@ -572,6 +587,19 @@ void UMapSubSystem::SetMerchantItemList(int32 MapIndex)
 void UMapSubSystem::RemoveMerchantItemList(int32 CurrentMap,int32 RemoveItemSlotNum)
 {
 	FShopItemSkillData* SkillDatas = MerchantItemDatas.Find(CurrentMap);
+	
+	if (!SkillDatas)
+	{
+		UE_LOG(LogTemp, Error, TEXT("상점 데이터 없음: MapIndex %d"), CurrentMap);
+		return;
+	}
+	
+	if (!SkillDatas->ItemSkillDatas.IsValidIndex(RemoveItemSlotNum))
+	{
+		UE_LOG(LogTemp, Error, TEXT("잘못된 슬롯 번호: %d"), RemoveItemSlotNum);
+		return;
+	}
+	
 	SkillDatas->ItemSkillDatas.RemoveAt(RemoveItemSlotNum);
 	SCREENLOG("현재 상점 아이템 개수: %d", SkillDatas->ItemSkillDatas.Num());
 }
@@ -596,7 +624,73 @@ void UMapSubSystem::LevelClear()
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Portal"), TPs);
 
 	SpawnPortal(TPs[0]);
+	
+	// 클리어 한 맵 또 클리어 방지
+	if (!CurMapDatas[CurMapIndex].bIsCleared)
+		UpdateCurseQuest(EActiveCurseQuest::ClearMaps, 1);
 		
 	CurMapDatas[CurMapIndex].bIsCleared = true;
 	CurClearSpawnerCount = 0;
+}
+
+void UMapSubSystem::AddCurseQuest(FActiveCurseQuest NewQuest)
+{
+	ActiveCurseQuests.Add(NewQuest);
+}
+
+void UMapSubSystem::UpdateCurseQuest(EActiveCurseQuest Type, int32 Amount)
+{
+	// 저주가 없는 경우 
+	if (ActiveCurseQuests.Num() == 0) return;
+	
+	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetGameInstance());
+	if (!GI || !GI->StatComp) return;
+	
+	// 역순으로 순회 (조건 만족하는 모든 저주 해제를 위해) 
+for (int32 i = ActiveCurseQuests.Num() - 1; i >= 0; --i)
+	{
+		FActiveCurseQuest& Quest = ActiveCurseQuests[i];
+		
+		if (Quest.QuestType == Type)
+		{
+			// 카운트
+			Quest.CurCount += Amount;
+			
+			// 달성 시
+			if (Quest.CurCount >= Quest.TargetCount)
+			{
+				// 보상 수여
+				switch (Quest.RewardType)
+				{
+				case ERewardType::RewardGold:
+					GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Quest.RewardValue);
+					break;
+				case ERewardType::RewardDreamPowder:
+					GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Quest.RewardValue);
+					break;
+				case ERewardType::RewardMaxHP:
+					GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, Quest.RewardValue);
+					break;
+				case ERewardType::RewardAttackDamage:
+					GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Quest.RewardValue);
+					break;
+				case ERewardType::RewardMemoryHaste:
+					GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, Quest.RewardValue);
+					break;
+				}
+				
+				SCREENLOG("[저주 해제] 보상: %s", *Quest.RewardInfo);
+				JIWONLOG("[저주 해제] %s", *Quest.RewardInfo);
+				
+				// 삭제
+				ActiveCurseQuests.RemoveAt(i);
+			}
+			else
+			{
+				// 진행 상황 피드백
+				FString QuestName = (Type == EActiveCurseQuest::ClearMaps) ? TEXT("맵 클리어") : TEXT("몬스터 처치");
+				SCREENLOG("[증오의 저주] %s 진행 중... (%d / %d)", *QuestName, Quest.CurCount, Quest.TargetCount);
+			}
+		}
+	}
 }

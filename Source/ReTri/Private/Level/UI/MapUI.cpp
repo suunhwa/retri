@@ -55,18 +55,25 @@ void UMapUI::NativeConstruct()
 	
 	for (FMapNodeData Data : MapSub->CurMapDatas)
 	{
+		if (!MapCanvas || !MapUIClass) break;
+		
 		FString NodeName = FString::Printf(TEXT("Node_%d"), Data.MapIndex);
 		UMapNode* MapNode = CreateWidget<UMapNode>(GetWorld(), MapUIClass, FName(*NodeName));
+		if (!MapNode) continue;
+		
 		MapNode->NodeIndexNumber = Data.MapIndex;
 		
 		FName EnumName = FName(*StaticEnum<EMapNodeType>()->GetNameStringByValue((int64)Data.MapType));
 		FMapUIData* UIData = GI->MapUIData->FindRow<FMapUIData>(EnumName, TEXT("MapNode"));
-		UTexture2D* Texture = UIData->MapIcon;
-		if (!Texture) SCREENLOG("엥? 그럼 어케 불러옴 ?");
-		else SCREENLOG("에? 근데 왜 안뜸?");
+		if (!UIData)
+		{
+			JIWONLOG("[MapUI] UIData를 찾지 못함: %s", *EnumName.ToString());
+			continue;
+		}
+		
 		FButtonStyle Style;
 		Style.Normal.SetResourceObject(UIData->MapIcon);
-		Style.Normal.ImageSize = FVector2D(50.f, 50.f); // 사이즈도 잊지 마십시오!
+		Style.Normal.ImageSize = FVector2D(50.f, 50.f);
 		Style.Hovered = Style.Normal;
 		Style.Pressed = Style.Normal;
 		FLinearColor MainColor = UIData->IconColor;
@@ -89,16 +96,8 @@ void UMapUI::NativeConstruct()
 				MapNode->SetWellVisibility(ESlateVisibility::Visible);
 			}
 		}
-		
-		// 나중에 위치를 찾을 수 있도록 저장
-		// NodeWidgets.Add(Node);
-		
-		if (!MapNode || !MapCanvas) continue;
-		
-		//UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(MapCanvas->AddChild(Node));
-		UCanvasPanelSlot* CanvasSlot = MapCanvas->AddChildToCanvas(MapNode);
-		
-		if (CanvasSlot)
+
+		if (UCanvasPanelSlot* CanvasSlot = MapCanvas->AddChildToCanvas(MapNode))
 		{
 			CanvasSlot->SetPosition(Data.UIPosition);
 			CanvasSlot->SetZOrder(11);

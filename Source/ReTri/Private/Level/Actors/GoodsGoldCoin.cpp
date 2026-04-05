@@ -24,9 +24,13 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 		
 		if (!GI || !GI->StatComp) return;
-
-		if (!GI || !GI->StatComp) return;
-		const int32 Amount = GI->GameData->GetRandomGold();
+		
+		// 랜덤의 경우 
+		if (!bIsFixedAmount)
+		{
+			Amount = GI->GameData->GetRandomGold();
+		}
+		
 		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
 		
 		if (!FloatingUIActorClass) return;

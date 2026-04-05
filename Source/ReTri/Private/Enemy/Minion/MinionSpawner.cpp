@@ -41,10 +41,20 @@ void AMinionSpawner::Tick(float DeltaTime)
 void AMinionSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA(APlayerCharacter::StaticClass()))
+	// === Level Clear ===
+	if (auto MapSub = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UMapSubSystem>())
 	{
-		CreateMinion();
-		BoxComp->OnComponentBeginOverlap.RemoveDynamic(this,&AMinionSpawner::OnOverlapBegin);
+		if (MapSub->CurMapDatas[MapSub->CurMapIndex].bIsCleared)
+		{
+			MapSub->LevelClear();
+			return;
+		}
+		
+		if (OtherActor->IsA(APlayerCharacter::StaticClass()))
+		{
+			CreateMinion();
+			BoxComp->OnComponentBeginOverlap.RemoveDynamic(this,&AMinionSpawner::OnOverlapBegin);
+		}
 	}
 }
 

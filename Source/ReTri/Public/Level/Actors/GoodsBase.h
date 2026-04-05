@@ -48,6 +48,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RollRotSpeed = 1500.f;
 	
+	bool bIsFixedAmount = false;
+	int32 Amount = 0;
+	
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class AFloatingUIActor> FloatingUIActorClass;
 };

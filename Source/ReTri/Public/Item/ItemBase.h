@@ -44,6 +44,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Collision")
 	UWidgetComponent* ItemUI;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AGoodsBase> GoodsClass;
+	
 	FPlayerSkillData CurSkillData;
 	void DataInit(FPlayerSkillData SkillData);
 	

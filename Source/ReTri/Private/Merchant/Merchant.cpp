@@ -192,6 +192,7 @@ void AMerchant::ShowMerchantUI()
 
 void AMerchant::HideMerchantUI()
 {
+	if (!MerchantUIInstance) return;
 	if (MerchantUIInstance->IsInViewport())
 	{
 		MerchantUIInstance->RemoveFromParent();

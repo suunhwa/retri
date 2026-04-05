@@ -15,7 +15,7 @@ void AInteractChaos::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	InteractableType = EInteractableType::Chaos;
+	//InteractableType = EInteractableType::Chaos;
 }
 
 void AInteractChaos::Interact_Implementation()
@@ -25,20 +25,19 @@ void AInteractChaos::Interact_Implementation()
 	UE_LOG(jiwon, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
-	FName KeyName = FName("Chaos");
-	bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
-	if (FoundValue) *FoundValue = true;
+	// FName KeyName = FName("Chaos");
+	// bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
+	// if (FoundValue) *FoundValue = true;
 	
 	SetIsUsed(true);
 	
-	// todo: 스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!
 	if (!ChaosDataTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Curse Data Table 할당 되지 않음"));
+		UE_LOG(LogTemp, Warning, TEXT("Chaos Data Table 할당 되지 않음"));
 		return;
 	}
 	
-	// Curse Data 가져오기
+	// Chaos Data 가져오기
 	TArray<FChaosData*> AllChaos;
 	ChaosDataTable->GetAllRows<FChaosData>(TEXT("Chaos::Interact"), AllChaos);
 	PickedChaoses.Empty();
@@ -52,6 +51,7 @@ void AInteractChaos::Interact_Implementation()
 
 	// UI띄우기
 	ShowSelectUI();
+	if (!SelectUIInstance) return;
 	
 	for (int i = 0; i < 3; i++)
 	{
@@ -61,25 +61,26 @@ void AInteractChaos::Interact_Implementation()
 		Args.Add(FMath::TruncToInt(AllChaos[i]->ChaosValues[AllChaos[i]->ChaosLevel]));
 		FString Info = FString::Format(*AllChaos[i]->ChaosInfo, Args);
 		USelectButtonUI* Button = SelectUIInstance->AddButton(AllChaos[i]->ChaosName, Info, i);
-		Button->OnSelectClicked.AddDynamic(this, &AInteractChaos::OnChaosSelected);
+		if (Button)
+		{
+			Button->OnSelectClicked.AddDynamic(this, &AInteractChaos::OnChaosSelected);
+		}
 	}
 }
 
 void AInteractChaos::OnChaosSelected(int32 Index)
 {
 	FChaosData* ChaosData = PickedChaoses[Index];
-	JIWONLOG("선택된 저주: %s", *ChaosData->ChaosName);
+	JIWONLOG("선택된 혼돈: %s", *ChaosData->ChaosName);
 	
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI || !GI->StatComp) return;
-	
-	// todo: MyPlayer에게 Chaos 효과 적용
 	
 	float Val = ChaosData->ChaosValues[ChaosData->ChaosLevel++];
 	switch (ChaosData->ChaosType)
 	{
 	case EChaosType::Chaos_Health:
-		GI->HealthComp->Heal(Val);
+		GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, Val);
 		break;
 	case EChaosType::Chaos_AttackDamage:
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Val);

@@ -7,6 +7,8 @@
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Level/Actors/GoodsDreamPowder.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "Player/PlayerCharacter.h"
 #include "ReTri/ReTri.h"
 
@@ -84,7 +86,12 @@ void AItemBase::Hold_Implementation()
 	IInteractableInterface::Hold_Implementation();
 	
 	// todo G 눌렀을 경우
+	
 	SCREENLOG("분해하는 경우");
+	
+	AGoodsDreamPowder* Goods = GetWorld()->SpawnActor<AGoodsDreamPowder>(GoodsClass, GetActorLocation(), GetActorRotation());
+	Goods->bIsFixedAmount = true;
+	Goods->Amount = CurSkillData.UpgradeCostDreamDust;
 }
 
 void AItemBase::DataInit(FPlayerSkillData SkillData)
