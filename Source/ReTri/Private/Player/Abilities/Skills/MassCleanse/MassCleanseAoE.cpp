@@ -34,7 +34,7 @@ void AMassCleanseAoE::BeginPlay()
 	}
 	
 	// 디버그: AoE 범위 시각화 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), HitRadius, 32, FColor::White, false, EffectDuration);
+	// DrawDebugSphere(GetWorld(), GetActorLocation(), HitRadius, 32, FColor::White, false, EffectDuration);
 
 	ApplyHit();
 
