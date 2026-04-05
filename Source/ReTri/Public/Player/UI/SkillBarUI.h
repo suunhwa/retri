@@ -14,6 +14,7 @@
 #include "Player/Components/AbilityComponent.h"
 #include "SkillBarUI.generated.h"
 
+class APlayerCharacter;
 
 UCLASS()
 class RETRI_API USkillBarUI : public UUserWidget
@@ -82,6 +83,9 @@ private:
 	// 콜백
 	UFUNCTION()
 	void OnSkillSlotChanged(EAbilitySlot ChangedSlot);
+	
+	UFUNCTION()
+	void OnAttackCountChanged(int32 Count);
 
 	void RefreshSlot(USkillSlotUI* SlotWidget, EAbilitySlot AbilitySlot);
 

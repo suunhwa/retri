@@ -28,10 +28,6 @@ protected:
 	virtual void Activate(ACharacter* Owner) override;
 	
 public:
-	// 최대 충전 수 
-	UPROPERTY(EditDefaultsOnly, Category="FastHands")
-	int32 MaxCharges = 3;
-	
 	// 충전 1회 당 재충전 시간 (s)
 	UPROPERTY(EditDefaultsOnly, Category="FastHands")
 	float RechargeTime = 14.f;
@@ -66,7 +62,7 @@ private:
 	FTimerHandle FireTimerHandle2;
 	FTimerHandle FireTimerHandle3;
 	
-	void FireShot(TWeakObjectPtr<ACharacter> WeakOwner, int32 ShotIndex, FVector Direction, float BaseDamage);
+	void FireShot(TWeakObjectPtr<ACharacter> WeakOwner, int32 ShotIndex, FVector Direction, float AttackDamage);
 	
 	void RestoreCharge();
 };

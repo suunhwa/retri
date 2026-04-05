@@ -156,12 +156,12 @@ void USkillSlotUI::SetupMaterials()
 		UE_LOG(LogTemp, Warning, TEXT("SetupMaterials: CooldownMI created OK"));
 	}
 
-	// ---- 테두리 쿨다운 링 MID (CooldownOverlay와 같은 머티리얼) ----
+	/*// ---- 테두리 링 MID ----
 	if (BorderImg && MCooldownRadial)
 	{
 		BorderMI = UMaterialInstanceDynamic::Create(MCooldownRadial, this);
 		BorderImg->SetBrushFromMaterial(BorderMI);
-	}
+	}*/
 }
 
 void USkillSlotUI::UpdateIconDisplay()
@@ -203,11 +203,11 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 		                                               : ESlateVisibility::Collapsed);
 	}
 
-	// ---- 테두리 쿨다운 링 ----
+	/*// ---- 테두리 쿨다운 링 ----
 	if (BorderMI)
 	{
 		BorderMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
-	}
+	}*/
 
 	// ---- 남은 초 텍스트 ----
 	if (CooldownText)
@@ -219,6 +219,39 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 				? FText::AsNumber(FMath::RoundToFloat(Remaining * 10.f) / 10.f)
 				: FText::AsNumber(FMath::CeilToInt(Remaining));
 			CooldownText->SetText(TimeText);
+			CooldownText->SetVisibility(ESlateVisibility::HitTestInvisible);
+		}
+		else
+		{
+			CooldownText->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+}
+
+void USkillSlotUI::UpdateStackDisplay(int32 Current, int32 Max)
+{
+	if (Max <= 0) return;
+
+	// 라디알 오버레이로 스택 채움 표시 (1/4→25%, 2/4→50%, 3/4→75%, 0/4→0%)
+	const float Ratio = FMath::Clamp(static_cast<float>(Current) / static_cast<float>(Max), 0.f, 1.f);
+
+	// CooldownMI와 동일한 파라미터 사용 (머티리얼 재활용)
+	if (CooldownMI)
+	{
+		CooldownMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
+	}
+	/*if (BorderMI)
+	{
+		BorderMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
+	}
+	*/
+
+	// 텍스트로도 표시 (선택)
+	if (CooldownText)
+	{
+		if (Current > 0)
+		{
+			CooldownText->SetText(FText::AsNumber(Current));
 			CooldownText->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
 		else

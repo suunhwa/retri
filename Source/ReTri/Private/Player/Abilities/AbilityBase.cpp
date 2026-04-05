@@ -15,6 +15,21 @@ bool UAbilityBase::TryActivate(ACharacter* Owner)
 	return true;
 }
 
+void UAbilityBase::InitFromDataTable(UDataTable* DataTable, FName RowName)
+{
+	if (!DataTable) return;
+
+	const FPlayerSkillData* Row = DataTable->FindRow<FPlayerSkillData>(RowName, TEXT("InitFromDataTable"));
+	if (!Row) return;
+
+	Cooldown   = Row->BaseCooldown;
+	BaseDamage = Row->BaseDamage;
+	MaxCharges = Row->MaxCharges;
+	Duration   = Row->Duration;
+	if (Row->Icon)
+		Icon = Row->Icon;
+}
+
 void UAbilityBase::StartCooldown(UWorld* World)
 {
 	if (!World || Cooldown <= 0.f) return;

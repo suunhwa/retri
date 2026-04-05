@@ -544,7 +544,7 @@ void UMapSubSystem::SetMerchantItemList()
 	
 	FShopItemSkillData TempSkillData;
 	int32 PickCount = FMath::RandRange(4, 6); 
-	if (PickCount < AcquiredSkills.Num()) PickCount = AcquiredSkills.Num();
+	if (PickCount > AcquiredSkills.Num()) PickCount = AcquiredSkills.Num();
 	for (int32 i = 0; i < PickCount; ++i)
 	{
 		TempSkillData.ItemSkillDatas.Add(*AcquiredSkills[i]);

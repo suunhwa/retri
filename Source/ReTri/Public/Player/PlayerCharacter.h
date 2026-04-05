@@ -20,6 +20,8 @@ class UInputMappingContext;
 class UNiagaraSystem;
 class UParticleSystem;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttackCountChanged, int32, Count);
+
 UCLASS()
 class RETRI_API APlayerCharacter : public ACharacter
 {
@@ -126,6 +128,9 @@ private:
 	TObjectPtr<UAnimMontage> DeathMontage;
 	
 public:
+	UPROPERTY(BlueprintAssignable, Category="Combat")
+	FOnAttackCountChanged OnAttackCountChanged;
+	
 	UPROPERTY(EditAnywhere, Category="Combat|Left")
 	int32 AttackCount = 0;
 	

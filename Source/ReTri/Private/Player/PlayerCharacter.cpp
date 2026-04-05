@@ -217,6 +217,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (CurrentTime - LastCombatTime >= CombatExitDelay)
 		{
 			bIsCombat = false;
+			
+			// 전투 이탈 시 공격 카운터 초기화 → 패시브 링 사라짐
+			if (AttackCount > 0)
+			{
+				AttackCount = 0;
+				OnAttackCountChanged.Broadcast(0);
+			}
 		}
 	}
 
@@ -325,6 +332,9 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	AttackCount++;
 	bool bIsEnhancedShot = (AttackCount >= 4);
 
+	// 리셋 전에 브로드캐스트 → 4타째에 100% 표시 후 다음 1타에서 리셋
+	OnAttackCountChanged.Broadcast(AttackCount);
+	
 	if (bIsEnhancedShot)
 	{
 		AttackCount = 0;

@@ -5,6 +5,8 @@
 #include "Player/UI/SkillSlotUI.h"
 #include "Player/Components/AbilityComponent.h"
 #include "Player/Abilities/AbilityBase.h"
+#include "Player/PlayerCharacter.h"
+#include "GameFramework/Character.h"
 
 void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 {
@@ -13,6 +15,12 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 	if (AbilityComp)
 	{
 		AbilityComp->OnSkillSlotChanged.AddDynamic(this, &USkillBarUI::OnSkillSlotChanged);
+	
+		// 플레이어 기본공격 카운터 바인딩 (샐러맨더 가루 UI)
+		if (APlayerCharacter* PC = Cast<APlayerCharacter>(AbilityComp->GetOwner()))
+		{
+			PC->OnAttackCountChanged.AddDynamic(this, &USkillBarUI::OnAttackCountChanged);
+		}
 	}
 
 	// ---- 대시 슬롯 (소형, 왼쪽) ----
@@ -113,6 +121,15 @@ void USkillBarUI::OnSkillSlotChanged(EAbilitySlot ChangedSlot)
 	if (SlotWidget)
 	{
 		RefreshSlot(SlotWidget, ChangedSlot);
+	}
+}
+
+void USkillBarUI::OnAttackCountChanged(int32 Count)
+{
+	// 4타째 발사 후 Count가 0으로 리셋됨 → 0이면 빈 상태
+	if (SlotLMB)
+	{
+		SlotLMB->UpdateStackDisplay(Count, 4);
 	}
 }
 

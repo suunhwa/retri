@@ -91,10 +91,39 @@ void UAbilityComponent::SetSkill(EAbilitySlot Slot, TSubclassOf<UAbilityBase> Ab
 	OnSkillSlotChanged.Broadcast(Slot);
 }
 
+bool UAbilityComponent::EquipAcquiredSkill(TSubclassOf<UAbilityBase> AbilityClass)
+{
+	// Q 슬롯 먼저, 비어있으면 장착
+	if (!GetAbility(EAbilitySlot::SkillQ))
+	{
+		SetSkill(EAbilitySlot::SkillQ, AbilityClass);
+		return true;
+	}
+	// E 슬롯 비어있으면 장착
+	if (!GetAbility(EAbilitySlot::SkillE))
+	{
+		SetSkill(EAbilitySlot::SkillE, AbilityClass);
+		return true;
+	}
+	// 둘 다 차있으면 실패 (상점에서 슬롯 선택 UI 필요)
+	return false;
+}
+
 void UAbilityComponent::RegisterAbility(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass)
 {
-	if (!AbilityClass) return;
-	
+	if (!AbilityClass)
+	{
+		Abilities.Remove(Slot);
+		return;
+	}
+
 	UAbilityBase* Instance = NewObject<UAbilityBase>(GetOwner(), AbilityClass);
+
+	// 데이터 테이블에서 스킬 데이터 초기화
+	if (SkillDataTable && Instance->DataTableRowName != NAME_None)
+	{
+		Instance->InitFromDataTable(SkillDataTable, Instance->DataTableRowName);
+	}
+
 	Abilities.Add(Slot, Instance);
 }

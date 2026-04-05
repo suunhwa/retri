@@ -113,6 +113,8 @@ public:
 	void SetupMaterials();
 	void UpdateIconDisplay();
 	void UpdateCooldownDisplay(bool bOnCooldown, float Remaining, float Total);
+	// 패시브 스택 표시 (예: 샐러맨더 가루 4타 카운터)
+	void UpdateStackDisplay(int32 Current, int32 Max);
 	void UnbindCooldown();
 
 	UFUNCTION()
