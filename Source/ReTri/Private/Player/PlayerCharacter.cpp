@@ -477,13 +477,35 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 	// 충돌 비활성화
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// 사망 몽타주 재생
+	// 사망 애니메이션 종료 후 게임 일시정지
+	FTimerHandle DeathPauseHandle;
+	GetWorldTimerManager().SetTimer(DeathPauseHandle, [this]()
+	{
+		UGameplayStatics::SetGamePaused(this, true);
+	}, DeathAnimDuration, false);
+	
+	/*// 사망 몽타주 재생
 	if (DeathMontage)
 	{
-		PlayAnimMontage(DeathMontage);
-	}
+		UAnimInstance* ai = GetMesh()->GetAnimInstance();
+		if (ai)
+		{
+			// 몽타주 종료 시점에 정확히 실행
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted)
+			{
+				if (!bInterrupted && GetMesh())
+				{
+					GetMesh()->bPauseAnims = true;
+					UGameplayStatics::SetGamePaused(this, true);
+				}
+			});
+			ai->Montage_Play(DeathMontage);
+			ai->Montage_SetEndDelegate(EndDelegate, DeathMontage);
+		}
+	}*/
 
-	// 일정 시간 후 레벨 재시작
+	/*// 일정 시간 후 레벨 재시작
 	FTimerHandle DeathTimerHandle;
 	GetWorldTimerManager().SetTimer(DeathTimerHandle,
 	                                [this]()
@@ -491,7 +513,7 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 		                                UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 	                                },
 	                                3.f,
-	                                false);
+	                                false);*/
 }
 
 void APlayerCharacter::HoverInteractable()

@@ -9,6 +9,16 @@ bool UAbilityBase::TryActivate(ACharacter* Owner)
 {
 	if (!Owner || bIsOnCooldown || !CanActivate(Owner)) return false;
 	
+	if (CastMontage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Ability] CastMontage 재생: %s"), *CastMontage->GetName());
+		Owner->PlayAnimMontage(CastMontage);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Ability] CastMontage 없음"));
+	}
+	
 	Activate(Owner);
 	OnAbilityActivated.Broadcast();
 	StartCooldown(Owner->GetWorld());
@@ -28,6 +38,8 @@ void UAbilityBase::InitFromDataTable(UDataTable* DataTable, FName RowName)
 	Duration   = Row->Duration;
 	if (Row->Icon)
 		Icon = Row->Icon;
+	if (Row->CastMontage)
+		CastMontage = Row->CastMontage;
 }
 
 void UAbilityBase::StartCooldown(UWorld* World)

@@ -108,4 +108,8 @@ struct RETRI_API FPlayerSkillData : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTexture2D> Icon;
+	
+	// 스킬 시전 애니메이션 몽타주
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAnimMontage> CastMontage;
 };

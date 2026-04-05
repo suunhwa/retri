@@ -72,6 +72,10 @@ protected:
 	// 아이콘 — 스킬 UI 슬롯에 표시
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TObjectPtr<UTexture2D> Icon;
+	
+	// 스킬 시전 애니메이션 몽타주
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	TObjectPtr<UAnimMontage> CastMontage;
 
 private:
 	void StartCooldown(UWorld* World);
