@@ -8,6 +8,7 @@
 
 
 class APillarOfFlameAoE;
+class AFireOrbProjectile;
 class UNiagaraSystem;
 
 /**
@@ -30,11 +31,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
 	TSubclassOf<APillarOfFlameAoE> PillarAoEClass;
 
+	// 날아가는 Orb 발사체 클래스
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
+	TSubclassOf<AFireOrbProjectile> FireOrbClass;
+
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> CastEffect;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	float EffectDuration = 2.0f;
+
+	// 손에 붙는 Orb 이펙트
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UNiagaraSystem> OrbEffect;
+
+	// Orb 유지 시간 (초)
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	float OrbDuration = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> CastSound;

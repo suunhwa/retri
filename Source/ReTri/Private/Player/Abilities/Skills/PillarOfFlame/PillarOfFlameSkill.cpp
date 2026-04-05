@@ -11,6 +11,7 @@
 #include "Player/ReTriPlayerController.h"
 #include "Player/Components/StatComponent.h"
 #include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameAoE.h"
+#include "Player/Abilities/Skills/PillarOfFlame/FireOrbProjectile.h"
 
 UPillarOfFlameSkill::UPillarOfFlameSkill()
 {
@@ -25,34 +26,37 @@ void UPillarOfFlameSkill::Activate(ACharacter* Owner)
 	FVector TargetPoint;
 	if (!PC->GetMouseWorldPosition(TargetPoint)) return;
 
-	if (!PillarAoEClass) return;
-
 	float AP = 0.f;
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(Owner))
 	{
 		AP = Player->GetStatComponent()->GetSpellPower();
 	}
 
-	// Init → BeginPlay 순서 보장을 위해 Deferred Spawn 사용
-	const FTransform SpawnTransform(
-		FRotator::ZeroRotator,
-		FVector(TargetPoint.X, TargetPoint.Y, Owner->GetActorLocation().Z)
-	);
-
-	APillarOfFlameAoE* Pillar = Owner->GetWorld()->SpawnActorDeferred<APillarOfFlameAoE>(
-		PillarAoEClass,
-		SpawnTransform,
-		Owner,
-		Owner,
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
-	);
-
-	if (Pillar)
+	// 손에서 타겟 방향으로 Orb 발사
+	if (FireOrbClass)
 	{
-		Pillar->Init(AP, Owner->GetController());
-		UGameplayStatics::FinishSpawningActor(Pillar, SpawnTransform);
+		FVector MuzzleLocation = Owner->GetMesh()->GetSocketLocation(TEXT("hand_r"));
+		UE_LOG(LogTemp, Warning, TEXT("[PillarOfFlame] Orb 스폰 위치: %s"), *MuzzleLocation.ToString());
+		FVector Direction = TargetPoint - MuzzleLocation;
+		Direction.Z = 0.f;
+		Direction.Normalize();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Owner;
+		SpawnParams.Instigator = Owner;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AFireOrbProjectile* Orb = Owner->GetWorld()->SpawnActor<AFireOrbProjectile>(
+			FireOrbClass, MuzzleLocation, Direction.Rotation(), SpawnParams
+		);
+
+		if (Orb)
+		{
+			Orb->Init(AP, Owner->GetController(), PillarAoEClass);
+		}
 	}
 
+	// 타겟 위치 이펙트
 	if (CastEffect)
 	{
 		if (UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(Owner->GetWorld(), CastEffect, TargetPoint))

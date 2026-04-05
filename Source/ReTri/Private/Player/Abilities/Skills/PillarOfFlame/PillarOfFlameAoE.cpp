@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 
 APillarOfFlameAoE::APillarOfFlameAoE()
@@ -89,6 +90,21 @@ void APillarOfFlameAoE::ApplyInitialHit()
 			UDamageType::StaticClass()
 		);
 
+		// 불타는 이펙트 붙이기
+		if (BurnEffect)
+		{
+			UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAttached(
+				BurnEffect,
+				Cast<ACharacter>(WeakEnemy.Get()) ? Cast<ACharacter>(WeakEnemy.Get())->GetMesh() : WeakEnemy.Get()->GetRootComponent(),
+				NAME_None,
+				FVector::ZeroVector,
+				FRotator::ZeroRotator,
+				EAttachLocation::SnapToTarget,
+				false
+			);
+			if (NC) BurnEffectComps.Add(NC);
+		}
+
 		// 경직: 짧은 시간 동안 이동 비활성화
 		if (ACharacter* EnemyChar = Cast<ACharacter>(WeakEnemy.Get()))
 		{
@@ -128,6 +144,16 @@ void APillarOfFlameAoE::ApplyDoTTick()
 
 void APillarOfFlameAoE::FinishDoT()
 {
+	// 불타는 이펙트 제거
+	for (TWeakObjectPtr<UNiagaraComponent> WeakNC : BurnEffectComps)
+	{
+		if (WeakNC.IsValid())
+		{
+			WeakNC->DeactivateImmediate();
+		}
+	}
+	BurnEffectComps.Empty();
+
 	GetWorldTimerManager().ClearTimer(DoTTimerHandle);
 	Destroy();
 }

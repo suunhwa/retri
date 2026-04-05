@@ -132,7 +132,6 @@ void USkillSlotUI::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent,
 
 void USkillSlotUI::OnCooldownChanged(float Remaining, float Total)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnCooldownChanged: Remaining=%.2f, Total=%.2f"), Remaining, Total);
 	UpdateCooldownDisplay(Remaining > 0.f, Remaining, Total);
 }
 
@@ -145,15 +144,11 @@ void USkillSlotUI::SetupMaterials()
 		IconImg->SetBrushFromMaterial(IconMI);
 	}
 
-	// ---- 쿨다운 라디알 MID ----
-	UE_LOG(LogTemp, Warning, TEXT("SetupMaterials: CooldownOverlayImg=%s, MCooldownRadial=%s"),
-		CooldownOverlayImg ? TEXT("OK") : TEXT("NULL"),
-		MCooldownRadial ? TEXT("OK") : TEXT("NULL"));
+	// ---- 쿨다운 radial MID ----
 	if (CooldownOverlayImg && MCooldownRadial)
 	{
 		CooldownMI = UMaterialInstanceDynamic::Create(MCooldownRadial, this);
 		CooldownOverlayImg->SetBrushFromMaterial(CooldownMI);
-		UE_LOG(LogTemp, Warning, TEXT("SetupMaterials: CooldownMI created OK"));
 	}
 
 	/*// ---- 테두리 링 MID ----
@@ -189,7 +184,6 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 	if (CooldownMI)
 	{
 		CooldownMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
-		UE_LOG(LogTemp, Warning, TEXT("CooldownMI set Ratio=%.2f"), Ratio);
 	}
 	else
 	{
