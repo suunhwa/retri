@@ -10,6 +10,7 @@
 #include "Components/DecalComponent.h"
 #include "Enemy/BP_StateTreeTask.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -19,11 +20,12 @@ AEnemyBase::AEnemyBase()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	BoxDecalComp = CreateDefaultSubobject<UDecalComponent>(TEXT("BoxDecalComp"));
-	BoxDecalComp->SetupAttachment(RootComponent);
-	
-	BoxDecalComp->SetVisibility(false);
-	BoxDecalComp->SetComponentTickEnabled(false);
+	// BoxDecalComp->SetupAttachment(RootComponent);
+	//
+	// BoxDecalComp->SetVisibility(false);
+	// BoxDecalComp->SetComponentTickEnabled(false);
+	// BoxDecalComp->SetRelativeLocation(FVector(0, 0, -1000.f));
+	// GetMesh()->SetReceivesDecals(false);
 }
 
 // Called when the game starts or when spawned
@@ -289,71 +291,154 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 
 void AEnemyBase::SpawnClones()
 {
-	// 기존 분신 있다면 제거
 	for (AEnemyBase* Clone : ActiveClones)
 	{
-		if (Clone) Clone->Destroy();
-	}
-	ActiveClones.Empty();
-	
-	// 소환
-	int32 CloneCount = 7;
-	float Radius = 2100.f;
-	
-	for (int32 i = 0; i < CloneCount; i++)
-	{
-		float Angle = (360.f / CloneCount) * i;
-		FVector Offset = FVector(FMath::Cos(FMath::DegreesToRadians(Angle)), FMath::Sin(FMath::DegreesToRadians(Angle)), 0.f) * Radius;
-		FVector SpawnLoc = GetActorLocation() + Offset;
-		
-		ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		AEnemyBase* NewClone = GetWorld()->SpawnActor<AEnemyBase>(CloneClass, SpawnLoc, FRotator::ZeroRotator);
-		
-		if (NewClone)
+		if (Clone)
 		{
-			if (Player)
-			{
-				FVector DirToPlayer = (Player->GetActorLocation() - SpawnLoc).GetSafeNormal();
-				DirToPlayer.Z = 0.f;
-				NewClone->SetActorRotation(DirToPlayer.Rotation());
-			}
-
-			// 장판 초기화
-			NewClone->InitCloneDecal(200.f, 1500.f);
-            
-			// TArray에 담는당!!
-			ActiveClones.Add(NewClone);
+			Clone->Destroy();
 		}
 	}
-	
+	ActiveClones.Empty();
+
+	const int32 CloneCount = 7;
+	const float Radius = 1800.f;
+
+	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (!Player || !CloneClass) return;
+
+	for (int32 i = 0; i < CloneCount; ++i)
+	{
+		const float AngleDeg = (360.f / CloneCount) * i;
+		const float AngleRad = FMath::DegreesToRadians(AngleDeg);
+
+		FVector Offset(
+			FMath::Cos(AngleRad),
+			FMath::Sin(AngleRad),
+			0.f
+		);
+		Offset *= Radius;
+
+		const FVector SpawnLoc = GetActorLocation() + Offset;
+
+		// 각 분신 위치 기준으로 플레이어를 바라보게
+		FVector Dir = Player->GetActorLocation() - SpawnLoc;
+		Dir.Z = 0.f;
+
+		if (Dir.IsNearlyZero())
+		{
+			Dir = GetActorForwardVector();
+			Dir.Z = 0.f;
+		}
+
+		Dir.Normalize();
+		const FRotator TargetRot = Dir.Rotation();
+
+		AEnemyBase* NewClone = GetWorld()->SpawnActor<AEnemyBase>(
+			CloneClass,
+			SpawnLoc,
+			TargetRot
+		);
+
+		if (!NewClone) continue;
+
+		NewClone->SetActorRotation(TargetRot);
+		NewClone->bCanRotate = false;
+		NewClone->PrimaryActorTick.bCanEverTick = false;
+
+		if (NewClone->GetCharacterMovement())
+		{
+			NewClone->GetCharacterMovement()->bOrientRotationToMovement = false;
+			NewClone->GetCharacterMovement()->RotationRate = FRotator::ZeroRotator;
+		}
+
+		if (NewClone->GetController())
+		{
+			NewClone->GetController()->SetControlRotation(TargetRot);
+		}
+
+		ActiveClones.Add(NewClone);
+	}
 }
 
 void AEnemyBase::InitCloneDecal(float Width, float Length)
 {
-	if (BoxDecal && BoxDecalComp)
+	if (!BoxDecal) return;
+
+	// 기존 데칼 제거
+	if (ActiveDecal)
 	{
-		// 생성
-		if (!DynamicBoxDecal) 
+		ActiveDecal->DestroyComponent();
+		ActiveDecal = nullptr;
+		DynamicBoxDecal = nullptr;
+	}
+
+	const float Thickness = 300.f;
+
+	FVector Forward = GetActorForwardVector();
+	FRotator Rot = Forward.Rotation();
+
+	FVector Location =
+		GetActorLocation() +
+		(Forward * (Length * 0.5f));
+
+	Location.Z -= 100.f;
+
+	FRotator FinalRot(-90.f, Rot.Yaw , 0.f);
+
+	ActiveDecal = UGameplayStatics::SpawnDecalAtLocation(
+		GetWorld(),
+		BoxDecal,
+		FVector(Thickness, Width, Length),
+		Location,
+		FinalRot,
+		5.0f
+	);
+
+	if (ActiveDecal)
+	{
+		DynamicBoxDecal = ActiveDecal->CreateDynamicMaterialInstance();
+
+		if (DynamicBoxDecal)
 		{
-			DynamicBoxDecal = UMaterialInstanceDynamic::Create(BoxDecal, this);
-			BoxDecalComp->SetDecalMaterial(DynamicBoxDecal);
+			DynamicBoxDecal->SetScalarParameterValue(TEXT("BoxProgress"), 0.0f);
 		}
-		
-		// 설정
-		BoxDecalComp->DecalSize = FVector(700.f, Width, Length);
-		BoxDecalComp->SetRelativeRotation(FRotator(-90, 0, 0));
-		
-		BoxDecalComp->SetVisibility(true);
-		UpdateBoxDecalProgress(0.f);
 	}
 }
 
-void AEnemyBase::UpdateBoxDecalProgress(float Progress)
+void AEnemyBase::StartDecalProgress(float Duration)
 {
-	if (DynamicBoxDecal)
-	{
-		DynamicBoxDecal->SetScalarParameterValue("BoxProgress", Progress);
-	}
+	if (!DynamicBoxDecal) return;
+
+	TSharedPtr<FTimerHandle> TimerHandlePtr = MakeShared<FTimerHandle>();
+	float UpdateInterval = 0.02f;
+
+	float* Elapsed = new float(0.0f);
+
+	GetWorldTimerManager().SetTimer(*TimerHandlePtr,
+		[this, Duration, TimerHandlePtr, Elapsed]() mutable
+		{
+			if (!DynamicBoxDecal)
+			{
+				GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
+				delete Elapsed;
+				return;
+			}
+
+			*Elapsed += 0.02f;
+
+			float Progress = FMath::Clamp(*Elapsed / Duration, 0.0f, 1.0f);
+
+			DynamicBoxDecal->SetScalarParameterValue("BoxProgress", Progress);
+
+			if (Progress >= 1.0f)
+			{
+				GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
+				delete Elapsed;
+			}
+		},
+		UpdateInterval,
+		true
+	);
 }
 
 void AEnemyBase::ExecuteJumpDownDamage()
@@ -376,4 +461,126 @@ void AEnemyBase::ExecuteJumpDownDamage()
 		);
 	
 	DrawDebugSphere(GetWorld(), ImpactLocation, JumpDownDamageRadius, 24, bHit ? FColor::Red : FColor::Green, false, 2.0f);
+}
+
+void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
+{
+	if (!Clone) return;
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	float Width = 110.f;
+	float Length = 2400.f;
+	float Height = 50.f;
+
+	FVector Forward = Clone->GetActorForwardVector();
+
+	FVector BaseLocation =
+		Clone->GetActorLocation() +
+		(Forward * (Length * 0.5f));
+
+	BaseLocation.Z -= 100.f;
+
+	FVector BoxCenter = BaseLocation;
+	BoxCenter.Z += Height * 0.5f;
+
+	FVector BoxExtent = FVector(
+		Length * 0.5f,
+		Width * 0.5f,
+		Height * 0.5f
+	);
+
+	TArray<AActor*> OverlappedActors;
+	TArray<AActor*> IgnoreActors;
+
+	IgnoreActors.Add(this);
+
+	for (AEnemyBase* C : ActiveClones)
+	{
+		if (C) IgnoreActors.Add(C);
+	}
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+	bool bHit = UKismetSystemLibrary::BoxOverlapActors(
+		World,
+		BoxCenter,
+		BoxExtent,
+		ObjectTypes,
+		ACharacter::StaticClass(),
+		IgnoreActors,
+		OverlappedActors
+	);
+
+	if (bHit)
+	{
+		for (AActor* Actor : OverlappedActors)
+		{
+			UGameplayStatics::ApplyDamage(
+				Actor,
+				CurrentSkillDamage,
+				GetController(),
+				this,
+				nullptr
+			);
+		}
+	}
+
+	DrawDebugBox(
+		World,
+		BoxCenter,
+		BoxExtent,
+		FRotator(0.f, Clone->GetActorRotation().Yaw, 0.f).Quaternion(),
+		FColor::Red,
+		false,
+		1.0f,
+		0,
+		2.0f
+	);
+}
+
+void AEnemyBase::ExecuteReinforcedDash(FVector StartLoc, FRotator DashRot)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("강화 대쉬 함수 실행됨!"));
+	
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	int32 NumberOfClones = 1;      // 소환할 분신 개수
+	float DistanceBetween = 400.f; // 분신 간의 간격
+	float TimeDelay = 0.1f;        // 분신이 나타나는 시간차 (잔상 효과)
+
+	for (int32 i = 1; i <= NumberOfClones; i++)
+	{
+		// 1. 소환될 위치 계산 (보스가 바라보는 방향으로 순차적 배치)
+		FVector SpawnLocation = StartLoc + (DashRot.Vector() * (DistanceBetween * i));
+        
+		// 2. 시간차를 두고 분신 소환 (람다 캡처 주의)
+		FTimerHandle CloneTimer;
+		GetWorldTimerManager().SetTimer(CloneTimer, [this, World, SpawnLocation, DashRot]()
+		{
+			AEnemyBase* NewClone = World->SpawnActor<AEnemyBase>(CloneClass, SpawnLocation, DashRot);
+            
+			if (NewClone)
+			{
+				// 분신 설정
+				NewClone->bIsBoss = false;
+                
+				// 공격 애니메이션 실행
+				if (CloneAttackMontage)
+				{
+					NewClone->PlayAnimMontage(CloneAttackMontage);
+				}
+
+				// [TA 팁] 분신이 공격 후 자연스럽게 사라지도록 설정
+				// 1초 뒤에 파괴하거나, 애니메이션 끝날 때 파괴 로직 추가
+				NewClone->SetLifeSpan(1.2f); 
+                
+				// (선택) 아까 만든 장판 초기화 함수가 있다면 여기서 호출!
+				// NewClone->InitCloneDecal(200.f, 500.f);
+			}
+		}, i * TimeDelay, false);
+	}
 }

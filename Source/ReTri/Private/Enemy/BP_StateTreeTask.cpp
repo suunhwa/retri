@@ -8,10 +8,13 @@
 #include "GameFramework/Actor.h"
 #include "Enemy/EnemyData.h"
 #include "AIController.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/DecalComponent.h"
 #include "Enemy/EnemyBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Level/Data/InteractableData.h"
 #include "ReTri/ReTri.h"
 
 UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer)
@@ -70,7 +73,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	if (HPRatio <= 0.3f)			// 3페이즈
 	{
 		RealPhase = 3;
-		SkillPool = { 5, 6, 7 };
+		SkillPool = { 6 };	// 5, 6, 7
 	}
 	else if (HPRatio <= 0.6f)		// 2페이즈
 	{
@@ -92,16 +95,16 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		if (Distance >= 400.f && Distance <= 1000.f)
 		{
 			// 중거리면 돌진, 점프만
-			SkillPool = { 3 }; // 1, 1, 3
+			SkillPool = { 1, 1, 3 }; // 1, 1, 3
 		}
 		else if (Distance < 400.f)
 		{
 			// 가까우면 모든 스킬
-			SkillPool = { 0, 1 };	//0, 1, 1, 2, 2, 3, 3
+			SkillPool = { 0, 1, 1, 3, 3 };	//0, 1, 1, 2, 2, 3, 3
 		}
 		else
 		{
-			SkillPool = { 1 };
+			SkillPool = { 3 };
 		}
 	}
 	
@@ -200,6 +203,11 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 	{
 		if (Boss->GetCurrentMontage() != nullptr) return EStateTreeRunStatus::Running;
 		
+		if (CurrentSkill == EDarkMoonSkillType::MirrorBlade && BladeRepeatCount < 4) 
+		{
+			return EStateTreeRunStatus::Running;
+		}
+		
 		SkillWaitTime += DeltaTime;
 		if (SkillWaitTime < 1.5f) return  EStateTreeRunStatus::Running;
 		
@@ -228,7 +236,6 @@ void UBP_StateTreeTask::ExecuteDash(AEnemyBase* Boss, ACharacter* Player, UAnimM
 	Boss->bIsCharging = true;
 	Boss->TargetActor = Player;
 	
-	FTimerHandle DashTimer;
 	Boss->GetWorldTimerManager().SetTimer(DashTimer, [Boss, Player, Montage]()
 	{
 		if (Boss && Player)
@@ -283,7 +290,154 @@ void UBP_StateTreeTask::ExecuteMirrorBlade(AEnemyBase* Boss, ACharacter* Player,
 	
 	Boss->SpawnClones();
 	
+	BladeRepeatCount = 0;	// 카운트 초기화
 	
+	// 사라지는 몽타주
+	Boss->PlayAnimMontage(Montage);
+
+	// 패턴 시작
+	ExecutePatternCycle(Boss);	
+}
+
+void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
+{
+	if (!IsValid(Boss)) return;
+
+	if (BladeRepeatCount >= 4)
+	{
+		Boss->SetActorHiddenInGame(false);
+		return;
+	}
+
+	const int32 CloneNum = Boss->ActiveClones.Num();
+	if (CloneNum <= 0) return;
+
+	const float AppearanceInterval = 0.1f;   // 장판 순차 등장 간격
+	const float WaitBeforeProgress = 0.3f;   // 다 등장한 뒤 잠깐 대기
+	const float ProgressDuration = 1.0f;     // 차오르는 시간
+	const float NextCycleDelay = 0.8f;       // 다음 반복까지 텀
+
+	// =========================
+	// 1) 장판 순차 등장
+	for (int32 i = 0; i < CloneNum; ++i)
+	{
+		const float Delay = i * AppearanceInterval;
+		AEnemyBase* Clone = Boss->ActiveClones[i];
+
+		FTimerHandle Handle;
+		Boss->GetWorldTimerManager().SetTimer(
+			Handle,
+			[Clone]()
+			{
+				if (IsValid(Clone))
+				{
+					Clone->InitCloneDecal(110.f, 2400.f);
+				}
+			},
+			Delay,
+			false
+		);
+	}
+
+	// 마지막 장판이 등장하고, 잠깐 쉰 뒤 차오름 시작
+	const float StartProgressTime = (CloneNum - 1) * AppearanceInterval + WaitBeforeProgress;
+
+	// =========================
+	// 2) 동시에 차오름 시작
+	FTimerHandle StartProgressHandle;
+	Boss->GetWorldTimerManager().SetTimer(
+		StartProgressHandle,
+		[this, Boss, ProgressDuration]()
+		{
+			if (!IsValid(Boss)) return;
+
+			TSharedPtr<FTimerHandle> ProgressHandlePtr = MakeShared<FTimerHandle>();
+			TSharedPtr<float> Elapsed = MakeShared<float>(0.0f);
+
+			Boss->GetWorldTimerManager().SetTimer(
+				*ProgressHandlePtr,
+				[this, Boss, ProgressDuration, ProgressHandlePtr, Elapsed]() mutable
+				{
+					if (!IsValid(Boss)) return;
+
+					*Elapsed += 0.02f;
+					const float Progress = FMath::Clamp(*Elapsed / ProgressDuration, 0.0f, 1.0f);
+
+					for (AEnemyBase* Clone : Boss->ActiveClones)
+					{
+						if (IsValid(Clone) && IsValid(Clone->DynamicBoxDecal))
+						{
+							Clone->DynamicBoxDecal->SetScalarParameterValue(TEXT("BoxProgress"), Progress);
+						}
+					}
+
+					if (Progress >= 1.0f)
+					{
+						Boss->GetWorldTimerManager().ClearTimer(*ProgressHandlePtr);
+					}
+				},
+				0.02f,
+				true
+			);
+		},
+		StartProgressTime,
+		false
+	);
+
+	// =========================
+	// 3) 다 차면 동시에 폭발
+	const float ExplosionTime = StartProgressTime + ProgressDuration;
+
+	FTimerHandle ExplosionHandle;
+	Boss->GetWorldTimerManager().SetTimer(
+		ExplosionHandle,
+		[this, Boss, NextCycleDelay]()
+		{
+			if (!IsValid(Boss)) return;
+
+			for (AEnemyBase* Clone : Boss->ActiveClones)
+			{
+				if (IsValid(Clone))
+				{
+					Boss->ExecuteMirrorBladeDamage(Clone);
+
+					if (IsValid(Clone->ActiveDecal))
+					{
+						Clone->ActiveDecal->DestroyComponent();
+						Clone->ActiveDecal = nullptr;
+					}
+
+					Clone->Destroy();
+				}
+			}
+
+			Boss->ActiveClones.Empty();
+			BladeRepeatCount++;
+
+			FTimerHandle NextHandle;
+			Boss->GetWorldTimerManager().SetTimer(
+				NextHandle,
+				[this, Boss]()
+				{
+					if (!IsValid(Boss)) return;
+
+					if (BladeRepeatCount < 4)
+					{
+						Boss->SpawnClones();
+						ExecutePatternCycle(Boss);
+					}
+					else
+					{
+						Boss->SetActorHiddenInGame(false);
+					}
+				},
+				NextCycleDelay,
+				false
+			);
+		},
+		ExplosionTime,
+		false
+	);
 }
 
 void UBP_StateTreeTask::ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
@@ -292,9 +446,31 @@ void UBP_StateTreeTask::ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Play
 
 void UBP_StateTreeTask::ExecutePowerDashShadow(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
 {
+	if (!Boss || !Player || !Montage) return;
+    
+	Boss->bIsCharging = true;
+	Boss->TargetActor = Player;
+	
+	Boss->GetWorldTimerManager().SetTimer(DashTimer, [Boss, Player, Montage]()
+	{
+	   if (IsValid(Boss) && IsValid(Player))
+	   {
+		  Boss->bIsCharging = false;
+          
+		  FVector Dir = (Player->GetActorLocation() - Boss->GetActorLocation()).GetSafeNormal();
+		  Dir.Z = 0; 
+		  Boss->SetActorRotation(Dir.Rotation());
+	   	
+		  Boss->ExecuteReinforcedDash(Boss->GetActorLocation(), Boss->GetActorRotation());
+
+		  Boss->LaunchCharacter(Boss->GetActorForwardVector() * 10000.0f, true, false);
+		  Boss->PlayAnimMontage(Montage);
+	   }
+	}, 1.5f, false);
 }
 
 void UBP_StateTreeTask::ExecutePowerJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
 {
 }
+
 

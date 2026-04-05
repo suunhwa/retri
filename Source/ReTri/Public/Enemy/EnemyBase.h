@@ -79,6 +79,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
 	class UAnimMontage* DownMontage;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
+	class UAnimMontage* CloneAttackMontage;
+	
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
 	TSubclassOf<class UCameraShakeBase> DeathCameraShake;
 	
@@ -134,20 +138,23 @@ public:
 	
 	
 	// ----------- MirrorBlade -----------
-	UPROPERTY(EditAnywhere, Category = Skill)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
 	UMaterialInterface* BoxDecal;
 	
 	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicBoxDecal;
 	
-	UPROPERTY()
-	UDecalComponent* BoxDecalComp;
+	//UPROPERTY()
+	//UDecalComponent* BoxDecalComp;
 	
 	UPROPERTY()
 	TArray<AEnemyBase*> ActiveClones; // 분신 관리 배열
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Skill)
 	TSubclassOf<AEnemyBase> CloneClass;
+	
+	UPROPERTY()
+	UDecalComponent* ActiveDecal = nullptr;
 	
 	
 	
@@ -177,13 +184,19 @@ public:
 	
 	void SpawnClones();
 	void InitCloneDecal(float Width, float Length);	// 장판
-	void UpdateBoxDecalProgress(float Progress);
+	void StartDecalProgress(float Duration);
+	
+	UFUNCTION(BlueprintCallable)
+	void ExecuteReinforcedDash(FVector StartLoc, FRotator DashRot);
 	
 	void PlayDeathEffect();
 	void BroadcastDeath();
 	
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void ExecuteJumpDownDamage();
+	
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void ExecuteMirrorBladeDamage(AEnemyBase* Clone);
 	
 protected:
 	virtual void UpdatePhase() { }

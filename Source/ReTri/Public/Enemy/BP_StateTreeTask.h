@@ -21,8 +21,8 @@ enum class EDarkMoonSkillType : uint8
 	Flash,
 	JumpDown,
 	MirrorBlade,
-	PowerDashShadow,
 	PowerDashSword,
+	PowerDashShadow,
 	PowerJumpDown 
 };
 
@@ -62,7 +62,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = Skill)
 	UMaterialInterface* JumpCircleDecal;
 	
-	
+private:
+	int32 BladeRepeatCount = 0; // MirrorBlade 스킬 n회 반복 카운트 
+	FTimerHandle CycleTimerHandle;
+	FTimerHandle DashTimer;
 	
 
 private:
@@ -74,6 +77,8 @@ private:
 	void ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	void ExecutePowerDashShadow(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	void ExecutePowerJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
+	
+	void ExecutePatternCycle(AEnemyBase* Boss);
 	
 	
 };
