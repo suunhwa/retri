@@ -47,7 +47,7 @@ private:
 
 	// AoE 반경
 	UPROPERTY(EditDefaultsOnly, Category="MassCleanse")
-	float HitRadius = 400.f;
+	float HitRadius = 250.f;
 
 	// 이펙트 지속 후 액터 소멸까지의 시간 (저지 불가 지속 시간과 동일)
 	UPROPERTY(EditDefaultsOnly, Category="MassCleanse")
