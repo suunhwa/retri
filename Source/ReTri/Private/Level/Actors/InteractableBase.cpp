@@ -8,12 +8,15 @@
 #include "Level/UI/InteractableUI.h"
 #include "Level/UI/SelectUI.h"
 #include "MapSubSystem.h"
+#include "Level/Actors/InteractChaos.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
 
 // Sets default values
 AInteractableBase::AInteractableBase()
@@ -32,6 +35,15 @@ AInteractableBase::AInteractableBase()
 	MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 	MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
 	MeshComp->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
+	
+	PaperComp = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PaperComp"));
+	PaperComp->SetupAttachment(CapsuleComp);	
+	ConstructorHelpers::FObjectFinder<UPaperSprite> TempPaper(TEXT("/Script/Paper2D.PaperSprite'/Game/LevelInteraction/03_Assets/Icon/_Interactable_Sprite._Interactable_Sprite'"));
+	if (TempPaper.Succeeded()) PaperComp->SetSprite(TempPaper.Object);
+	PaperComp->SetRelativeLocation(FVector(0.f, 0.f, 2300.f));
+	PaperComp->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));
+	PaperComp->SetRelativeScale3D(FVector(8.f, 1.f, 8.f));
+	
 	
 	InteractUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractUI"));
 	InteractUI->SetupAttachment(CapsuleComp);
