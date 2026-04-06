@@ -43,7 +43,7 @@ AInteractableBase::AInteractableBase()
 	PaperComp->SetRelativeLocation(FVector(0.f, 0.f, 2300.f));
 	PaperComp->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));
 	PaperComp->SetRelativeScale3D(FVector(8.f, 1.f, 8.f));
-	
+	PaperComp->SetCastShadow(false);
 	
 	InteractUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractUI"));
 	InteractUI->SetupAttachment(CapsuleComp);

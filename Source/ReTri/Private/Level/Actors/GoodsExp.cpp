@@ -1,37 +1,31 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Level/Actors/GoodsGoldCoin.h"
+#include "Level/Actors/GoodsExp.h"
 
-#include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
 #include "Level/Actors/FloatingUIActor.h"
 
 #include "Player/Components/StatComponent.h"
 
-AGoodsGoldCoin::AGoodsGoldCoin()
+
+AGoodsExp::AGoodsExp()
 {
-	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/Mesh/GoodsExp.GoodsExp'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/low-poly_gold_coin/StaticMeshes/SM_Gold.SM_Gold'"));
 	if (TempMesh.Succeeded()) MeshComp->SetStaticMesh(TempMesh.Object);
 }
 
-void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
+void AGoodsExp::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 	
 	if (OtherActor == TargetPlayer)
 	{
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-		
 		if (!GI || !GI->StatComp) return;
 		
-		// 랜덤의 경우 
-		if (!bIsFixedAmount)
-		{
-			Amount = GI->GameData->GetRandomGold();
-		}
-		
-		GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
+		// todo EXP 적용
+		// GI->StatComp->ApplyStatModifier(EStatTypes::, Amount);
 		
 		if (!FloatingUIActorClass) return;
 		AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), FRotator::ZeroRotator);

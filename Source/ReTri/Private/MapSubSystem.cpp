@@ -7,8 +7,10 @@
 #include "Level/Actors/LootDreamPowderPillar.h"
 #include "Level/Actors/LootGoldCoinPot.h"
 #include "Level/Actors/InteractableBase.h"
+#include "Level/Actors/FloatingUIActor.h"
 
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/Components/HealthComponent.h"
 #include "Player/Components/StatComponent.h"
@@ -500,7 +502,6 @@ void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 			continue;
 		}
 		
-		
 		AInteractableBase* I = GetWorld()->SpawnActor<AInteractableBase>(
 			IData.InteractableClass, 
 			TPs[i]->GetActorLocation(), 
@@ -577,9 +578,9 @@ void UMapSubSystem::SetMerchantItemList(int32 MapIndex)
 	{
 		TempSkillData.ItemSkillDatas.Add(*AcquiredSkills[i]);
 		
-		UE_LOG(jiwon, Display, TEXT("Acquired Skill: %s"), *AcquiredSkills[i]->SkillNameKR);
+		UE_LOG(LogTemp, Display, TEXT("Acquired Skill: %s"), *AcquiredSkills[i]->SkillNameKR);
 	}
-	UE_LOG(jiwon, Display, TEXT("ItemSkillDatas: %d"), TempSkillData.ItemSkillDatas.Num());
+	UE_LOG(LogTemp, Display, TEXT("ItemSkillDatas: %d"), TempSkillData.ItemSkillDatas.Num());
 
 	// 최종 상점에 등록!
 	MerchantItemDatas.Add(MapIndex, TempSkillData);
@@ -638,6 +639,7 @@ void UMapSubSystem::LevelClear()
 void UMapSubSystem::AddCurseQuest(FActiveCurseQuest NewQuest)
 {
 	ActiveCurseQuests.Add(NewQuest);
+	OnCurseQuestChanged.Broadcast();
 }
 
 void UMapSubSystem::UpdateCurseQuest(EActiveCurseQuest Type, int32 Amount)
@@ -649,7 +651,7 @@ void UMapSubSystem::UpdateCurseQuest(EActiveCurseQuest Type, int32 Amount)
 	if (!GI || !GI->StatComp) return;
 	
 	// 역순으로 순회 (조건 만족하는 모든 저주 해제를 위해) 
-for (int32 i = ActiveCurseQuests.Num() - 1; i >= 0; --i)
+	for (int32 i = ActiveCurseQuests.Num() - 1; i >= 0; --i)
 	{
 		FActiveCurseQuest& Quest = ActiveCurseQuests[i];
 		
@@ -664,31 +666,62 @@ for (int32 i = ActiveCurseQuests.Num() - 1; i >= 0; --i)
 				SCREENLOG("[저주 해제] %s", *Quest.RewardInfo);
 				JIWONLOG("[저주 해제] %s", *Quest.RewardInfo);
 				
+				FString FloatingTextStr;
+				FLinearColor FloatingColor = FLinearColor::White;
+				
 				// 보상 수여
 				switch (Quest.RewardType)
 				{
 				case ERewardType::RewardGold:
 					GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Quest.RewardValue);
+					FloatingTextStr = FString::Printf(TEXT("골드 +%d"), Quest.RewardValue);
+					FloatingColor = FLinearColor(1.f, 0.617f, 0.f, 1.f);
 					SCREENLOG("[저주 해제] 골드 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardDreamPowder:
 					GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Quest.RewardValue);
+					FloatingTextStr = FString::Printf(TEXT("꿈가루 +%d"), Quest.RewardValue);
+					FloatingColor = FLinearColor(0.053f, 0.510f, 1.0f, 1.f);
 					SCREENLOG("[저주 해제] 꿈가루 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardMaxHP:
 					GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, Quest.RewardValue);
 					GI->HealthComp->Heal(Quest.RewardValue);
+					FloatingTextStr = FString::Printf(TEXT("최대 체력 +%d"), Quest.RewardValue);
+					FloatingColor = FLinearColor(0.1f, 1.0f, 0.1f, 1.f);
 					SCREENLOG("[저주 해제] 최대체력 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardAttackDamage:
 					GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Quest.RewardValue);
+					FloatingTextStr = FString::Printf(TEXT("공격력 +%d"), Quest.RewardValue);
+					FloatingColor = FLinearColor(1.0f, 0.1f, 0.1f, 1.f);
 					SCREENLOG("[저주 해제] 공격력 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardMemoryHaste:
 					GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, Quest.RewardValue);
+					FloatingTextStr = FString::Printf(TEXT("기억 가속 +%d"), Quest.RewardValue);
+					FloatingColor = FLinearColor(0.8f, 0.2f, 0.8f, 1.f);
 					SCREENLOG("[저주 해제] 기억가속 보상: %d", Quest.RewardValue);
 					break;
 				}
+				
+				// Floating UI 생성 (플레이어 위치)
+				if (GI->FloatingUIActorClass)
+				{
+					if (ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
+					{
+						AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(
+							GI->FloatingUIActorClass,
+							Player->GetActorLocation(),
+							FRotator::ZeroRotator);
+						
+						if (FloatingUI)
+						{
+							FloatingUI->ShowFloatingUI(FText::FromString(FloatingTextStr), FloatingColor);
+						}
+					}
+				}
+				
 				// 삭제
 				ActiveCurseQuests.RemoveAt(i);
 			}
@@ -700,4 +733,7 @@ for (int32 i = ActiveCurseQuests.Num() - 1; i >= 0; --i)
 			}
 		}
 	}
+	
+	// 리스트 정리
+	OnCurseQuestChanged.Broadcast();
 }
