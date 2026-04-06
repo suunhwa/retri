@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Level/Interfaces/InteractableInterface.h"
+#include "Interface/SkillItemInterface.h"
 #include "Player/Data/PlayerSkillData.h"
 #include "ItemBase.generated.h"
 
@@ -14,7 +14,7 @@ class UDropItemUI;
 struct FPlayerSkillData;
 
 UCLASS()
-class RETRI_API AItemBase : public AActor, public IInteractableInterface
+class RETRI_API AItemBase : public AActor, public ISkillItemInterface
 {
 	GENERATED_BODY()
 	
@@ -33,8 +33,8 @@ public:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
 	
-	virtual void Interact_Implementation() override;
-	virtual void Hold_Implementation() override;
+	virtual void Acquire_Implementation() override;
+	virtual void Hold_Implementation(AActor* PlayerActor) override;
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Collision")
@@ -48,6 +48,7 @@ public:
 	TSubclassOf<class AGoodsBase> GoodsClass;
 	
 	FPlayerSkillData CurSkillData;
+	FPlayerSkillData GetSkillData() { return CurSkillData; }
 	void DataInit(FPlayerSkillData SkillData);
 	
 	void SetInteractionUIVisibility(bool isVisible);

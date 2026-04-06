@@ -16,9 +16,9 @@ ABullet::ABullet()
 	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	collisionComp->SetSphereRadius(15.f);
 	collisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	collisionComp->SetCollisionObjectType(ECC_GameTraceChannel6);
+	collisionComp->SetCollisionObjectType(ECC_GameTraceChannel5);
 	collisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	collisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap); // dark moon
+	collisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap); // dark moon
 	collisionComp->SetGenerateOverlapEvents(true);
 	RootComponent = collisionComp;
 

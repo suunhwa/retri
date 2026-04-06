@@ -26,6 +26,4 @@ public:
 	void Hover();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Interaction")
 	void Interact();
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Interaction")
-	void Hold();
 };

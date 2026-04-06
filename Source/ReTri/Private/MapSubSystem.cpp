@@ -10,6 +10,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/Components/HealthComponent.h"
 #include "Player/Components/StatComponent.h"
 
 // === Infrastructure (UE Overrides) ===
@@ -617,6 +618,7 @@ void UMapSubSystem::SetMinionSpawnerCount()
 void UMapSubSystem::LevelClear()
 {
 	CurClearSpawnerCount++;
+	
 	if (MinionSpawnerCount > CurClearSpawnerCount) return;
 	SCREENLOG("전투맵 클리어!");
 
@@ -659,29 +661,34 @@ for (int32 i = ActiveCurseQuests.Num() - 1; i >= 0; --i)
 			// 달성 시
 			if (Quest.CurCount >= Quest.TargetCount)
 			{
+				SCREENLOG("[저주 해제] %s", *Quest.RewardInfo);
+				JIWONLOG("[저주 해제] %s", *Quest.RewardInfo);
+				
 				// 보상 수여
 				switch (Quest.RewardType)
 				{
 				case ERewardType::RewardGold:
 					GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Quest.RewardValue);
+					SCREENLOG("[저주 해제] 골드 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardDreamPowder:
 					GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Quest.RewardValue);
+					SCREENLOG("[저주 해제] 꿈가루 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardMaxHP:
 					GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, Quest.RewardValue);
+					GI->HealthComp->Heal(Quest.RewardValue);
+					SCREENLOG("[저주 해제] 최대체력 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardAttackDamage:
 					GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Quest.RewardValue);
+					SCREENLOG("[저주 해제] 공격력 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardMemoryHaste:
 					GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, Quest.RewardValue);
+					SCREENLOG("[저주 해제] 기억가속 보상: %d", Quest.RewardValue);
 					break;
 				}
-				
-				SCREENLOG("[저주 해제] 보상: %s", *Quest.RewardInfo);
-				JIWONLOG("[저주 해제] %s", *Quest.RewardInfo);
-				
 				// 삭제
 				ActiveCurseQuests.RemoveAt(i);
 			}

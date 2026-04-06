@@ -22,6 +22,7 @@ AItemBase::AItemBase()
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SetRootComponent(SphereComp);
 	SphereComp->SetSphereRadius(150.f);
+	SphereComp->SetCollisionObjectType(ECC_GameTraceChannel6);
 	// SphereComp->SetCollisionProfileName(TEXT("OverlapAll"));
 	
 	ItemUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComp"));
@@ -73,21 +74,26 @@ void AItemBase::NotifyActorEndOverlap(AActor* OtherActor)
 	}
 }
 
-void AItemBase::Interact_Implementation()
+void AItemBase::Acquire_Implementation()
 {
-	IInteractableInterface::Interact_Implementation();
+	ISkillItemInterface::Acquire_Implementation();
 	
 	// todo F 습득 행동 
 	SCREENLOG("습득하는 경우와 인벤토리가 가득 차있는 경우");
 }
 
-void AItemBase::Hold_Implementation()
+void AItemBase::Hold_Implementation(AActor* PlayerActor)
 {
-	IInteractableInterface::Hold_Implementation();
+	ISkillItemInterface::Hold_Implementation(PlayerActor);
 	
 	// todo G 눌렀을 경우
 	
-	SCREENLOG("분해하는 경우");
+	if (!PlayerActor->IsA(APlayerCharacter::StaticClass())) return;
+	APlayerCharacter* Player = Cast<APlayerCharacter>(PlayerActor);
+	
+	//if (Player->CurHoldTime < Player->MaxHoldTime) return;
+	
+	SCREENLOG("분해 완료!");
 	
 	AGoodsDreamPowder* Goods = GetWorld()->SpawnActor<AGoodsDreamPowder>(GoodsClass, GetActorLocation(), GetActorRotation());
 	Goods->bIsFixedAmount = true;

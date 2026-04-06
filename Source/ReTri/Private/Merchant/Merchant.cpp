@@ -28,7 +28,7 @@ AMerchant::AMerchant()
 	
 	MerchantCollision = CreateDefaultSubobject<USphereComponent>(TEXT("MerchantCollision"));
 	MerchantCollision->SetupAttachment(RootComponent);
-	MerchantCollision->SetSphereRadius(250.f);
+	MerchantCollision->SetSphereRadius(200.f);
 	MerchantCollision->SetCollisionProfileName(TEXT("Interaction"));
 	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonSevarog/Characters/Heroes/Sevarog/Meshes/Sevarog.Sevarog'"));
