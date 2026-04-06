@@ -13,9 +13,40 @@
 class AActor;
 class ALootGoldCoinPot;
 class ALootDreamPowderPillar;
-/**
- * 
- */
+
+UENUM(BlueprintType)
+enum class EActiveCurseQuest : uint8
+{
+	None,
+	KillMinions,
+	ClearMaps
+};
+
+USTRUCT(BlueprintType)
+struct FActiveCurseQuest
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, Category="Curse")
+	EActiveCurseQuest QuestType = EActiveCurseQuest::None;
+	
+	UPROPERTY(BlueprintReadWrite, Category="Curse")
+	int32 TargetCount = 0;
+	
+	UPROPERTY(BlueprintReadWrite, Category="Curse")
+	int32 CurCount = 0;
+	
+	UPROPERTY(BlueprintReadWrite, Category="Curse")
+	ERewardType RewardType;
+	
+	UPROPERTY(BlueprintReadWrite, Category="Curse")
+	int32 RewardValue = 0;
+	
+	UPROPERTY(BlueprintReadWrite, Category="Curse")
+	FString RewardInfo;
+};
+
+
 UCLASS()
 class RETRI_API UMapSubSystem : public UGameInstanceSubsystem
 {
@@ -51,21 +82,25 @@ public:
 	TMap<int32, FShopItemSkillData> MerchantItemDatas;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
+	TArray<FActiveCurseQuest> ActiveCurseQuests;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
 	int32 CurMapIndex = 0;
 	
 	/** 현재 맵 정보 */
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
-	FMapNodeData GetCurMapData()
-	{
-		return CurMapDatas[CurMapIndex];
-	}
+	FMapNodeData GetCurMapData() { return CurMapDatas[CurMapIndex]; }
+	
+	/** 현재 맵 정보 (원본 직접 참조) */
+	FMapNodeData& GetCurMapDataRef() { return CurMapDatas[CurMapIndex]; }
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
-	int32 EnemySpawnerCount = 0;
+	int32 MinionSpawnerCount = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
+	int32 CurClearSpawnerCount = 0;
 	
 	// === Public API ===
-	/** 맵 생성 (트리 구조) XXXX */
-	UFUNCTION(BlueprintCallable, Category="Map|Generation")
+	/** 트리 구조 맵 생성 — ProceduralGenerateMap 사용 권장 */
 	void GenerateMap();
 	
 	/** 절차적 맵 생성 (그리드 형태) */
@@ -82,6 +117,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
 	FInteractableData GetRowInteractionData(FName RowName, bool& bSuccess); 
+	
+	TArray<FPlayerSkillData*> GetRandomAcquiredItemList();
 	
 	// === Level Setting API? ===
 	/** 사용된 Interactable 저장 */
@@ -100,14 +137,25 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SpawnLootPieces(TArray<AActor*> TargetPoints);
 	
+	/** 상점 맵 마다 상인 상점 목록 생성 함수 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void SetMerchantItemList(int32 MapIndex);
+	void RemoveMerchantItemList(int32 CurrentMap,int32 RemoveItemSlotNum);
 	
 	/** 적 스포너 개수 받아오기 */
 	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
-	void SetEnemySpawnerCount(int32 SpawnerNum);
+	void SetMinionSpawnerCount();
 	
 	/** 게임 클리어 (포탈 생성 조건) */
-	UFUNCTION(BlueprintCallable, Category="Map|Helper")
+	UFUNCTION(BlueprintCallable, Category="Map|LevelSetting")
 	void LevelClear();
+	
+	// === Curse Quest ===
+	/** 저주 퀘스트 추가 */
+	UFUNCTION(BlueprintCallable, Category="Map|Curse")
+	void AddCurseQuest(FActiveCurseQuest NewQuest);
+
+	/** 저주 퀘스트 갱신 (맵 클리어, 처치 등) */
+	UFUNCTION(BlueprintCallable, Category="Map|Curse")
+	void UpdateCurseQuest(EActiveCurseQuest Type, int32 Amount = 1);
 };

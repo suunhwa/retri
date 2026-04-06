@@ -37,9 +37,13 @@ void AGoodsDreamPowder::NotifyActorBeginOverlap(AActor* OtherActor)
 		auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 		
 		if (!GI || !GI->StatComp) return;
-
-		if (!GI || !GI->StatComp) return;
-		const int32 Amount = GI->GameData->GetRandomDreamPowder();
+		
+		// 랜덤의 경우 
+		if (!bIsFixedAmount)
+		{
+			Amount = GI->GameData->GetRandomDreamPowder();
+		}
+		
 		GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Amount);
 		
 		if (!FloatingUIActorClass) return;

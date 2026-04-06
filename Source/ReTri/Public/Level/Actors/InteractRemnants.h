@@ -6,9 +6,8 @@
 #include "Level/Actors/InteractableBase.h"
 #include "InteractRemnants.generated.h"
 
-/**
- * 
- */
+class AItemBase;
+
 UCLASS()
 class RETRI_API AInteractRemnants : public AInteractableBase
 {
@@ -20,4 +19,7 @@ protected:
 
 public:	
 	virtual void Interact_Implementation() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AItemBase> ItemClass;
 };

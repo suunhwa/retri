@@ -18,7 +18,8 @@ void UShopSlotUI::NativeConstruct()
 
 void UShopSlotUI::OnClicked()
 {
-	OnSlotClicked.Broadcast();
+	OnSlotClicked.Broadcast(SlotNumber);
+	
 }
 
 void UShopSlotUI::SetGoldText(int32 Gold, FLinearColor Color)

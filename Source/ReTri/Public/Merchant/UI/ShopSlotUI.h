@@ -10,7 +10,7 @@ class UButton;
 class UTextBlock;
 class UImage;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSkillSlotClicked);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkillSlotClicked, int32, SlotNum);
 
 UCLASS()
 class RETRI_API UShopSlotUI : public UUserWidget
@@ -42,4 +42,6 @@ public:
 	
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* GoldText;
+	
+	int32 SlotNumber;
 };

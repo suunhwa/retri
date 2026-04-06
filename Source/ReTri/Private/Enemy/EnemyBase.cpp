@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "MapSubSystem.h"
 
 
 // Sets default values
@@ -168,6 +169,15 @@ void AEnemyBase::PlayDeathEffect()
 void AEnemyBase::BroadcastDeath()
 {
 	OnMinionDieDelegate.Broadcast();
+	
+	// === 증오 ===
+	if (UGameInstance* GI = GetWorld()->GetGameInstance())
+	{
+		if (UMapSubSystem* MapSub = GI->GetSubsystem<UMapSubSystem>())
+		{
+			MapSub->UpdateCurseQuest(EActiveCurseQuest::KillMinions, 1);
+		}
+	}
 }
 
 void AEnemyBase::StartCharging(AActor* NewTarget)
