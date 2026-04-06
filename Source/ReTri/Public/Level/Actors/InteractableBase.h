@@ -12,6 +12,7 @@
 
 class UCapsuleComponent;
 class UWidgetComponent;
+class UPaperSpriteComponent;
 class USelectUI;
 
 UCLASS()
@@ -55,6 +56,8 @@ public:
 	UCapsuleComponent* CapsuleComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* MeshComp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPaperSpriteComponent* PaperComp;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractableType InteractableType;
@@ -85,7 +88,6 @@ public:
 	// === [ Select ] ===
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SelectUI")
 	TSubclassOf<USelectUI> SelectUIClass;
-	
 	UPROPERTY()
 	USelectUI* SelectUIInstance;
 	

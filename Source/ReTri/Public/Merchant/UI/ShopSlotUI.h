@@ -10,7 +10,7 @@ class UButton;
 class UTextBlock;
 class UImage;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSkillSlotClicked);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkillSlotClicked, int32, SlotNum);
 
 UCLASS()
 class RETRI_API UShopSlotUI : public UUserWidget
@@ -29,8 +29,11 @@ public:
 	void OnClicked();
 	
 	UFUNCTION(BlueprintCallable)
-	void SetGoldText(FString Gold, FLinearColor Color = FLinearColor(0.022000f, 0.002732f, 0.002428f, 1.000000f));
+	void SetGoldText(int32 Gold, FLinearColor Color = FLinearColor(0.8f, 0.8f, 0.5f, 1.0f));
 
+	UFUNCTION(BlueprintCallable)
+	void SetItemIcon(UTexture2D* Texture);
+	
 	UPROPERTY(meta=(BindWidget))
 	UButton* ItemSlotButton;
 	
@@ -39,4 +42,6 @@ public:
 	
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* GoldText;
+	
+	int32 SlotNumber;
 };

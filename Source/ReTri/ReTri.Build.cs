@@ -22,7 +22,8 @@ public class ReTri : ModuleRules
 			"Niagara",
 			"Slate",
 			"SlateCore",
-			"UMG"
+			"UMG",
+			"Paper2D"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

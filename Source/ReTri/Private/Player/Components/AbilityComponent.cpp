@@ -36,7 +36,12 @@ void UAbilityComponent::BeginPlay()
 				if (Pair.Value)
 					RegisterAbility(Slot, Pair.Value);
 			}
-			return; // 복원 완료, 아래 기본 등록 스킵
+			
+			// 저장 안 된 슬롯은 기본값으로 채움
+			if (!GetAbility(EAbilitySlot::Dash)) RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);
+			if (!GetAbility(EAbilitySlot::TravelerMemory1)) RegisterAbility(EAbilitySlot::TravelerMemory1, TravelerMemory1Class);
+			if (!GetAbility(EAbilitySlot::TravelerMemory2)) RegisterAbility(EAbilitySlot::TravelerMemory2, TravelerMemory2Class);
+			return;
 		}
 	}
 	RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);

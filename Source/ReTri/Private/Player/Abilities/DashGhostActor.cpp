@@ -18,6 +18,7 @@ void ADashGhostActor::Init(USkeletalMeshComponent* SourceMesh)
 	if (!SourceMesh) return;
 
 	// 포즈 스냅샷 복사
+	
 	GhostMesh->SetSkinnedAssetAndUpdate(SourceMesh->GetSkeletalMeshAsset());
 	GhostMesh->SetWorldTransform(SourceMesh->GetComponentTransform());
 	GhostMesh->CopyPoseFromSkeletalComponent(SourceMesh);

@@ -3,18 +3,20 @@
 
 #include "Level/Actors/InteractableBase.h"
 
-#include "Level/Actors/NZW_TestPlayer.h"
 #include "Level/Data/InteractableData.h"
 #include "Level/UI/InteractableInfoUI.h"
 #include "Level/UI/InteractableUI.h"
 #include "Level/UI/SelectUI.h"
 #include "MapSubSystem.h"
+#include "Level/Actors/InteractChaos.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
 
 // Sets default values
 AInteractableBase::AInteractableBase()
@@ -34,11 +36,20 @@ AInteractableBase::AInteractableBase()
 	MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
 	MeshComp->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
 	
+	PaperComp = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PaperComp"));
+	PaperComp->SetupAttachment(CapsuleComp);	
+	ConstructorHelpers::FObjectFinder<UPaperSprite> TempPaper(TEXT("/Script/Paper2D.PaperSprite'/Game/LevelInteraction/03_Assets/Icon/_Interactable_Sprite._Interactable_Sprite'"));
+	if (TempPaper.Succeeded()) PaperComp->SetSprite(TempPaper.Object);
+	PaperComp->SetRelativeLocation(FVector(0.f, 0.f, 2300.f));
+	PaperComp->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));
+	PaperComp->SetRelativeScale3D(FVector(8.f, 1.f, 8.f));
+	
+	
 	InteractUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractUI"));
 	InteractUI->SetupAttachment(CapsuleComp);
-	InteractUI->SetWidgetSpace(EWidgetSpace::Screen); //! EWidgetSpace::World
+	InteractUI->SetWidgetSpace(EWidgetSpace::World); //! EWidgetSpace::World
 	InteractUI->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
-	InteractUI->SetRelativeScale3D(FVector(0.8f, 0.8f, 0.8f));
+	//InteractUI->SetRelativeScale3D(FVector(0.8f, 0.8f, 0.8f));
 	ConstructorHelpers::FClassFinder<UInteractableUI> TempUI(TEXT("/Game/LevelInteraction/01_UI/WBP_InteractableUI.WBP_InteractableUI_C"));
 	if (TempUI.Succeeded()) InteractUI->SetWidgetClass(TempUI.Class);
 	InteractUI->SetVisibility(false);
@@ -85,7 +96,7 @@ void AInteractableBase::Tick(float DeltaTime)
 		bIsHovering = false;
 	}
 	
-	//UIFocus();
+	UIFocus();
 	UIHold();
 }
 

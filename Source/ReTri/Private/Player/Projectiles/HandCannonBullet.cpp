@@ -19,9 +19,9 @@ AHandCannonBullet::AHandCannonBullet()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	CollisionComp->SetSphereRadius(25.f);
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel6);
+	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel5);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap); // dark moon
+	CollisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap); // dark moon
 	CollisionComp->SetGenerateOverlapEvents(true);
 	RootComponent = CollisionComp;
 	

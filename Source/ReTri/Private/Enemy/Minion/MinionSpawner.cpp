@@ -5,6 +5,7 @@
 
 #include "Enemy/Minion/MinionSpawner.h"
 
+#include "MapSubSystem.h"
 #include "Components/BoxComponent.h"
 #include "Enemy/Minion/Minion.h"
 #include "Kismet/GameplayStatics.h"
@@ -40,10 +41,20 @@ void AMinionSpawner::Tick(float DeltaTime)
 void AMinionSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA(APlayerCharacter::StaticClass()))
+	// === Level Clear ===
+	if (auto MapSub = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UMapSubSystem>())
 	{
-		CreateMinion();
-		BoxComp->OnComponentBeginOverlap.RemoveDynamic(this,&AMinionSpawner::OnOverlapBegin);
+		if (MapSub->CurMapDatas[MapSub->CurMapIndex].bIsCleared)
+		{
+			MapSub->LevelClear();
+			return;
+		}
+		
+		if (OtherActor->IsA(APlayerCharacter::StaticClass()))
+		{
+			CreateMinion();
+			BoxComp->OnComponentBeginOverlap.RemoveDynamic(this,&AMinionSpawner::OnOverlapBegin);
+		}
 	}
 }
 
@@ -74,6 +85,14 @@ void AMinionSpawner::AddMinionDeathCount()
 	if (CurrentDeathCount >= MaxlMinionCount)
 	{
 		SCREENLOG("전멸.");
+		
+		if (auto GI = UGameplayStatics::GetGameInstance(GetWorld()))
+		{
+			if (auto MapSub = GI->GetSubsystem<UMapSubSystem>())
+			{
+				MapSub->LevelClear();
+			}
+		}
 	}
 }
 

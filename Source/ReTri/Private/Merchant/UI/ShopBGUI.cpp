@@ -3,23 +3,30 @@
 
 #include "Merchant/UI/ShopBGUI.h"
 
+#include "Components/TextBlock.h"
+#include "Components/WrapBox.h"
 #include "Merchant/UI/ShopSlotUI.h"
 
-UShopSlotUI* UShopBGUI::AddButton(FString Title, FString Info, int32 Index, FLinearColor Color)
+UShopSlotUI* UShopBGUI::AddButton(int32 Number, UTexture2D* ItemIcon, int32 GoldText, FLinearColor Color)
 {
 	if (!ShopSlotUIClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ShopSlotUI: ButtonClass가 설정되지 않았습니다."));
+		UE_LOG(LogTemp, Warning, TEXT("ShopSlotUI: UShopSlotUI가 설정되지 않았습니다."));
 		return nullptr;
 	}
 	
 	UShopSlotUI* ShopSlot = CreateWidget<UShopSlotUI>(this, ShopSlotUIClass);
-	//todo 여기 매개변수랑 이런거 바꿔야함
-	//!! Slot->ItemIcon = ItemIcon;
-	//!! Slot->GoldText = GoldText;
+	ShopSlot->ClearFlags(RF_Transactional); // PIE World Leak 방지
+	ShopSlot->SetItemIcon(ItemIcon);
+	ShopSlot->SetGoldText(GoldText, Color);
+	ShopSlot->SlotNumber = Number;
+	
+	ItemWrapBox->AddChildToWrapBox(ShopSlot);
+	
 	return ShopSlot;
 }
 
 void UShopBGUI::ClearButtons()
 {
+	ItemWrapBox->ClearChildren();
 }
