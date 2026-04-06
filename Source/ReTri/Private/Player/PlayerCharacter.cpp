@@ -131,6 +131,13 @@ APlayerCharacter::APlayerCharacter()
 	{
 		ia_Interaction = TempInteractionInput.Object;
 	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> TempPickUpInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_PickUp.IA_PickUp'"));
+	if (TempPickUpInput.Succeeded())
+	{
+		ia_PickUp = TempPickUpInput.Object;
+	}
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> TempIMC(
 		TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Inputs/IMC_Player.IMC_Player'"));
@@ -276,6 +283,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			                        &APlayerCharacter::OnTravelerMemory2);
 			playerInput->BindAction(ia_Dash, ETriggerEvent::Started, this, &APlayerCharacter::OnDash);
 			playerInput->BindAction(ia_Interaction, ETriggerEvent::Started, this, &APlayerCharacter::OnInteraction);
+			playerInput->BindAction(ia_PickUp, ETriggerEvent::Started, this, &APlayerCharacter::OnPickUp);
 		}
 	}
 }
@@ -389,10 +397,19 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 				PSC->SetWorldScale3D(FVector(EnhancedShotEffectScale));
 			}
 		}
+		
+		// 총구에 남아있는 이펙트 (총알과 별개로 제자리에 터짐)
+		if (EnhancedMuzzleParticle)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(
+				GetWorld(), EnhancedMuzzleParticle, MuzzleLocation,
+				Direction.Rotation(), FVector(EnhancedShotEffectScale)
+			);
+		}
 	}
 	else if (SpawnedBullet)
 	{
-		UE_LOG(LogTemp, Log, TEXT("[Attack] 일반탄 %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
+		// UE_LOG(LogTemp, Log, TEXT("[Attack] 일반탄 %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
 	}
 }
 
@@ -564,6 +581,45 @@ void APlayerCharacter::Interaction()
 
 			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 			GI->DebugStat();
+
+			return;
+		}
+	}
+}
+
+void APlayerCharacter::OnPickUp(const struct FInputActionValue& inputValue)
+{
+	// G 키를 눌렀을 때 오브젝트 들과 상호작용 할 수 있도록 
+
+	// 감지하고자 하는 오브젝트 타입
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
+
+	// 제외할 Actors 
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+
+	DrawDebugSphere(GetWorld(), GetActorLocation(), 42.f, 16, FColor::Red);
+
+	// 근처에 Interaction Object가 있는지 감지 
+	TArray<AActor*> OutActors;
+	bool bHit = UKismetSystemLibrary::SphereOverlapActors(GetWorld(),
+														  GetActorLocation(),
+														  42.f,
+														  ObjectTypes,
+														  AActor::StaticClass(),
+														  IgnoreActors,
+														  OutActors);
+
+	if (!bHit) return;
+	for (AActor* Actor : OutActors)
+	{
+		if (Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+		{
+			/*IInteractableInterface::Execute_Interact(Actor);
+
+			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+			GI->DebugStat();*/
 
 			return;
 		}

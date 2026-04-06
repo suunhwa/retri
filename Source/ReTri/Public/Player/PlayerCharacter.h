@@ -102,6 +102,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Interaction")
 	TObjectPtr<UInputAction> ia_Interaction;
 	
+	// item pick up
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Interaction")
+	TObjectPtr<UInputAction> ia_PickUp;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Inputs")
 	TObjectPtr<UInputMappingContext> imc_Player;
 
@@ -119,6 +123,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TObjectPtr<UParticleSystem> EnhancedShotParticle;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TObjectPtr<UParticleSystem> EnhancedMuzzleParticle;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	float EnhancedShotEffectScale = 1.f;
@@ -170,6 +177,7 @@ private:
 	void OnSkillE(const struct FInputActionValue& inputValue);
 	void OnTravelerMemory2(const struct FInputActionValue& inputValue);
 	void OnInteraction(const struct FInputActionValue& inputValue);
+	void OnPickUp(const struct FInputActionValue& inputValue);
 	
 private:
 	UFUNCTION()

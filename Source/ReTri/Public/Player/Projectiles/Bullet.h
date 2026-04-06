@@ -19,10 +19,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 public:
 	// 발사체
 	UPROPERTY(VisibleAnywhere)
@@ -43,9 +39,27 @@ public:
 	void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 		bool bFromSweep, const FHitResult& SweepResult);
+	
+	// 일반탄 히트 이펙트
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UParticleSystem> ImpactEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<USoundBase> ImpactSound;
+
+	// 강화탄 히트 이펙트
+	UPROPERTY(EditDefaultsOnly, Category="Effects|Enhanced")
+	TObjectPtr<UParticleSystem> EnhancedImpactEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects|Enhanced")
+	TObjectPtr<USoundBase> EnhancedImpactSound;
 
 public:
 	void SetBulletDamage(float InDamage) { Damage = InDamage; }
 	float GetBulletDamage() const { return Damage; }
-	void SetEnhanced() {}
+	void SetEnhanced();
+	
+	private:
+private:
+	bool bIsEnhanced = false;
 };
