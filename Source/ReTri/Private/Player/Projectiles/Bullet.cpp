@@ -43,11 +43,9 @@ void ABullet::BeginPlay()
 	collisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnOverlap);
 }
 
-// Called every frame
-void ABullet::Tick(float DeltaTime)
+void ABullet::SetEnhanced()
 {
-	Super::Tick(DeltaTime);
-
+	bIsEnhanced = true;
 }
 
 void ABullet::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -57,7 +55,16 @@ void ABullet::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	if(!OtherActor || OtherActor == GetOwner()) return;
 
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
+
+	UParticleSystem* HitFX    = bIsEnhanced && EnhancedImpactEffect ? EnhancedImpactEffect : ImpactEffect;
+	USoundBase*      HitSound = bIsEnhanced && EnhancedImpactSound  ? EnhancedImpactSound  : ImpactSound;
+
+	if (HitFX)
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, GetActorLocation());
+
+	if (HitSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+	
+	
 	Destroy();
 }
-
-

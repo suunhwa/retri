@@ -169,6 +169,15 @@ void USkillSlotUI::UpdateIconDisplay()
 	if (!IconTex)
 		IconTex = FallbackIcon;
 
+	// 텍스처가 없으면 아이콘 자체를 숨김 (null을 material에 넘기면 이전 텍스처가 잔류함)
+	if (!IconTex)
+	{
+		IconImg->SetVisibility(ESlateVisibility::Hidden);
+		return;
+	}
+
+	IconImg->SetVisibility(ESlateVisibility::HitTestInvisible);
+	
 	if (IconMI)
 	{
 		IconMI->SetTextureParameterValue(TEXT("IconTexture"), IconTex);
