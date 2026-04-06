@@ -20,6 +20,9 @@ void UDropItemUI::SetItemIcon(UTexture2D* Texture)
 	FSlateBrush Brush;
 	Brush.SetResourceObject(Texture);
 	Brush.SetImageSize(FVector2D(65.0f, 65.f));
+	Brush.DrawAs = ESlateBrushDrawType::RoundedBox;
+	Brush.OutlineSettings.RoundingType = ESlateBrushRoundingType::HalfHeightRadius;
+	
 	ItemIcon->SetBrush(Brush);
 }
 
