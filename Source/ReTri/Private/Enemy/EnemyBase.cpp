@@ -472,7 +472,7 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 
 	float Width = 110.f;
 	float Length = 2400.f;
-	float Height = 50.f;
+	float Height = 100.f;
 
 	FVector Forward = Clone->GetActorForwardVector();
 
@@ -543,21 +543,19 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 
 void AEnemyBase::ExecuteReinforcedDash(FVector StartLoc, FRotator DashRot)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("강화 대쉬 함수 실행됨!"));
-	
 	UWorld* World = GetWorld();
 	if (!World) return;
 
 	int32 NumberOfClones = 1;      // 소환할 분신 개수
 	float DistanceBetween = 400.f; // 분신 간의 간격
-	float TimeDelay = 0.1f;        // 분신이 나타나는 시간차 (잔상 효과)
+	float TimeDelay = 0.1f;        // 분신이 나타나는 시간차
 
 	for (int32 i = 1; i <= NumberOfClones; i++)
 	{
-		// 1. 소환될 위치 계산 (보스가 바라보는 방향으로 순차적 배치)
+		// 소환될 위치 계산 (보스가 바라보는 방향으로 순차적 배치)
 		FVector SpawnLocation = StartLoc + (DashRot.Vector() * (DistanceBetween * i));
         
-		// 2. 시간차를 두고 분신 소환 (람다 캡처 주의)
+		// 시간차를 두고 분신 소환 (람다 캡처 주의)
 		FTimerHandle CloneTimer;
 		GetWorldTimerManager().SetTimer(CloneTimer, [this, World, SpawnLocation, DashRot]()
 		{
@@ -574,12 +572,8 @@ void AEnemyBase::ExecuteReinforcedDash(FVector StartLoc, FRotator DashRot)
 					NewClone->PlayAnimMontage(CloneAttackMontage);
 				}
 
-				// [TA 팁] 분신이 공격 후 자연스럽게 사라지도록 설정
-				// 1초 뒤에 파괴하거나, 애니메이션 끝날 때 파괴 로직 추가
+				// 분신이 공격 후 자연스럽게 사라지도록 설정
 				NewClone->SetLifeSpan(1.2f); 
-                
-				// (선택) 아까 만든 장판 초기화 함수가 있다면 여기서 호출!
-				// NewClone->InitCloneDecal(200.f, 500.f);
 			}
 		}, i * TimeDelay, false);
 	}

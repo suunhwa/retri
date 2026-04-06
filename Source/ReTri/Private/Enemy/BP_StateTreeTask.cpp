@@ -86,7 +86,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		else
 		{
 			RealPhase = 2;
-			SkillPool = { 0, 2, 2, 3, 3, 5, 5 };
+			SkillPool = { 0, 1, 1, 3, 3, 6, 6 };
 		}
 	}
 	else							// 1페이즈
