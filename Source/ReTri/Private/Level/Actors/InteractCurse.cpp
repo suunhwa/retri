@@ -77,7 +77,7 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 		//SCREENLOG("맵을 %d구역 클리어하세요!", CurseData->CurseMap);
 		PickedQuestType = EActiveCurseQuest::ClearMaps;
 		PickedTargetCount = CurseData->CurseMap;
-		QuestMessage = FString::Printf(TEXT("맵을 4개 클리어하세요!"), PickedTargetCount);
+		QuestMessage = FString::Printf(TEXT("맵을 %d개 클리어하세요!"), PickedTargetCount);
 	}
 	SCREENLOG("%s", *QuestMessage);
 	
