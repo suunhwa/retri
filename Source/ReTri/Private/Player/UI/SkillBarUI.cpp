@@ -35,7 +35,7 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 		);
 	}
 
-	// ---- 핸드캐논 (RMB) ----
+	// ---- 핸드캐논 (RMB) — 초기 장착, 교체 가능 ----
 	if (SlotRMB)
 	{
 		SlotRMB->InitSlot(
@@ -71,7 +71,7 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 		);
 	}
 
-	// ---- 빠른손 (R) ----
+	// ---- 빠른손 (R) — 초기 장착, 교체 가능 ----
 	if (SlotR)
 	{
 		SlotR->InitSlot(
@@ -99,9 +99,18 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 
 void USkillBarUI::HandleSlotDrop(USkillSlotUI* SourceSlot, USkillSlotUI* TargetSlot)
 {
-	if (!AbilityComp || !SourceSlot || !TargetSlot) return;
+	if (!AbilityComp || !SourceSlot) return;
 
 	const EAbilitySlot SrcSlot = SourceSlot->GetLinkedSlot();
+
+	// TargetSlot == nullptr : 스킬바 밖으로 드래그 → 바닥에 드롭 후 슬롯 비움
+	if (!TargetSlot)
+	{
+		FVector DropLocation = AbilityComp->GetOwner()->GetActorLocation();
+		AbilityComp->DropSkill(SrcSlot, DropLocation);
+		return;
+	}
+
 	const EAbilitySlot DstSlot = TargetSlot->GetLinkedSlot();
 
 	UAbilityBase* SrcAbility = SourceSlot->GetLinkedSkill();

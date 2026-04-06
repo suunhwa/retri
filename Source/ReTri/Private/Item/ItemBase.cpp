@@ -10,6 +10,7 @@
 #include "Level/Actors/GoodsDreamPowder.h"
 #include "Navigation/CrowdFollowingComponent.h"
 #include "Player/PlayerCharacter.h"
+#include "Player/Components/AbilityComponent.h"
 #include "ReTri/ReTri.h"
 
 class UInteractableUI;
@@ -78,8 +79,37 @@ void AItemBase::Acquire_Implementation()
 {
 	ISkillItemInterface::Acquire_Implementation();
 	
-	// todo F 습득 행동 
-	SCREENLOG("습득하는 경우와 인벤토리가 가득 차있는 경우");
+	/*// todo F 습득 행동 
+	SCREENLOG("습득하는 경우와 인벤토리가 가득 차있는 경우");*/
+	
+	if (!AbilityClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AItemBase::Acquire — AbilityClass 미설정"));
+		return;
+	}
+
+	APlayerCharacter* Player = Cast<APlayerCharacter>(
+		UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (!Player) return;
+
+	UAbilityComponent* AbilityComp = Player->GetAbilityComponent();
+	if (!AbilityComp) return;
+
+	// 빈 슬롯 있으면 장착
+	if (AbilityComp->EquipAcquiredSkill(AbilityClass))
+	{
+		if (EquipSuccessSound)
+			UGameplayStatics::PlaySound2D(GetWorld(), EquipSuccessSound);
+
+		Destroy();
+	}
+	else
+	{
+		// 모두 꽉 참 — 사운드만 재생
+		// 플레이어 쪽에서 스킬 버리고 다시 픽업
+		if (EquipFullSound)
+			UGameplayStatics::PlaySound2D(GetWorld(), EquipFullSound);
+	}
 }
 
 void AItemBase::Hold_Implementation(AActor* PlayerActor)

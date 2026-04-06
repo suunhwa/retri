@@ -5,7 +5,9 @@
 
 #include "ReTriGameInstance.h"
 #include "GameFramework/Character.h"
+#include "Item/ItemBase.h"
 #include "Player/Abilities/AbilityBase.h"
+#include "Player/Data/PlayerSkillData.h"
 
 
 // Sets default values for this component's properties
@@ -44,10 +46,9 @@ void UAbilityComponent::BeginPlay()
 			return;
 		}
 	}
+	// 초기 장착: 대시 + 핸드캐논(RMB) + 빠른손(R) 만 장착. Q/E 슬롯은 빈 상태로 시작
 	RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);
 	RegisterAbility(EAbilitySlot::TravelerMemory1, TravelerMemory1Class);
-	RegisterAbility(EAbilitySlot::SkillQ, SkillQClass);
-	RegisterAbility(EAbilitySlot::SkillE, SkillEClass);
 	RegisterAbility(EAbilitySlot::TravelerMemory2, TravelerMemory2Class);
 	
 }
@@ -98,20 +99,53 @@ void UAbilityComponent::SetSkill(EAbilitySlot Slot, TSubclassOf<UAbilityBase> Ab
 
 bool UAbilityComponent::EquipAcquiredSkill(TSubclassOf<UAbilityBase> AbilityClass)
 {
-	// Q 슬롯 먼저, 비어있으면 장착
-	if (!GetAbility(EAbilitySlot::SkillQ))
+	// 교체 가능한 4개 슬롯 중 빈 슬롯에 장착 (Q→E→RMB→R 순)
+	// 슬롯 간 스왑으로 배치가 바뀔 수 있으므로 고정 슬롯(Dash)만 제외하고 전부 확인
+	constexpr EAbilitySlot Swappable[] = {
+		EAbilitySlot::SkillQ,
+		EAbilitySlot::SkillE,
+		EAbilitySlot::TravelerMemory1,
+		EAbilitySlot::TravelerMemory2,
+	};
+
+	for (EAbilitySlot Slot : Swappable)
 	{
-		SetSkill(EAbilitySlot::SkillQ, AbilityClass);
-		return true;
+		if (!GetAbility(Slot))
+		{
+			SetSkill(Slot, AbilityClass);
+			return true;
+		}
 	}
-	// E 슬롯 비어있으면 장착
-	if (!GetAbility(EAbilitySlot::SkillE))
-	{
-		SetSkill(EAbilitySlot::SkillE, AbilityClass);
-		return true;
-	}
-	// 둘 다 차있으면 실패 (상점에서 슬롯 선택 UI 필요)
 	return false;
+}
+
+
+void UAbilityComponent::DropSkill(EAbilitySlot Slot, FVector SpawnLocation)
+{
+	UAbilityBase* Ability = GetAbility(Slot);
+	if (!Ability) return;
+
+	if (DropItemClass)
+	{
+		UWorld* World = GetWorld();
+		AItemBase* Item = World->SpawnActor<AItemBase>(DropItemClass, SpawnLocation, FRotator::ZeroRotator);
+		if (Item)
+		{
+			Item->AbilityClass = Ability->GetClass();
+
+			// 데이터 테이블에서 스킬 정보 조회해 아이템 UI 초기화
+			if (SkillDataTable && Ability->DataTableRowName != NAME_None)
+			{
+				if (FPlayerSkillData* Row = SkillDataTable->FindRow<FPlayerSkillData>(
+					Ability->DataTableRowName, TEXT("DropSkill")))
+				{
+					Item->DataInit(*Row);
+				}
+			}
+		}
+	}
+
+	SetSkill(Slot, nullptr);
 }
 
 void UAbilityComponent::RegisterAbility(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass)
