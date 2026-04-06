@@ -81,6 +81,7 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	{
 	case EChaosType::Chaos_Health:
 		GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, Val);
+		GI->HealthComp->Heal(GI->StatComp->GetMaxHP());
 		break;
 	case EChaosType::Chaos_AttackDamage:
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Val);
