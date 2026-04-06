@@ -33,7 +33,7 @@ void UStatComponent::BeginPlay()
 
 	if (GI && GI->bHasSavedStats)
 	{
-		const FPlayerStatInfo& SavedInfo = GI->CurPlayerStats;
+		const FPlayerStatInfo SavedInfo = GI->CurPlayerStats;
 
 		Gold = SavedInfo.Gold;
 		DreamDust = SavedInfo.DreamDust;
