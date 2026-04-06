@@ -77,8 +77,40 @@ void AEnemyBase::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 	
-	bIsJumpDownAttacking = false;
+	if (bIsJumpDownAttacking)
+	{
+		if (bIsEnhancedJump)
+		{
+			ExecuteEnhancedJumpDownDamage();
+		}
+		else
+		{
+			ExecuteJumpDownDamage();
+		}
+
+		// 상태 초기화
+		bIsJumpDownAttacking = false;
+		bIsEnhancedJump = false;
+	}
 	
+	// 데칼 정리
+	if (CircleDecalComp)
+	{
+		CircleDecalComp->DestroyComponent();
+		CircleDecalComp = nullptr;
+	}
+
+	if (CrossDecalHorizontal)
+	{
+		CrossDecalHorizontal->DestroyComponent();
+		CrossDecalHorizontal = nullptr;
+	}
+
+	if (CrossDecalVertical)
+	{
+		CrossDecalVertical->DestroyComponent();
+		CrossDecalVertical = nullptr;
+	}
 }
 
 // Called every frame
@@ -213,6 +245,7 @@ void AEnemyBase::RotateToTarget(float DeltaTime, float InterpSpeed)
 	SetActorRotation(NewRot);
 }
 
+// ---------------------------------------- 점프 다운
 void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Decal)
 {
 	CircleDecalComp = UGameplayStatics::SpawnDecalAtLocation
@@ -299,6 +332,7 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 	}
 }
 
+// ---------------------------------------- 분신 검기
 void AEnemyBase::SpawnClones()
 {
 	for (AEnemyBase* Clone : ActiveClones)
@@ -415,6 +449,7 @@ void AEnemyBase::InitCloneDecal(float Width, float Length)
 	}
 }
 
+// ---------------------------------------- 분신검기 데칼
 void AEnemyBase::StartDecalProgress(float Duration)
 {
 	if (!DynamicBoxDecal) return;
@@ -451,8 +486,10 @@ void AEnemyBase::StartDecalProgress(float Duration)
 	);
 }
 
+// ---------------------------------------- 점프다운 대미지
 void AEnemyBase::ExecuteJumpDownDamage()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ExecuteJumpDownDamage Called"));
 	FVector ImpactLocation = GetActorLocation();
 	
 	TArray<AActor*> IgnoreActors;
@@ -473,6 +510,7 @@ void AEnemyBase::ExecuteJumpDownDamage()
 	DrawDebugSphere(GetWorld(), ImpactLocation, JumpDownDamageRadius, 24, bHit ? FColor::Red : FColor::Green, false, 2.0f);
 }
 
+// ---------------------------------------- 분신검기 대미지
 void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 {
 	if (!Clone) return;
@@ -511,14 +549,14 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 		if (C) IgnoreActors.Add(C);
 	}
 
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	// TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	// ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel5));
 
 	bool bHit = UKismetSystemLibrary::BoxOverlapActors(
 		World,
 		BoxCenter,
 		BoxExtent,
-		ObjectTypes,
+		{},
 		ACharacter::StaticClass(),
 		IgnoreActors,
 		OverlappedActors
@@ -528,13 +566,19 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 	{
 		for (AActor* Actor : OverlappedActors)
 		{
-			UGameplayStatics::ApplyDamage(
-				Actor,
-				CurrentSkillDamage,
-				GetController(),
-				this,
-				nullptr
-			);
+			ACharacter* Player = Cast<ACharacter>(Actor);
+			if (!Player) continue;
+			
+			if (Player->IsPlayerControlled())
+			{
+				UGameplayStatics::ApplyDamage(
+					Actor,
+					CurrentSkillDamage,
+					GetController(),
+					this,
+					nullptr
+				);
+			}
 		}
 	}
 
@@ -551,6 +595,7 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 	);
 }
 
+// ---------------------------------------- 강화 대쉬
 void AEnemyBase::ExecuteReinforcedDash(FVector StartLoc, FRotator DashRot)
 {
 	UWorld* World = GetWorld();
@@ -587,4 +632,258 @@ void AEnemyBase::ExecuteReinforcedDash(FVector StartLoc, FRotator DashRot)
 			}
 		}, i * TimeDelay, false);
 	}
+}
+
+
+// ---------------------------------------- 강화 점프
+void AEnemyBase::SpawnEnhancedJumpDecal(FVector Location, class UMaterialInterface* CircleDecal,
+	class UMaterialInterface* CrossDecal)
+{
+	CircleDecalComp = UGameplayStatics::SpawnDecalAtLocation(
+		GetWorld(),
+		CircleDecal,
+		FVector(700.f, 700.f, 700.f),
+		Location,
+		FRotator(-90.f, 0.f, 0.f),
+		2.0f
+	);
+
+	CrossDecalHorizontal = UGameplayStatics::SpawnDecalAtLocation(
+		GetWorld(),
+		CrossDecal,
+		FVector(250.f, 200.f, 3200.f),
+		Location,
+		FRotator(-90.f, 0.f, 0.f),
+		2.0f
+	);
+
+	CrossDecalVertical = UGameplayStatics::SpawnDecalAtLocation(
+		GetWorld(),
+		CrossDecal,
+		FVector(250.f, 200.f, 3200.f),
+		Location,
+		FRotator(-90.f, 90.f, 0.f),
+		2.0f
+	);
+
+	if (CrossDecalHorizontal)
+	{
+		CrossDecalHorizontal->SetVisibility(false);
+	}
+
+	if (CrossDecalVertical)
+	{
+		CrossDecalVertical->SetVisibility(false);
+	}
+
+	UMaterialInstanceDynamic* CircleMID = nullptr;
+
+	if (CircleDecalComp)
+	{
+		CircleMID = CircleDecalComp->CreateDynamicMaterialInstance();
+	}
+
+	if (CircleMID)
+	{
+		float UpdateInterval = 0.02f;
+
+		TSharedPtr<FTimerHandle> TimerHandlePtr = MakeShared<FTimerHandle>();
+		TWeakObjectPtr<AEnemyBase> WeakThis = this;
+		UWorld* WorldContext = GetWorld();
+
+		WorldContext->GetTimerManager().SetTimer(
+			*TimerHandlePtr,
+			[WeakThis, WorldContext, CircleMID, TimerHandlePtr, Location, Progress = 0.0f]() mutable
+			{
+				if (!WeakThis.IsValid())
+				{
+					if (IsValid(WorldContext))
+					{
+						WorldContext->GetTimerManager().ClearTimer(*TimerHandlePtr);
+					}
+					return;
+				}
+
+				AEnemyBase* Boss = WeakThis.Get();
+				if (!Boss) return;
+
+				if (!IsValid(CircleMID))
+				{
+					Boss->GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
+					return;
+				}
+
+				Progress += (0.5f / (1.0f / 0.02f));
+				float ClampedProgress = FMath::Min(Progress, 0.5f);
+
+				CircleMID->SetScalarParameterValue(TEXT("Progress Circle"), ClampedProgress);
+
+				// 막판에만 십자 표시
+				if (Progress >= 0.42f)
+				{
+					if (Boss->CrossDecalHorizontal)
+					{
+						Boss->CrossDecalHorizontal->SetVisibility(true);
+					}
+
+					if (Boss->CrossDecalVertical)
+					{
+						Boss->CrossDecalVertical->SetVisibility(true);
+					}
+				}
+
+				if (Progress >= 0.5f)
+				{
+					Boss->GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
+
+					FVector DownStartLoc = Location + FVector(0.0f, 0.0f, 1500.0f);
+					Boss->SetActorLocation(DownStartLoc, false);
+
+					Boss->SetActorHiddenInGame(false);
+					Boss->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+					Boss->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+
+					Boss->LaunchCharacter(FVector(0, 0, -5000.f), true, true);
+					Boss->PlayAnimMontage(Boss->DownMontage, 1.0f);
+				}
+			},
+			UpdateInterval,
+			true
+		);
+	}
+}
+
+// ---------------------------------------- 강화 점프다운 원형 대미지
+void AEnemyBase::ExecuteEnhancedJumpDownDamage()
+{
+	// UE_LOG(LogTemp, Warning, TEXT("ExecuteEnhancedJumpDownDamage Called"));
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	FVector ImpactLocation = GetActorLocation();
+
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+
+	// 원형 대미지
+	UGameplayStatics::ApplyRadialDamage(
+		World,
+		CurrentSkillDamage,
+		ImpactLocation,
+		JumpDownDamageRadius,
+		nullptr,
+		IgnoreActors,
+		this,
+		GetInstigatorController(),
+		false
+	);
+
+	// 십자 대미지 호출
+	ExecuteJumpCrossDamage(ImpactLocation);
+
+	DrawDebugSphere(
+		World,
+		ImpactLocation,
+		JumpDownDamageRadius,
+		24,
+		FColor::Red,
+		false,
+		2.0f
+	);
+}
+
+// ---------------------------------------- 강화 점프다운 십자 대미지
+void AEnemyBase::ExecuteJumpCrossDamage(FVector ImpactLocation)
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	const float CrossLength = 3200.f;
+	const float CrossThickness = 200.f;
+	const float Height = 250.f;
+
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(this);
+
+	TArray<AActor*> OverlappedActors;
+	TSet<AActor*> HitActors;
+
+	// 가로
+	UKismetSystemLibrary::BoxOverlapActors(
+		World,
+		ImpactLocation,
+		FVector(CrossLength * 0.5f, CrossThickness * 0.5f, Height * 0.5f),
+		{},
+		ACharacter::StaticClass(),
+		IgnoreActors,
+		OverlappedActors
+	);
+
+	for (AActor* Actor : OverlappedActors)
+	{
+		if (ACharacter* Player = Cast<ACharacter>(Actor))
+		{
+			if (Player->IsPlayerControlled())
+			{
+				HitActors.Add(Player);
+			}
+		}
+	}
+
+	OverlappedActors.Empty();
+
+	// 세로
+	UKismetSystemLibrary::BoxOverlapActors(
+		World,
+		ImpactLocation,
+		FVector(CrossThickness * 0.5f, CrossLength * 0.5f, Height * 0.5f),
+		{},
+		ACharacter::StaticClass(),
+		IgnoreActors,
+		OverlappedActors
+	);
+
+	for (AActor* Actor : OverlappedActors)
+	{
+		if (ACharacter* Player = Cast<ACharacter>(Actor))
+		{
+			if (Player->IsPlayerControlled())
+			{
+				HitActors.Add(Player);
+			}
+		}
+	}
+
+	for (AActor* Actor : HitActors)
+	{
+		UGameplayStatics::ApplyDamage(
+			Actor,
+			CurrentSkillDamage,
+			GetInstigatorController(),
+			this,
+			nullptr
+		);
+	}
+
+	DrawDebugBox(
+		World,
+		ImpactLocation,
+		FVector(CrossLength * 0.5f, CrossThickness * 0.5f, Height * 0.5f),
+		FColor::Blue,
+		false,
+		2.0f,
+		0,
+		3.0f
+	);
+
+	DrawDebugBox(
+		World,
+		ImpactLocation,
+		FVector(CrossThickness * 0.5f, CrossLength * 0.5f, Height * 0.5f),
+		FColor::Blue,
+		false,
+		2.0f,
+		0,
+		3.0f
+	);
 }
