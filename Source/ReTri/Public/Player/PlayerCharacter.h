@@ -20,6 +20,8 @@ class UInputMappingContext;
 class UNiagaraSystem;
 class UParticleSystem;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttackCountChanged, int32, Count);
+
 UCLASS()
 class RETRI_API APlayerCharacter : public ACharacter
 {
@@ -62,7 +64,9 @@ public:
 
 // getter (성소 상호작용)
 public:
+	UFUNCTION(BlueprintPure, Category="Components")
 	UHealthComponent* GetHealthComponent() const { return HealthComp; }
+	
 	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; }
 	UStatComponent* GetStatComponent() const { return StatComp; }
 
@@ -125,7 +129,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> DeathMontage;
 	
+	// 사망 애니메이션 길이 (초) - 이 시간 후 게임 일시정지
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	float DeathAnimDuration = 2.3f;
+	
 public:
+	UPROPERTY(BlueprintAssignable, Category="Combat")
+	FOnAttackCountChanged OnAttackCountChanged;
+	
 	UPROPERTY(EditAnywhere, Category="Combat|Left")
 	int32 AttackCount = 0;
 	

@@ -9,28 +9,30 @@
 class UCapsuleComponent;
 class UNiagaraComponent;
 
+/**
+ * 대규모 정화 AoE 액터
+ * 플레이어 위치 기준 구체 범위 내 적에게 즉발 빛 피해 적용
+ * DoT 없음, 원소 효과 메커니즘 생략
+ */
 UCLASS()
 class RETRI_API AMassCleanseAoE : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AMassCleanseAoE();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	/** 스킬 발동 전 AbilityPower 주입 */
+	/** AbilityPower·Instigator 주입 (SpawnActorDeferred 직후 호출) */
 	void Init(float InAbilityPower, AController* InInstigator);
 
 private:
-	void ApplyInitialHit();
-	void ApplyDoTTick();
-	void FinishDoT();
-	
+	void ApplyHit();
+	void FinishEffect();
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCapsuleComponent> HitVolume;
 
@@ -39,40 +41,24 @@ private:
 
 	float AbilityPower = 0.f;
 
-	// 즉발 계수
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
-	float ImmediateDamageCoeff = 2.5f;
-
-	// DoT 총 피해 계수
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
-	float DoTDamageCoeff = 2.75f;
-
-	// DoT 지속 시간 (초)
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
-	float DoTDuration = 2.4f;
-
-	// DoT 틱 간격
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
-	float DoTTickInterval = 0.4f;
-
-	// 경직 지속 시간
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
-	float StaggerDuration = 0.25f;
+	// 즉발 피해 계수 (AP × 3.0 = 300%)
+	UPROPERTY(EditDefaultsOnly, Category="MassCleanse")
+	float DamageCoeff = 3.0f;
 
 	// AoE 반경
-	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
-	float HitRadius = 200.f;
+	UPROPERTY(EditDefaultsOnly, Category="MassCleanse")
+	float HitRadius = 250.f;
+
+	// 이펙트 지속 후 액터 소멸까지의 시간 (저지 불가 지속 시간과 동일)
+	UPROPERTY(EditDefaultsOnly, Category="MassCleanse")
+	float EffectDuration = 1.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> ImpactSound;
 
 	TWeakObjectPtr<AController> InstigatorController;
 
-	FTimerHandle DoTTimerHandle;
 	FTimerHandle LifeTimerHandle;
 
-	float DoTDamagePerTick = 0.f;
-
-	/** 현재 범위 내 적 수집 */
 	TArray<TWeakObjectPtr<AActor>> GetEnemiesInRange() const;
 };

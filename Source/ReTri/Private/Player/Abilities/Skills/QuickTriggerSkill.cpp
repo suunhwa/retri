@@ -53,10 +53,10 @@ void UQuickTriggerSkill::Activate(ACharacter* Owner)
 	);
 	
 	// 공격력 가져오기
-	float BaseDamage = 10.f;
+	float AttackDamage = 10.f;
 	if (UStatComponent* StatComp = Player->GetStatComponent())
 	{
-		BaseDamage = StatComp->GetAttackPower();
+		AttackDamage = StatComp->GetAttackPower();
 	}
 	
 	// 공격 속도로 발사 간격 계산
@@ -71,16 +71,16 @@ void UQuickTriggerSkill::Activate(ACharacter* Owner)
 	TWeakObjectPtr<ACharacter> WeakOwner(Owner);
 	
 	// 1번탄 즉시 발사 (120%)
-	FireShot(WeakOwner, 0, Direction, BaseDamage);
+	FireShot(WeakOwner, 0, Direction, AttackDamage);
 	
 	// 2번탄 즉시 발사 (150%)
 	FTimerDelegate Del2;
-	Del2.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 1, Direction, BaseDamage);
+	Del2.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 1, Direction, AttackDamage);
 	Owner->GetWorldTimerManager().SetTimer(FireTimerHandle2, Del2, FireDelay, false);
 	
 	// 3번탄 즉시 발사 (420%)
 	FTimerDelegate Del3;
-	Del3.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 2, Direction, BaseDamage);
+	Del3.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 2, Direction, AttackDamage);
 	Owner->GetWorldTimerManager().SetTimer(FireTimerHandle3, Del3, FireDelay * 2.f, false);
 	
 	// effects
@@ -97,7 +97,7 @@ void UQuickTriggerSkill::Activate(ACharacter* Owner)
 void UQuickTriggerSkill::FireShot(TWeakObjectPtr<ACharacter> WeakOwner,
 	int32 ShotIndex,
 	FVector Direction,
-	float BaseDamage)
+	float AttackDamage)
 {
 	if (!WeakOwner.IsValid() || !PiercingBullet) return;
 	ACharacter* Owner = WeakOwner.Get();
@@ -121,7 +121,7 @@ void UQuickTriggerSkill::FireShot(TWeakObjectPtr<ACharacter> WeakOwner,
 	
 	if (Bullet)
 	{
-		Bullet->SetDamage(BaseDamage * DamageMultipliers[ShotIndex]);
+		Bullet->SetDamage(AttackDamage * DamageMultipliers[ShotIndex]);
 	}
 }
 

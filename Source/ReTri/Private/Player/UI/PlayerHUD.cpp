@@ -5,6 +5,13 @@
 
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Player/UI/SkillBarUI.h"
+
+void UPlayerHUD::InitSkillBar(UAbilityComponent* InAbilityComp)
+{
+	if (SkillBar && InAbilityComp)
+		SkillBar->InitSkillBar(InAbilityComp);
+}
 
 void UPlayerHUD::OnHPChanged(float CurrentHP, float MaxHP)
 {
@@ -12,7 +19,9 @@ void UPlayerHUD::OnHPChanged(float CurrentHP, float MaxHP)
 		HPBar->SetPercent(MaxHP > 0.f ? CurrentHP / MaxHP : 0.f);
 
 	if (HPText)
-		HPText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), FMath::RoundToInt(CurrentHP), FMath::RoundToInt(MaxHP))));
+		HPText->SetText(
+			FText::FromString(
+				FString::Printf(TEXT("%d / %d"), FMath::RoundToInt(CurrentHP), FMath::RoundToInt(MaxHP))));
 }
 
 void UPlayerHUD::OnStatChanged(EStatTypes StatType, float NewValue)

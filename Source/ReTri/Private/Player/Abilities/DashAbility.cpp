@@ -1,8 +1,11 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/Abilities/DashAbility.h"
+#include "Player/Abilities/DashGhostActor.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "TimerManager.h"
 
 void UDashAbility::Activate(ACharacter* Owner)
 {
@@ -16,4 +19,46 @@ void UDashAbility::Activate(ACharacter* Owner)
 	Dir.Normalize();
 
 	Owner->LaunchCharacter(Dir * DashImpulse, true, false);
+
+	// 잔상 생성 시작
+	if (GhostActorClass)
+	{
+		GhostSpawnedCount = 0;
+		GhostOwner = Owner;
+		Owner->GetWorldTimerManager().SetTimer(
+			GhostSpawnTimer,
+			this, &UDashAbility::SpawnGhost,
+			GhostSpawnInterval, true
+		);
+	}
+}
+
+void UDashAbility::SpawnGhost()
+{
+	if (!GhostOwner.IsValid() || !GhostActorClass) return;
+
+	ACharacter* Owner = GhostOwner.Get();
+	USkeletalMeshComponent* Mesh = Owner->GetMesh();
+	if (!Mesh) return;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ADashGhostActor* Ghost = Owner->GetWorld()->SpawnActor<ADashGhostActor>(
+		GhostActorClass,
+		Mesh->GetComponentLocation(),
+		Mesh->GetComponentRotation(),
+		SpawnParams
+	);
+
+	if (Ghost)
+	{
+		Ghost->Init(Mesh);
+	}
+
+	GhostSpawnedCount++;
+	if (GhostSpawnedCount >= GhostCount)
+	{
+		Owner->GetWorldTimerManager().ClearTimer(GhostSpawnTimer);
+	}
 }

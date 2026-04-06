@@ -8,6 +8,7 @@
 
 class UCapsuleComponent;
 class UNiagaraComponent;
+class UNiagaraSystem;
 
 /**
  * 불기둥 스킬이 소환하는 범위 Actor
@@ -69,7 +70,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> ImpactSound;
 
+	// DoT 중 적에게 붙는 불타는 이펙트
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UNiagaraSystem> BurnEffect;
+
 	TWeakObjectPtr<AController> InstigatorController;
+
+	// 붙인 번 이펙트 추적 (제거용)
+	TArray<TWeakObjectPtr<UNiagaraComponent>> BurnEffectComps;
 
 	FTimerHandle DoTTimerHandle;
 	FTimerHandle LifeTimerHandle;

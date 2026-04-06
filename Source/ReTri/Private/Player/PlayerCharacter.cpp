@@ -193,11 +193,14 @@ void APlayerCharacter::BeginPlay()
 				PlayerHUDWidget->OnHPChanged(HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
 				const int32 RequiredExp = StatComp->GetRequiredExpForLevel(StatComp->GetCurrentLevel() + 1);
 				PlayerHUDWidget->OnExpChanged(StatComp->GetCurrentExp(), RequiredExp, StatComp->GetCurrentLevel());
-			
+
 				// 초기 재화 표시
 				const FPlayerStatInfo InitStat = StatComp->GetStatInfo();
 				PlayerHUDWidget->OnStatChanged(EStatTypes::Gold, InitStat.Gold);
 				PlayerHUDWidget->OnStatChanged(EStatTypes::DreamDust, InitStat.DreamDust);
+
+				// 스킬바 초기화
+				PlayerHUDWidget->InitSkillBar(AbilityComp);
 			}
 		}
 	}
@@ -214,6 +217,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (CurrentTime - LastCombatTime >= CombatExitDelay)
 		{
 			bIsCombat = false;
+			
+			// 전투 이탈 시 공격 카운터 초기화 → 패시브 링 사라짐
+			if (AttackCount > 0)
+			{
+				AttackCount = 0;
+				OnAttackCountChanged.Broadcast(0);
+			}
 		}
 	}
 
@@ -322,6 +332,9 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	AttackCount++;
 	bool bIsEnhancedShot = (AttackCount >= 4);
 
+	// 리셋 전에 브로드캐스트 → 4타째에 100% 표시 후 다음 1타에서 리셋
+	OnAttackCountChanged.Broadcast(AttackCount);
+	
 	if (bIsEnhancedShot)
 	{
 		AttackCount = 0;
@@ -464,13 +477,35 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 	// 충돌 비활성화
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// 사망 몽타주 재생
+	// 사망 애니메이션 종료 후 게임 일시정지
+	FTimerHandle DeathPauseHandle;
+	GetWorldTimerManager().SetTimer(DeathPauseHandle, [this]()
+	{
+		UGameplayStatics::SetGamePaused(this, true);
+	}, DeathAnimDuration, false);
+	
+	/*// 사망 몽타주 재생
 	if (DeathMontage)
 	{
-		PlayAnimMontage(DeathMontage);
-	}
+		UAnimInstance* ai = GetMesh()->GetAnimInstance();
+		if (ai)
+		{
+			// 몽타주 종료 시점에 정확히 실행
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted)
+			{
+				if (!bInterrupted && GetMesh())
+				{
+					GetMesh()->bPauseAnims = true;
+					UGameplayStatics::SetGamePaused(this, true);
+				}
+			});
+			ai->Montage_Play(DeathMontage);
+			ai->Montage_SetEndDelegate(EndDelegate, DeathMontage);
+		}
+	}*/
 
-	// 일정 시간 후 레벨 재시작
+	/*// 일정 시간 후 레벨 재시작
 	FTimerHandle DeathTimerHandle;
 	GetWorldTimerManager().SetTimer(DeathTimerHandle,
 	                                [this]()
@@ -478,7 +513,7 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 		                                UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 	                                },
 	                                3.f,
-	                                false);
+	                                false);*/
 }
 
 void APlayerCharacter::HoverInteractable()
@@ -526,10 +561,10 @@ void APlayerCharacter::Interaction()
 		if (Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
 		{
 			IInteractableInterface::Execute_Interact(Actor);
-			
+
 			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 			GI->DebugStat();
-			
+
 			return;
 		}
 	}
