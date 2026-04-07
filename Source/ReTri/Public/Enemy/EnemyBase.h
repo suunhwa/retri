@@ -110,6 +110,9 @@ public:
 	// (4스킬)
 	bool bIsMirrorPatternActive = false;
 	
+	// (7스킬)
+	bool bIsEnhancedJump = false;
+	
 	// 바라보면서 회전할지 여부
 	UPROPERTY(BlueprintReadWrite, Category = "Boss")
 	bool bCanRotate = true;
@@ -156,6 +159,16 @@ public:
 	UPROPERTY()
 	UDecalComponent* ActiveDecal = nullptr;
 	
+	// ----------- PowerJumpDown -----------
+	UPROPERTY()
+	class UDecalComponent* CrossDecalHorizontal;
+
+	UPROPERTY()
+	class UDecalComponent* CrossDecalVertical;
+	
+	UPROPERTY(EditAnywhere, Category = Skill)
+	UMaterialInterface* JumpCrossDecal;
+	
 	
 	
 public:
@@ -188,6 +201,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ExecuteReinforcedDash(FVector StartLoc, FRotator DashRot);
+	
+	void SpawnEnhancedJumpDecal(FVector Location, class UMaterialInterface* CircleDecal, class UMaterialInterface* CrossDecal);
+	void ExecuteEnhancedJumpDownDamage();
+	void ExecuteJumpCrossDamage(FVector ImpactLocation);
+	
+	// ----------------------------------------
 	
 	void PlayDeathEffect();
 	void BroadcastDeath();

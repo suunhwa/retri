@@ -66,14 +66,14 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	float HPRatio = Boss->CurrentHP / Boss->MaxHP;
 	int32 RealPhase = Boss->CurrentPhase;
 	int32 FinalSkillIndex = -1;		// 최종 스킬 인덱스
-	TArray<int32> SkillPool;		// 이번에 쓸 스킬 후보지
+	TArray<int32> SkillPool;		// 이번에 쓸 스킬 후보지 / 2, 5 취소
 	
 	
 	// 체력에 따른 페이즈
 	if (HPRatio <= 0.3f)			// 3페이즈
 	{
 		RealPhase = 3;
-		SkillPool = { 6 };	// 5, 6, 7
+		SkillPool = { 6, 7 };
 	}
 	else if (HPRatio <= 0.6f)		// 2페이즈
 	{
@@ -100,7 +100,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		else if (Distance < 400.f)
 		{
 			// 가까우면 모든 스킬
-			SkillPool = { 0, 1, 1, 3, 3 };	//0, 1, 1, 2, 2, 3, 3
+			SkillPool = { 0, 1, 1, 3, 3 };
 		}
 		else
 		{
@@ -114,7 +114,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		FinalSkillIndex = SkillPool[RandomIndex];
 	}
 	
-	// ==================================================
+	// ================================================== 
 	
 	// 결정된 인덱스로 스킬 실행
 	if (Boss->BossSkills.IsValidIndex(FinalSkillIndex))
@@ -264,9 +264,11 @@ void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UA
 {
 	if (!Boss || !Player || !Montage) return;
 	
+	Boss->bIsJumpDownAttacking = true;
+	Boss->bIsEnhancedJump = false;
+	
 	// 플레이어 위치
 	LandingPosition = Player->GetActorLocation();
-	Boss->bIsJumpDownAttacking = true;
 	
 	Boss->PlayAnimMontage(Montage);
 	
@@ -281,7 +283,7 @@ void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UA
 	
 	
 	// 보스야 장판 생성해
-	Boss->SpawnJumpDecal(LandingPosition, JumpCircleDecal);
+	Boss->SpawnJumpDecal(LandingPosition, Boss->JumpCircleDecal);
 }
 
 void UBP_StateTreeTask::ExecuteMirrorBlade(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
@@ -293,7 +295,7 @@ void UBP_StateTreeTask::ExecuteMirrorBlade(AEnemyBase* Boss, ACharacter* Player,
 	BladeRepeatCount = 0;	// 카운트 초기화
 	
 	// 사라지는 몽타주
-	Boss->PlayAnimMontage(Montage);
+	Boss->PlayAnimMontage(Montage, 3.0);
 
 	// 패턴 시작
 	ExecutePatternCycle(Boss);	
@@ -442,10 +444,6 @@ void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
 
 void UBP_StateTreeTask::ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
 {
-}
-
-void UBP_StateTreeTask::ExecutePowerDashShadow(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
-{
 	if (!Boss || !Player || !Montage) return;
     
 	Boss->bIsCharging = true;
@@ -469,8 +467,30 @@ void UBP_StateTreeTask::ExecutePowerDashShadow(AEnemyBase* Boss, ACharacter* Pla
 	}, 1.5f, false);
 }
 
+void UBP_StateTreeTask::ExecutePowerDashShadow(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
+{
+	
+}
+
 void UBP_StateTreeTask::ExecutePowerJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
 {
+	if (!Boss || !Player || !Montage) return;
+	
+	Boss->bIsJumpDownAttacking = true;
+	Boss->bIsEnhancedJump = true;
+
+	LandingPosition = Player->GetActorLocation();
+
+	Boss->PlayAnimMontage(Montage);
+
+	Boss->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	Boss->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	FVector SkyLoc = Boss->GetActorLocation() + FVector(0, 0, 3000.f);
+	Boss->SetActorLocation(SkyLoc);
+	Boss->SetActorHiddenInGame(true);
+
+	Boss->SpawnEnhancedJumpDecal(LandingPosition, Boss->JumpCircleDecal, Boss->JumpCrossDecal);
 }
 
 
