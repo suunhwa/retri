@@ -3,12 +3,10 @@
 #include "Enemy/EnemyBase.h"
 
 #include "AIController.h"
-#include "AudioDevice.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
-#include "Enemy/BP_StateTreeTask.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
