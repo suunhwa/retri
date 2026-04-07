@@ -210,7 +210,6 @@ void AMerchant::OnClickedMerchantSlotUI(int32 SlotNum)
 	
 	HideMerchantUI();
 	
-	// todo Spawn Item 
 	if (auto* GI = Cast<UReTriGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
 	{
 		if (auto* MapSub = GI->GetSubsystem<UMapSubSystem>())
