@@ -1,0 +1,8 @@
+﻿,WellRewardName,WellRewardNameKR,WellRewardType,DreamDustCost,RewardAmount
+RewardMaxHP          ,MaxHP            ,최대 체력,RewardMaxHP          ,100,200
+RewardAttackPower      ,AttackPower    ,공격력,RewardAttackPower      ,150,20
+RewardSpellPower       ,SpellPower     ,기억 피해량,RewardSpellPower       ,150,10
+RewardProjectileSpeed   ,ProjectileSpeed ,총알 속도,RewardProjectileSpeed   ,200,300
+RewardAttackSpeed      ,AttackSpeed    ,공격 속도,RewardAttackSpeed      ,300,150
+RewardMoveSpeed       ,MoveSpeed         ,이동 속도,RewardMoveSpeed       ,300,120
+RewardMemoryAcceleration,MemoryAcceleration,기억 가속,RewardMemoryAcceleration,250,120

@@ -205,7 +205,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 			
 			// 맵테마 설정 (전투 80% / 상점 20%)
 			int32 RandomMapType = FMath::RandRange(1, 10);
-			NewNode.MapType = (RandomMapType <= 5) ? EMapNodeType::Merchant : EMapNodeType::Combat;
+			NewNode.MapType = (RandomMapType <= 3) ? EMapNodeType::Merchant : EMapNodeType::Combat;
 			NewNode.bIsCleared = false;
 				
 			// 상호작용 기물 스폰 랜덤 정하기

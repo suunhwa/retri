@@ -106,16 +106,15 @@ void UMyMinionFSM::AttackState()
 		return;
 	}
 	
-	Me->OnAttackOverlap(PlayerTarget);
-	
 	float Distance = Me->GetDistanceTo(PlayerTarget);
-
 	if (Distance > AttackRange)
 	{
 		_State = EMinionState::Move;
 		AIC->MoveToActor(PlayerTarget, 150.0f);
 		return;
 	}
+	
+	Me->OnAttackOverlap(PlayerTarget);
 	
 	if (MyStatInfo->MinionAttackMontage)
 	{

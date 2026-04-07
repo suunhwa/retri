@@ -29,13 +29,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsAttacking = false;
 	
-	
-	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSM)
 	class UMyMinionFSM* FSM;
 	
+	// === EXP Drop ===
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExpDrop")
+	int32 AmountExp = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExpDrop")
+	TSubclassOf<class AGoodsBase> GoodsEXPClass;
 	
+	// === Minimap ===
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Minimap")
+	class UPaperSpriteComponent* PaperComp;
 	
 protected:
 	void CheckDistanceAndMove(float DeltaTime);
@@ -44,7 +50,7 @@ protected:
 public:
 	FEnemyDataTableRow* GetStatInfo() { return MyStatInfo; }
 	
-	virtual void OnAttackOverlap(AActor* OtherActor);
+	virtual void OnAttackOverlap(AActor* OtherActor) override;
 	void DoRagdoll();
 	void PlayMontage(UAnimMontage* MontageToPlay);
 
@@ -52,12 +58,5 @@ private:
 	// 맞았을 때 색 변경
 	void FlashRed();
 	FTimerHandle FlashTimer;
-	
-	
-	
-	
-	
-	
-	
 	
 };

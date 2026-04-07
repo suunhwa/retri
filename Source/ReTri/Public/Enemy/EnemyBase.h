@@ -210,7 +210,7 @@ public:
 	
 	void PlayDeathEffect();
 	void BroadcastDeath();
-	
+		
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void ExecuteJumpDownDamage();
 	

@@ -28,6 +28,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Level/Actors/FloatingUIActor.h"
 #include "Player/UI/HPBar.h"
 #include "Player/UI/PlayerHUD.h"
 
@@ -460,6 +461,22 @@ float APlayerCharacter::TakeDamage(float DamageAmount,
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	HealthComp->HandleDamage(Damage, EventInstigator);
+	
+	// === Damage UI ===
+	if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
+	{
+		if (GI->FloatingUIActorClass)
+		{
+			AFloatingUIActor* DamageText = GetWorld()->SpawnActor<AFloatingUIActor>(
+				GI->FloatingUIActorClass, 
+				GetActorLocation(),
+				FRotator::ZeroRotator
+			);
+				
+			FString DmgString = FString::Printf(TEXT("%d"), FMath::RoundToInt(Damage));
+			DamageText->ShowFloatingUI(FText::FromString(DmgString), FLinearColor::Red);
+		}
+	}
 
 	UE_LOG(LogTemp,
 	       Warning,

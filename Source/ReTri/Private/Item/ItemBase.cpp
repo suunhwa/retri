@@ -23,7 +23,7 @@ AItemBase::AItemBase()
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SetRootComponent(SphereComp);
 	SphereComp->SetSphereRadius(150.f);
-	SphereComp->SetCollisionObjectType(ECC_GameTraceChannel6);
+	SphereComp->SetCollisionObjectType(ECC_GameTraceChannel6); // SkillItem
 	// SphereComp->SetCollisionProfileName(TEXT("OverlapAll"));
 	
 	ItemUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComp"));

@@ -43,6 +43,9 @@ public:
 	FString Description;
 };
 
+
+// === [ Chaos Data ] ===
+
 UENUM(BlueprintType)
 enum class EChaosType : uint8
 {
@@ -70,6 +73,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<float> ChaosValues;
 };
+
+
+// === [ Curse Data ] ===
 
 UENUM(BlueprintType)
 enum class ECurseType : uint8
@@ -122,6 +128,42 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Info;
 };
+
+
+// === [ Well Data ] ===
+
+UENUM(BlueprintType)
+enum class EWellRewardType: uint8
+{
+	RewardMaxHP					UMETA(DisplayName="RewardMaxHP"),				// 
+	RewardAttackPower			UMETA(DisplayName="RewardAttackPower"),			// 
+	RewardSpellPower			UMETA(DisplayName="RewardSpellPower"),			// 
+	RewardProjectileSpeed		UMETA(DisplayName="RewardProjectileSpeed"),		// 
+	RewardAttackSpeed			UMETA(DisplayName="RewardAttackSpeed"),			// 
+	RewardMoveSpeed				UMETA(DisplayName="RewardMoveSpeed"),			// 
+	RewardMemoryAcceleration	UMETA(DisplayName="RewardMoveSpeed"),			// 
+};
+
+USTRUCT(BlueprintType)
+struct FWellRewardData : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString WellRewardName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString WellRewardNameKR;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EWellRewardType WellRewardType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 DreamDustCost;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RewardAmount;
+};
+
+
+
 
 // === [ Map Info ] ===
 

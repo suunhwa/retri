@@ -108,7 +108,7 @@ public:
 	float GetSpellPower() const { return BaseSpellPower + AddedSpellPower; }
 
 	UFUNCTION(BlueprintPure, Category="Stats")
-	float GetAttackSpeed() const { return FMath::Max(0.1f, BaseAttackSpeed + AddedAttackSpeed); }
+	float GetAttackSpeed() const { return FMath::Max(0.1f, BaseAttackSpeed / AddedAttackSpeed); }
 
 	UFUNCTION(BlueprintPure, Category="Stats")
 	float GetCritRate() const { return FMath::Clamp(BaseCritRate + AddedCritRate, 0.f, 1.f); }
