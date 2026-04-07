@@ -147,6 +147,10 @@ void AMinion::OnAttackOverlap(AActor* OtherActor)
 		);
 		
 		bHasHitTarget = true;
+		
+		// === Spawn EXP Goods ===
+		auto EXP = GetWorld()->SpawnActor<AGoodsExp>(GoodsEXPClass, GetActorLocation(), GetActorRotation());
+		EXP->Amount = AmountExp;
 
 		//UE_LOG(LogTemp, Warning, TEXT("플레이어에게 %f 데미지를 입혔다!"), 1.0f);
 	}
@@ -160,16 +164,17 @@ void AMinion::DoRagdoll()
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	GetMesh()->SetSimulatePhysics(true);
 	
-	if (APlayerCharacter* Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[Minion] EXP 지급: %d"), AmountExp);
-		Player->GetStatComponent()->AddExp(AmountExp);
-		UE_LOG(LogTemp, Warning, TEXT("[Minion] EXP 지급 성공"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("[Minion] 플레이어 못 찾음"));
-	}
+	// 미안.. 이거말고 다른거 있어...
+	// if (APlayerCharacter* Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("[Minion] EXP 지급: %d"), AmountExp);
+	// 	Player->GetStatComponent()->AddExp(AmountExp);
+	// 	UE_LOG(LogTemp, Warning, TEXT("[Minion] EXP 지급 성공"));
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("[Minion] 플레이어 못 찾음"));
+	// }
 }
 
 void AMinion::FlashRed()

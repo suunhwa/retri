@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Level/UI/SelectUI.h"
+#include "Level/UI/WellSelectUI.h"
 
 #include "Components/VerticalBox.h"
-#include "Level/UI/SelectButtonUI.h"
+#include "Level/UI/WellSelectButtonUI.h"
 
-USelectButtonUI* USelectUI::AddButton(FString Title, FString Info, int32 Index, FLinearColor Color)
+UWellSelectButtonUI* UWellSelectUI::AddButton(FString Description, FString Cost, int32 Index)
 {
 	if (!ButtonClass) 
 	{
@@ -14,21 +14,19 @@ USelectButtonUI* USelectUI::AddButton(FString Title, FString Info, int32 Index, 
 		return nullptr;
 	}
 	
-	USelectButtonUI* Button = CreateWidget<USelectButtonUI>(this, ButtonClass);
+	UWellSelectButtonUI* Button = CreateWidget<UWellSelectButtonUI>(this, ButtonClass);
 	Button->ClearFlags(RF_Transactional); // PIE World Leak 방지
 	
 	Button->ThisIndex = Index;
-	Button->SetTextTitle(Title, Color);
-	Button->SetTextInfo(Info);
+	Button->SetTextDescription(Description);
+	Button->SetTextCost(Cost);
 	
 	VerticalBox->AddChildToVerticalBox(Button);
 	
 	return Button;
 }
 
-void USelectUI::ClearButtons()
+void UWellSelectUI::ClearButtons()
 {
 	VerticalBox->ClearChildren();
 }
-
-

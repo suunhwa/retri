@@ -12,6 +12,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "MapSubSystem.h"
+#include "ReTriGameInstance.h"
+#include "Level/Actors/FloatingUIActor.h"
 
 
 // Sets default values
@@ -185,6 +187,22 @@ float AEnemyBase::TakeDamage(float DamageAmount, struct FDamageEvent const& Dama
 	
 	CurrentHP -= ActualDamage;
 	UpdatePhase();
+	
+	// === Damage UI ===
+	if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
+	{
+		if (GI->FloatingUIActorClass)
+		{
+			AFloatingUIActor* DamageText = GetWorld()->SpawnActor<AFloatingUIActor>(
+				GI->FloatingUIActorClass, 
+				GetActorLocation(),
+				FRotator::ZeroRotator
+			);
+				
+			FString DmgString = FString::Printf(TEXT("%d"), FMath::RoundToInt(ActualDamage));
+			DamageText->ShowFloatingUI(FText::FromString(DmgString), FLinearColor(1.0f, 0.612f, 0.057, 1.0f));
+		}
+	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("%s 적중! 남은 체력: %f"), *EnemyRowName.ToString(), CurrentHP);
 	

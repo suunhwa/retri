@@ -18,7 +18,7 @@ class RETRI_API AInteractCurse : public AInteractableBase
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 public:	
 	virtual void Interact_Implementation() override;
 	
@@ -31,6 +31,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Curse")
 	UDataTable* CurseRewardDataTable;
 	
+	UPROPERTY()
+	USelectUI* SelectUIInstance;
+	
+	virtual void ShowSelectUI() override;
+	virtual void HideSelectUI() override;
 private:
 	TArray<FCurseData*> CurseDatas;
 	TArray<FCurseRewardData*> CurseRewardDatas;

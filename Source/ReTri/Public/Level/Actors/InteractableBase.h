@@ -87,12 +87,10 @@ public:
 
 	// === [ Select ] ===
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SelectUI")
-	TSubclassOf<USelectUI> SelectUIClass;
-	UPROPERTY()
-	USelectUI* SelectUIInstance;
-	
-	void ShowSelectUI();
-	void HideSelectUI();
+	TSubclassOf<UUserWidget> SelectUIClass;
+
+	virtual void ShowSelectUI() {}
+	virtual void HideSelectUI() {}
 	
 protected:
 	UPROPERTY() //todo 플레이어 클래스로 바꿔야할수도 

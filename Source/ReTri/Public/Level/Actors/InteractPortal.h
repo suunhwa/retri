@@ -8,9 +8,6 @@
 
 class UMapUI;
 
-/**
- * 
- */
 UCLASS()
 class RETRI_API AInteractPortal : public AInteractableBase
 {

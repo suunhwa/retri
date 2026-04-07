@@ -111,7 +111,7 @@ void UStatComponent::ApplyStatModifier(EStatTypes Type, float Delta)
 		break;
 
 	case EStatTypes::AttackSpeed:
-		AddedAttackSpeed += Delta;
+		AddedAttackSpeed *= Delta;
 		NewValue = GetAttackSpeed();
 		break;
 
