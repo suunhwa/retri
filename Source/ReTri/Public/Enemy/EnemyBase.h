@@ -169,6 +169,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = Skill)
 	UMaterialInterface* JumpCrossDecal;
 	
+	// ---------------------- 이펙트
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* JumpDownVFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* EnhancedJumpDownVFX;
 	
 	
 public:

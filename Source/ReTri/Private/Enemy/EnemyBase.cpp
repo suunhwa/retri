@@ -3,6 +3,7 @@
 #include "Enemy/EnemyBase.h"
 
 #include "AIController.h"
+#include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 #include "Components/CapsuleComponent.h"
@@ -69,6 +70,7 @@ void AEnemyBase::BeginPlay()
 			}
 		}
 	}, 0.2f, false);
+	
 }
 
 void AEnemyBase::Landed(const FHitResult& Hit)
@@ -79,10 +81,24 @@ void AEnemyBase::Landed(const FHitResult& Hit)
 	{
 		if (bIsEnhancedJump)
 		{
+			
+			// 강화 점프
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				EnhancedJumpDownVFX,
+				GetActorLocation(),
+				GetActorRotation(),
+				FVector(10.0f),
+				true,
+				true,
+				ENCPoolMethod::None,
+				true
+				);
 			ExecuteEnhancedJumpDownDamage();
 		}
 		else
 		{
+			// 일반 점프
 			ExecuteJumpDownDamage();
 		}
 
