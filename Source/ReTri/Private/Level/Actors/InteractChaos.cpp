@@ -9,6 +9,9 @@
 #include "ReTriGameInstance.h"
 #include "Player/Components/StatComponent.h"
 #include "Player/Components/HealthComponent.h"
+#include "Level/Actors/FloatingUIActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 
 void AInteractChaos::BeginPlay()
@@ -24,10 +27,6 @@ void AInteractChaos::Interact_Implementation()
 	
 	UE_LOG(jiwon, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
 	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
-	
-	// FName KeyName = FName("Chaos");
-	// bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
-	// if (FoundValue) *FoundValue = true;
 	
 	SetIsUsed(true);
 	
@@ -77,27 +76,54 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	if (!GI || !GI->StatComp) return;
 	
 	float Val = ChaosData->ChaosValues[ChaosData->ChaosLevel++];
+	
+	FString FloatingText;
+	FLinearColor FloatingColor = FLinearColor::White;
+	
 	switch (ChaosData->ChaosType)
 	{
 	case EChaosType::Chaos_Health:
 		GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, Val);
 		GI->HealthComp->Heal(GI->StatComp->GetMaxHP());
+		FloatingText = FString::Printf(TEXT("최대 체력 +%d"), FMath::TruncToInt(Val));
+		FloatingColor = FLinearColor(0.1f, 1.0f, 0.1f, 1.f); // Green
 		break;
 	case EChaosType::Chaos_AttackDamage:
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Val);
+		FloatingText = FString::Printf(TEXT("공격력 +%d"), FMath::TruncToInt(Val));
+		FloatingColor = FLinearColor(1.0f, 0.1f, 0.1f, 1.f); // Red
 		break;
 	case EChaosType::Chaos_AbilityPower:
 		GI->StatComp->ApplyStatModifier(EStatTypes::SpellPower, Val);
+		FloatingText = FString::Printf(TEXT("주문력 +%d"), FMath::TruncToInt(Val));
+		FloatingColor = FLinearColor(0.1f, 0.5f, 1.0f, 1.f); // Cyan
 		break;
 	case EChaosType::Chaos_AttackSpeed:
-		Val = GI->StatComp->GetAttackSpeed() * (Val - 1.0f);
-		GI->StatComp->ApplyStatModifier(EStatTypes::AttackSpeed, Val);
+		{
+			float OriginalVal = ChaosData->ChaosValues[ChaosData->ChaosLevel - 1];
+			Val = GI->StatComp->GetAttackSpeed() * (OriginalVal - 1.0f);
+			GI->StatComp->ApplyStatModifier(EStatTypes::AttackSpeed, Val);
+			FloatingText = FString::Printf(TEXT("공격 속도 +%d%%"), FMath::RoundToInt((OriginalVal - 1.0f) * 100.f));
+			FloatingColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.f); // Yellow
+		}
 		break;
 	case EChaosType::Chaos_MemoryHaste:
 		GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, Val);
+		FloatingText = FString::Printf(TEXT("기억 가속 +%d"), FMath::TruncToInt(Val));
+		FloatingColor = FLinearColor(0.8f, 0.2f, 0.8f, 1.f); // Purple
 		break;
 	}
 
+	if (GI->FloatingUIActorClass && !FloatingText.IsEmpty())
+	{
+		if (ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
+		{
+			AFloatingUIActor* FloatingUIActor = GetWorld()->SpawnActor<AFloatingUIActor>(
+				GI->FloatingUIActorClass, Player->GetActorLocation(), FRotator::ZeroRotator);
+			FloatingUIActor->ShowFloatingUI(FText::FromString(FloatingText), FloatingColor);
+		}
+	}
+	
 	GI->DebugStat();
 	
 	HideSelectUI();

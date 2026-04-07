@@ -4,6 +4,7 @@
 #include "Level/Actors/LootBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacter.h"
 
 // Sets default values
 ALootBase::ALootBase()
@@ -39,7 +40,9 @@ void ALootBase::Tick(float DeltaTime)
 void ALootBase::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
+	
 	if (OtherActor == UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) return;
+	
 	if (bIsBroken == true) return;
 	
 	OtherActor->Destroy();

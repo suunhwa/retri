@@ -7,11 +7,26 @@
 #include "Enemy/EnemyBase.h"
 #include "Enemy/Minion/MyMinionFSM.h"
 #include "Kismet/GameplayStatics.h"
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
+#include "ReTriGameInstance.h"
+#include "Level/Actors/FloatingUIActor.h"
+#include "Level/Actors/GoodsExp.h"
+#include "Player/PlayerCharacter.h"
 
 
 AMinion::AMinion()
 {
 	FSM = CreateDefaultSubobject<UMyMinionFSM>(TEXT("FSM"));
+	
+	PaperComp = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PaperComp"));
+	PaperComp->SetupAttachment(RootComponent);	
+	ConstructorHelpers::FObjectFinder<UPaperSprite> TempPaper(TEXT("/Script/Paper2D.PaperSprite'/Game/LevelInteraction/03_Assets/Icon/_Enemy_Sprite._Enemy_Sprite'"));
+	if (TempPaper.Succeeded()) PaperComp->SetSprite(TempPaper.Object);
+	PaperComp->SetRelativeLocation(FVector(0.f, 0.f, 2750.f));
+	PaperComp->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));
+	PaperComp->SetRelativeScale3D(FVector(8.f, 1.f, 8.f));
+	PaperComp->SetCastShadow(false);
 }
 
 void AMinion::BeginPlay()
@@ -86,9 +101,26 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 	{
 		FlashRed();
 		
+		// === Damage UI ===
+		if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
+		{
+			if (GI->FloatingUIActorClass)
+			{
+				AFloatingUIActor* DamageText = GetWorld()->SpawnActor<AFloatingUIActor>(
+					GI->FloatingUIActorClass, 
+					GetActorLocation(),
+					FRotator::ZeroRotator
+				);
+				
+				FString DmgString = FString::Printf(TEXT("%d"), FMath::RoundToInt(ActualDamage));
+				DamageText->ShowFloatingUI(FText::FromString(DmgString), FLinearColor(1.0f, 0.612f, 0.057, 1.0f));
+			}
+		}
+		
 		if (CurrentHP <= 0.0f)
 		{
 			FSM->_State = EMinionState::Die;
+			
 		}
 		else
 		{
@@ -100,6 +132,8 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 
 void AMinion::OnAttackOverlap(AActor* OtherActor)
 {
+	if (!OtherActor->IsA(APlayerCharacter::StaticClass())) return;
+
 	ACharacter* Player = Cast<ACharacter>(OtherActor);
 	if (Player)
 	{
@@ -125,6 +159,10 @@ void AMinion::DoRagdoll()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	GetMesh()->SetSimulatePhysics(true);
+	
+	// Spawn Goods
+	auto EXP = GetWorld()->SpawnActor<AGoodsExp>(GoodsEXPClass, GetActorLocation(), GetActorRotation());
+	EXP->Amount = AmountExp;
 }
 
 void AMinion::FlashRed()

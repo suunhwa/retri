@@ -69,11 +69,13 @@ void AMinionSpawner::CreateMinion()
 		{
 			auto mini = GetWorld()->SpawnActor<AMinion>(DawnFactory, Pos, FRotator::ZeroRotator);
 			mini->OnMinionDieDelegate.AddDynamic(this, &AMinionSpawner::AddMinionDeathCount);
+			mini->AmountExp = FMath::RandRange(5, 20);
 		}
 		else if (SpawnPoints[i]->Tags.Contains("Dusk"))
 		{
 			auto mini = GetWorld()->SpawnActor<AMinion>(DuskFactory, Pos, FRotator::ZeroRotator);
 			mini->OnMinionDieDelegate.AddDynamic(this, &AMinionSpawner::AddMinionDeathCount);
+			mini->AmountExp = FMath::RandRange(30, 50);
 		}
 	}
 }

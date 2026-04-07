@@ -20,4 +20,13 @@ protected:
 
 public:	
 	virtual void Interact_Implementation() override;
+	
+	UFUNCTION()
+	void OnChaosSelected(int32 Index);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Chaos")
+	UDataTable* WellDataTable;
+	
+private:
+	TArray<FWellRewardData*> PickedWellReward;
 };

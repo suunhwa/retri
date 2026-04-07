@@ -17,6 +17,5 @@ class RETRI_API ALootGoldCoinPot : public ALootBase
 public:
 	ALootGoldCoinPot();
 	
-	
 	virtual void Break() override;
 };

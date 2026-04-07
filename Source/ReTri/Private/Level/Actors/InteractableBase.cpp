@@ -18,6 +18,7 @@
 #include "PaperSpriteComponent.h"
 #include "PaperSprite.h"
 
+
 // Sets default values
 AInteractableBase::AInteractableBase()
 {
@@ -40,7 +41,7 @@ AInteractableBase::AInteractableBase()
 	PaperComp->SetupAttachment(CapsuleComp);	
 	ConstructorHelpers::FObjectFinder<UPaperSprite> TempPaper(TEXT("/Script/Paper2D.PaperSprite'/Game/LevelInteraction/03_Assets/Icon/_Interactable_Sprite._Interactable_Sprite'"));
 	if (TempPaper.Succeeded()) PaperComp->SetSprite(TempPaper.Object);
-	PaperComp->SetRelativeLocation(FVector(0.f, 0.f, 2300.f));
+	PaperComp->SetRelativeLocation(FVector(0.f, 0.f, 2750.f));
 	PaperComp->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));
 	PaperComp->SetRelativeScale3D(FVector(8.f, 1.f, 8.f));
 	PaperComp->SetCastShadow(false);

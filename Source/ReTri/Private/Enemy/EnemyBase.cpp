@@ -139,12 +139,9 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 }
 
-
-
 void AEnemyBase::OnAttackOverlap(AActor* OtherActor)
 {
 	if (bHasHitTarget || !OtherActor || OtherActor == this) return;
-	
 	ACharacter* Player = Cast<ACharacter>(OtherActor);
 	if (Player)
 	{
