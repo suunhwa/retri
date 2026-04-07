@@ -160,9 +160,16 @@ void AMinion::DoRagdoll()
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	GetMesh()->SetSimulatePhysics(true);
 	
-	// Spawn Goods
-	auto EXP = GetWorld()->SpawnActor<AGoodsExp>(GoodsEXPClass, GetActorLocation(), GetActorRotation());
-	EXP->Amount = AmountExp;
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Minion] EXP 지급: %d"), AmountExp);
+		Player->GetStatComponent()->AddExp(AmountExp);
+		UE_LOG(LogTemp, Warning, TEXT("[Minion] EXP 지급 성공"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Minion] 플레이어 못 찾음"));
+	}
 }
 
 void AMinion::FlashRed()
