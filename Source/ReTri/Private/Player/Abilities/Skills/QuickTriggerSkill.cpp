@@ -68,19 +68,22 @@ void UQuickTriggerSkill::Activate(ACharacter* Owner)
 	
 	const float FireDelay = BaseFireDelay / AttackSpeed;
 	
+	// Activate 시점에 캡처 — 타이머 딜레이 동안 애니메이션으로 소켓 위치가 바뀌어도 동일한 위치에서 발사
+	FVector MuzzleLocation = Owner->GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
+
 	TWeakObjectPtr<ACharacter> WeakOwner(Owner);
-	
+
 	// 1번탄 즉시 발사 (120%)
-	FireShot(WeakOwner, 0, Direction, AttackDamage);
-	
-	// 2번탄 즉시 발사 (150%)
+	FireShot(WeakOwner, 0, Direction, AttackDamage, MuzzleLocation);
+
+	// 2번탄 (150%)
 	FTimerDelegate Del2;
-	Del2.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 1, Direction, AttackDamage);
+	Del2.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 1, Direction, AttackDamage, MuzzleLocation);
 	Owner->GetWorldTimerManager().SetTimer(FireTimerHandle2, Del2, FireDelay, false);
-	
-	// 3번탄 즉시 발사 (420%)
+
+	// 3번탄 (420%)
 	FTimerDelegate Del3;
-	Del3.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 2, Direction, AttackDamage);
+	Del3.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 2, Direction, AttackDamage, MuzzleLocation);
 	Owner->GetWorldTimerManager().SetTimer(FireTimerHandle3, Del3, FireDelay * 2.f, false);
 	
 	// effects
@@ -97,15 +100,13 @@ void UQuickTriggerSkill::Activate(ACharacter* Owner)
 void UQuickTriggerSkill::FireShot(TWeakObjectPtr<ACharacter> WeakOwner,
 	int32 ShotIndex,
 	FVector Direction,
-	float AttackDamage)
+	float AttackDamage,
+	FVector MuzzleLocation)
 {
 	if (!WeakOwner.IsValid() || !PiercingBullet) return;
 	ACharacter* Owner = WeakOwner.Get();
-	
-	// 인덱스 방어
+
 	if (!DamageMultipliers.IsValidIndex(ShotIndex)) return;
-	
-	FVector MuzzleLocation = Owner->GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = Owner;

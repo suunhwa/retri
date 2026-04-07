@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interface/SkillItemInterface.h"
+#include "Player/Abilities/AbilityBase.h"
 #include "Player/Data/PlayerSkillData.h"
 #include "ItemBase.generated.h"
 
 class USphereComponent;
 class UWidgetComponent;
 class UDropItemUI;
+class USoundBase;
 struct FPlayerSkillData;
 
 UCLASS()
@@ -50,6 +52,18 @@ public:
 	FPlayerSkillData CurSkillData;
 	FPlayerSkillData GetSkillData() { return CurSkillData; }
 	void DataInit(FPlayerSkillData SkillData);
+	
+	// 장착할 어빌리티 클래스 — AMerchant 스폰 시 설정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
+	TSubclassOf<UAbilityBase> AbilityClass;
+
+	// 장착 성공 사운드 (BP)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	TObjectPtr<USoundBase> EquipSuccessSound;
+
+	// 슬롯 꽉 차있을 때 사운드 (BP)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Sound")
+	TObjectPtr<USoundBase> EquipFullSound;
 	
 	void SetInteractionUIVisibility(bool isVisible);
 };

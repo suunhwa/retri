@@ -11,30 +11,32 @@ bool UAbilityBase::TryActivate(ACharacter* Owner)
 {
 	if (!Owner || bIsOnCooldown || !CanActivate(Owner)) return false;
 
-	// 마우스 방향으로 회전
-	if (APlayerController* PC = Cast<APlayerController>(Owner->GetController()))
+	// 마우스 방향으로 회전 (ShouldRotateToMouse() == false인 스킬은 건너뜀)
+	if (ShouldRotateToMouse())
 	{
-		FVector WorldPos;
-		FVector WorldDir;
-		if (PC->DeprojectMousePositionToWorld(WorldPos, WorldDir))
+		if (APlayerController* PC = Cast<APlayerController>(Owner->GetController()))
 		{
-			// 마우스 월드 위치 구하기 (Z 평면 기준)
-			float T = (Owner->GetActorLocation().Z - WorldPos.Z) / WorldDir.Z;
-			FVector MouseWorld = WorldPos + WorldDir * T;
-
-			FVector Dir = MouseWorld - Owner->GetActorLocation();
-			Dir.Z = 0.f;
-			if (!Dir.IsNearlyZero())
+			FVector WorldPos;
+			FVector WorldDir;
+			if (PC->DeprojectMousePositionToWorld(WorldPos, WorldDir))
 			{
-				Dir.Normalize();
-				Owner->GetCharacterMovement()->bOrientRotationToMovement = false;
-				Owner->SetActorRotation(FRotator(0.f, Dir.Rotation().Yaw, 0.f));
+				float T = (Owner->GetActorLocation().Z - WorldPos.Z) / WorldDir.Z;
+				FVector MouseWorld = WorldPos + WorldDir * T;
 
-				FTimerHandle RotHandle;
-				Owner->GetWorldTimerManager().SetTimer(RotHandle, [Owner]()
+				FVector Dir = MouseWorld - Owner->GetActorLocation();
+				Dir.Z = 0.f;
+				if (!Dir.IsNearlyZero())
 				{
-					if (Owner) Owner->GetCharacterMovement()->bOrientRotationToMovement = true;
-				}, 0.8f, false);
+					Dir.Normalize();
+					Owner->GetCharacterMovement()->bOrientRotationToMovement = false;
+					Owner->SetActorRotation(FRotator(0.f, Dir.Rotation().Yaw, 0.f));
+
+					FTimerHandle RotHandle;
+					Owner->GetWorldTimerManager().SetTimer(RotHandle, [Owner]()
+					{
+						if (Owner) Owner->GetCharacterMovement()->bOrientRotationToMovement = true;
+					}, 0.8f, false);
+				}
 			}
 		}
 	}

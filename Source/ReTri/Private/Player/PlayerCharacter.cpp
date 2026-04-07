@@ -22,6 +22,7 @@
 #include "TimerManager.h"
 #include "Player/ReTriPlayerController.h"
 #include "ReTriGameInstance.h"
+#include "Item/Interface/SkillItemInterface.h"
 #include "Level/Actors/InteractableBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -589,41 +590,50 @@ void APlayerCharacter::Interaction()
 
 void APlayerCharacter::OnPickUp(const struct FInputActionValue& inputValue)
 {
-	// G 키를 눌렀을 때 오브젝트 들과 상호작용 할 수 있도록 
+	// ISkillItemInterface 구현 액터 전체에서 거리 체크 (콜리전 채널 무시)
+	TArray<AActor*> AllItems;
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), USkillItemInterface::StaticClass(), AllItems);
 
-	// 감지하고자 하는 오브젝트 타입
+	const float PickUpRadius = 200.f;
+	for (AActor* Actor : AllItems)
+	{
+		if (FVector::Dist(GetActorLocation(), Actor->GetActorLocation()) <= PickUpRadius)
+		{
+			ISkillItemInterface::Execute_Acquire(Actor);
+			return; // 가장 먼저 찾은 아이템 하나만 처리
+		}
+	}
+	
+	// 감지 안됨
+	/*UE_LOG(LogTemp, Warning, TEXT("[OnPickUp] 키 입력 감지"));
+
+	// 스킬 아이템 픽업 (ECC_GameTraceChannel6 — ItemBase 콜리전 채널)
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel6));
 
-	// 제외할 Actors 
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(this);
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 42.f, 16, FColor::Red);
-
-	// 근처에 Interaction Object가 있는지 감지 
 	TArray<AActor*> OutActors;
-	bool bHit = UKismetSystemLibrary::SphereOverlapActors(GetWorld(),
-														  GetActorLocation(),
-														  42.f,
-														  ObjectTypes,
-														  AActor::StaticClass(),
-														  IgnoreActors,
-														  OutActors);
+	UKismetSystemLibrary::SphereOverlapActors(GetWorld(),
+											  GetActorLocation(),
+											  200.f,
+											  ObjectTypes,
+											  AActor::StaticClass(),
+											  IgnoreActors,
+											  OutActors);
 
-	if (!bHit) return;
+	UE_LOG(LogTemp, Warning, TEXT("[OnPickUp] 감지된 액터 수: %d"), OutActors.Num());
+
 	for (AActor* Actor : OutActors)
 	{
-		if (Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+		if (Actor->GetClass()->ImplementsInterface(USkillItemInterface::StaticClass()))
 		{
-			/*IInteractableInterface::Execute_Interact(Actor);
-
-			auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-			GI->DebugStat();*/
-
+			UE_LOG(LogTemp, Warning, TEXT("[OnPickUp] 아이템 발견, Acquire 호출: %s"), *Actor->GetName());
+			ISkillItemInterface::Execute_Acquire(Actor);
 			return;
 		}
-	}
+	}*/
 }
 
 void APlayerCharacter::DebugAddExp(int32 Amount)

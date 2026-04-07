@@ -15,6 +15,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Merchant/UI/ShopBGUI.h"
 #include "Merchant/UI/ShopSlotUI.h"
+#include "Player/Abilities/AbilityBase.h"
 #include "Player/PlayerCharacter.h"
 
 #include "ReTri/ReTri.h"
@@ -235,7 +236,21 @@ void AMerchant::OnClickedMerchantSlotUI(int32 SlotNum)
 			if (Item)
 			{
 				// 스폰한 아이템에 정보 넣기  
-				Item->DataInit(SkillDatas->ItemSkillDatas[SlotNum]);
+				// Item->DataInit(SkillDatas->ItemSkillDatas[SlotNum]);
+				const FPlayerSkillData& SkillData = SkillDatas->ItemSkillDatas[SlotNum];
+				Item->DataInit(SkillData);
+
+				// SkillID 로 어빌리티 클래스 매핑
+				if (TSubclassOf<UAbilityBase>* FoundClass = SkillIDToClassMap.Find(SkillData.SkillID))
+				{
+					Item->AbilityClass = *FoundClass;
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning,
+						TEXT("AMerchant: SkillID '%s' 에 매핑된 AbilityClass 없음. BP에서 SkillIDToClassMap 설정!"),
+						*SkillData.SkillID);
+				}
 				
 				// 구매 한 아이템 상점 리스트에서 지우기 
 				MapSub->RemoveMerchantItemList(MapSub->CurMapIndex, SlotNum);
