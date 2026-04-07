@@ -10,6 +10,8 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MapSubSystem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCurseQuestChanged);
+
 class AActor;
 class ALootGoldCoinPot;
 class ALootDreamPowderPillar;
@@ -44,6 +46,9 @@ struct FActiveCurseQuest
 	
 	UPROPERTY(BlueprintReadWrite, Category="Curse")
 	FString RewardInfo;
+	
+	UPROPERTY(BlueprintReadWrite, Category="Curse")
+	FLinearColor CurseColor;
 };
 
 
@@ -151,6 +156,10 @@ public:
 	void LevelClear();
 	
 	// === Curse Quest ===
+	/**  퀘스트 추가 */
+	UPROPERTY(BlueprintAssignable, Category="Map|Curse")
+	FOnCurseQuestChanged OnCurseQuestChanged;
+	
 	/** 저주 퀘스트 추가 */
 	UFUNCTION(BlueprintCallable, Category="Map|Curse")
 	void AddCurseQuest(FActiveCurseQuest NewQuest);

@@ -8,8 +8,6 @@
 #include "Level/UI/SelectUI.h"
 #include "ReTri/ReTri.h"
 #include "ReTriGameInstance.h"
-#include "Player/Components/StatComponent.h"
-#include "Player/Components/HealthComponent.h"
 
 
 void AInteractCurse::BeginPlay()
@@ -99,8 +97,9 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 		NewQuest.RewardType = CurseRewardDatas[RandomReward]->RewardType;
 		NewQuest.RewardValue = RewardVal;
 		NewQuest.RewardInfo = CurseRewardDatas[RandomReward]->Info;
+		NewQuest.CurseColor = CurseData->CurseColor;
 		
-		MapSub->ActiveCurseQuests.Add(NewQuest);
+		MapSub->AddCurseQuest(NewQuest);
 		
 		JIWONLOG("저주 퀘스트: %s", *QuestMessage);
 	}

@@ -55,6 +55,9 @@ public:
 protected:
 	virtual bool CanActivate(ACharacter* Owner) { return true; }
 	virtual void Activate(ACharacter* Owner) PURE_VIRTUAL(UAbilityBase::Activate, );
+
+	// false 반환 시 TryActivate에서 마우스 방향 회전을 건너뜀
+	virtual bool ShouldRotateToMouse() const { return true; }
 	
 	// 데이터 테이블에서 로드된 값들 — 자식 클래스에서 사용
 	UPROPERTY(EditDefaultsOnly, Category="Ability")

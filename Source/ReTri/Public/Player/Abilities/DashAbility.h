@@ -15,6 +15,7 @@ class RETRI_API UDashAbility : public UAbilityBase
 
 protected:
 	virtual void Activate(ACharacter* Owner) override;
+	virtual bool ShouldRotateToMouse() const override { return false; }
 
 	// 대시 순간 가해지는 속도 (값 올릴수록 더 멀리 감)
 	UPROPERTY(EditDefaultsOnly, Category="Dash")

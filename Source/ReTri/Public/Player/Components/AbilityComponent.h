@@ -9,6 +9,7 @@
 #include "AbilityComponent.generated.h"
 
 class UAbilityBase;
+class AItemBase;
 
 UENUM(BlueprintType)
 enum class EAbilitySlot : uint8
@@ -44,23 +45,29 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Ability")
 	FOnSkillSlotChanged OnSkillSlotChanged;
 
-	//
 	UFUNCTION(BlueprintCallable, Category="Ability")
 	bool TryActivate(EAbilitySlot Slot);
-	
+
 	// UI에서 슬롯별 스킬 오브젝트 접근
 	UFUNCTION(BlueprintCallable, Category="Ability")
 	UAbilityBase* GetAbility(EAbilitySlot Slot) const;
-	
+
 	// GI에 스킬 데이터 저장
 	UFUNCTION(BlueprintCallable, Category="Ability")
 	void SetSkill(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass);
 
-	// 빈 슬롯(Q 또는 E)에 스킬 장착 — 상점 구매 시 호출
+	// 빈 슬롯에 스킬 장착 — 픽업 시 호출
 	UFUNCTION(BlueprintCallable, Category="Ability")
 	bool EquipAcquiredSkill(TSubclassOf<UAbilityBase> AbilityClass);
-	
+
+	// 슬롯 스킬을 바닥에 드롭 후 슬롯 비움
+	UFUNCTION(BlueprintCallable, Category="Ability")
+	void DropSkill(EAbilitySlot Slot, FVector SpawnLocation);
+
 private:
+	// 버린 스킬을 월드에 스폰할 아이템 클래스 — BP에서 설정
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Drop")
+	TSubclassOf<AItemBase> DropItemClass;
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Data")
 	TObjectPtr<UDataTable> SkillDataTable;
 
@@ -71,16 +78,10 @@ private:
 	TSubclassOf<UAbilityBase> TravelerMemory1Class;  // 우클릭 고유스킬
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
-	TSubclassOf<UAbilityBase> SkillQClass;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
-	TSubclassOf<UAbilityBase> SkillEClass;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
 	TSubclassOf<UAbilityBase> TravelerMemory2Class;  // R 고유스킬
-	
+
 	UPROPERTY()
 	TMap<EAbilitySlot, TObjectPtr<UAbilityBase>> Abilities;
-	
+
 	void RegisterAbility(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass);
 };

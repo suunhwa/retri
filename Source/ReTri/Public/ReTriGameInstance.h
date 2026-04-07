@@ -68,6 +68,8 @@ public:
 	TSubclassOf<class ALootGoldCoinPot> GoldCoinPotClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Map|NodeMap")
 	TSubclassOf<class ALootDreamPowderPillar> DreamPowderClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Map|NodeMap")
+	TSubclassOf<class AFloatingUIActor> FloatingUIActorClass;
 	// =========== Level ===============================================
 	
 	void DebugStat() const;

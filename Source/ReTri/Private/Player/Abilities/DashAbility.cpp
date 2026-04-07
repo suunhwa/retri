@@ -18,6 +18,9 @@ void UDashAbility::Activate(ACharacter* Owner)
 	Dir.Z = 0.f;
 	Dir.Normalize();
 
+	// 대시 방향으로 캐릭터 회전
+	Owner->SetActorRotation(FRotator(0.f, Dir.Rotation().Yaw, 0.f));
+
 	Owner->LaunchCharacter(Dir * DashImpulse, true, false);
 
 	// 잔상 생성 시작

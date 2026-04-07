@@ -11,6 +11,7 @@ class UProgressBar;
 class UTextBlock;
 class USkillBarUI;
 class UAbilityComponent;
+class UCurseQuestUI;
 
 /**
  * 플레이어 HUD (HP바, 골드, 꿈가루)
@@ -60,4 +61,8 @@ protected:
 	// 스킬바
 	UPROPERTY(meta=(BindWidgetOptional))
 	TObjectPtr<USkillBarUI> SkillBar;
+	
+	// 증오 퀘스트 UI
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UCurseQuestUI> CurseQuestUI;
 };
