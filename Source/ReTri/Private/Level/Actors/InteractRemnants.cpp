@@ -41,16 +41,24 @@ void AInteractRemnants::Interact_Implementation()
 			int32 RandomNum = FMath::RandRange(0, SkillRandomDatas.Num()-1);
 			
 			FVector Loc = GetActorLocation() + (GetActorRightVector() * 300.f);
+			
+			FPlayerSkillData* PickedData = SkillRandomDatas[RandomNum];
 			auto* Item = GetWorld()->SpawnActor<AItemBase>(ItemClass, Loc, FRotator::ZeroRotator);
 			if (Item)
 			{
-				Item->DataInit(*SkillRandomDatas[RandomNum]);
-			}
-			else
-			{
-				SCREENLOG("아이템 스폰 실패!");
+				Item->DataInit(*PickedData);
+
+				// Row 이름으로 AbilityClass 찾아서 설정
+				FName RowName = FName(*PickedData->SkillID);
+				if (TSubclassOf<UAbilityBase>* Found = SkillIDToClassMap.Find(RowName))
+				{
+					Item->AbilityClass = *Found;
+				}
+				else
+				{
+					UE_LOG(jiwon, Warning, TEXT("SkillClassMap에 %s 없음"), *PickedData->SkillID);
+				}
 			}
 		}
 	}
-	
 }
