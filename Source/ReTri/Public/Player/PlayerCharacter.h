@@ -104,7 +104,7 @@ private:
 	
 	// item pick up
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Interaction")
-	TObjectPtr<UInputAction> ia_PickUp;
+	TObjectPtr<UInputAction> ia_Salvage;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Inputs")
 	TObjectPtr<UInputMappingContext> imc_Player;
@@ -178,6 +178,7 @@ private:
 	void OnTravelerMemory2(const struct FInputActionValue& inputValue);
 	void OnInteraction(const struct FInputActionValue& inputValue);
 	void OnPickUp(const struct FInputActionValue& inputValue);
+	void OnSalvage(const struct FInputActionValue& inputValue);
 	
 private:
 	UFUNCTION()

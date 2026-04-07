@@ -133,11 +133,11 @@ APlayerCharacter::APlayerCharacter()
 		ia_Interaction = TempInteractionInput.Object;
 	}
 	
-	ConstructorHelpers::FObjectFinder<UInputAction> TempPickUpInput(
-		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_PickUp.IA_PickUp'"));
-	if (TempPickUpInput.Succeeded())
+	ConstructorHelpers::FObjectFinder<UInputAction> TempSalvageInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/ia_Salvage.ia_Salvage'"));
+	if (TempSalvageInput.Succeeded())
 	{
-		ia_PickUp = TempPickUpInput.Object;
+		ia_Salvage = TempSalvageInput.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> TempIMC(
@@ -284,7 +284,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			                        &APlayerCharacter::OnTravelerMemory2);
 			playerInput->BindAction(ia_Dash, ETriggerEvent::Started, this, &APlayerCharacter::OnDash);
 			playerInput->BindAction(ia_Interaction, ETriggerEvent::Started, this, &APlayerCharacter::OnInteraction);
-			playerInput->BindAction(ia_PickUp, ETriggerEvent::Started, this, &APlayerCharacter::OnPickUp);
+			playerInput->BindAction(ia_Interaction, ETriggerEvent::Started, this, &APlayerCharacter::OnPickUp);
+			playerInput->BindAction(ia_Salvage, ETriggerEvent::Started, this, &APlayerCharacter::OnSalvage);
 		}
 	}
 }
@@ -634,6 +635,22 @@ void APlayerCharacter::OnPickUp(const struct FInputActionValue& inputValue)
 			return;
 		}
 	}*/
+}
+
+void APlayerCharacter::OnSalvage(const struct FInputActionValue& inputValue)
+{
+	TArray<AActor*> AllItems;
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), USkillItemInterface::StaticClass(), AllItems);
+
+	const float SalvageRadius = 300.f;
+	for (AActor* Actor : AllItems)
+	{
+		if (FVector::Dist(GetActorLocation(), Actor->GetActorLocation()) <= SalvageRadius)
+		{
+			ISkillItemInterface::Execute_Hold(Actor, this);
+			return; 
+		}
+	}
 }
 
 void APlayerCharacter::DebugAddExp(int32 Amount)

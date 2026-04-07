@@ -11,6 +11,7 @@
 #include "Navigation/CrowdFollowingComponent.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/Components/AbilityComponent.h"
+#include "Player/Components/StatComponent.h"
 #include "ReTri/ReTri.h"
 
 class UInteractableUI;
@@ -116,22 +117,36 @@ void AItemBase::Hold_Implementation(AActor* PlayerActor)
 {
 	ISkillItemInterface::Hold_Implementation(PlayerActor);
 	
-	// todo G 눌렀을 경우
-	
 	if (!PlayerActor->IsA(APlayerCharacter::StaticClass())) return;
 	APlayerCharacter* Player = Cast<APlayerCharacter>(PlayerActor);
 	
 	//if (Player->CurHoldTime < Player->MaxHoldTime) return;
 	
-	SCREENLOG("분해 완료!");
+	// stat에 바로 꿈가루 반영해주기 위해 가져옴
+	UStatComponent* StatComp = Player->GetStatComponent();
+	if (!StatComp) return;
+	
+	/*SCREENLOG("분해 완료!");
 	
 	AGoodsDreamPowder* Goods = GetWorld()->SpawnActor<AGoodsDreamPowder>(GoodsClass, GetActorLocation(), GetActorRotation());
 	Goods->bIsFixedAmount = true;
-	Goods->Amount = CurSkillData.UpgradeCostDreamDust;
+	Goods->Amount = CurSkillData.UpgradeCostDreamDust;*/
+	
+	// CSV의 UpgradeCostDreamDust 값을 분해 보상으로 지급
+	int32 RewardAmount = CurSkillData.UpgradeCostDreamDust;
+	UE_LOG(LogTemp, Warning, TEXT("[Salvage] 꿈가루: %d"), RewardAmount);
+	if (RewardAmount <= 0) return;
+
+	StatComp->ApplyStatModifier(EStatTypes::DreamDust, static_cast<float>(RewardAmount));
+	UE_LOG(LogTemp, Warning, TEXT("[Salvage] 꿈가루 지급 성공: %d"), RewardAmount);
+	
+	Destroy();
 }
 
 void AItemBase::DataInit(FPlayerSkillData SkillData)
 {
+	CurSkillData = SkillData;
+	
 	if (!ItemUI)
 	{
 		UE_LOG(jiwon, Error, TEXT("ItemUI 설정안됨 ㄷㄷ"));
