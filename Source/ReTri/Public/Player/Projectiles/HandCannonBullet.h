@@ -10,6 +10,7 @@ class USphereComponent;
 class UStaticMeshComponent;
 class UProjectileMovementComponent;
 class UNiagaraSystem;
+class UNiagaraComponent;
 class UParticleSystem;
 class UParticleSystemComponent;
 
