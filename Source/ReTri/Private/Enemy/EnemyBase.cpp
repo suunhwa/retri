@@ -86,9 +86,9 @@ void AEnemyBase::Landed(const FHitResult& Hit)
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 				GetWorld(),
 				EnhancedJumpDownVFX,
-				GetActorLocation(),
+				FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z - 200.f),
 				GetActorRotation(),
-				FVector(10.0f),
+				FVector(4.0f),
 				true,
 				true,
 				ENCPoolMethod::None,
@@ -99,6 +99,17 @@ void AEnemyBase::Landed(const FHitResult& Hit)
 		else
 		{
 			// 일반 점프
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				JumpDownVFX,
+				FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z - 200.f),
+				GetActorRotation(),
+				FVector(4.0f),
+				true,
+				true,
+				ENCPoolMethod::None,
+				true
+				);
 			ExecuteJumpDownDamage();
 		}
 
@@ -518,7 +529,7 @@ void AEnemyBase::ExecuteJumpDownDamage()
 		false
 		);
 	
-	DrawDebugSphere(GetWorld(), ImpactLocation, JumpDownDamageRadius, 24, bHit ? FColor::Red : FColor::Green, false, 2.0f);
+	// DrawDebugSphere(GetWorld(), ImpactLocation, JumpDownDamageRadius, 24, bHit ? FColor::Red : FColor::Green, false, 2.0f);
 }
 
 // ---------------------------------------- 분신검기 대미지
@@ -792,15 +803,15 @@ void AEnemyBase::ExecuteEnhancedJumpDownDamage()
 	// 십자 대미지 호출
 	ExecuteJumpCrossDamage(ImpactLocation);
 
-	DrawDebugSphere(
-		World,
-		ImpactLocation,
-		JumpDownDamageRadius,
-		24,
-		FColor::Red,
-		false,
-		2.0f
-	);
+	// DrawDebugSphere(
+	// 	World,
+	// 	ImpactLocation,
+	// 	JumpDownDamageRadius,
+	// 	24,
+	// 	FColor::Red,
+	// 	false,
+	// 	2.0f
+	// );
 }
 
 // ---------------------------------------- 강화 점프다운 십자 대미지
