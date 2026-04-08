@@ -12,8 +12,17 @@ void USelectButtonUI::NativeConstruct()
 	Super::NativeConstruct();
 	
 	if (ButtonSelect)
-		ButtonSelect->OnClicked.AddDynamic(this, &USelectButtonUI::OnClicked);
+		ButtonSelect->OnClicked.AddUniqueDynamic(this, &USelectButtonUI::OnClicked);
 }
+
+void USelectButtonUI::NativeDestruct()
+{
+	if (ButtonSelect)
+		ButtonSelect->OnClicked.RemoveDynamic(this, &USelectButtonUI::OnClicked);
+		
+	Super::NativeDestruct();
+}
+
 
 void USelectButtonUI::OnClicked()
 {

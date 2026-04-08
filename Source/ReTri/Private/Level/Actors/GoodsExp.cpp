@@ -24,8 +24,7 @@ void AGoodsExp::NotifyActorBeginOverlap(AActor* OtherActor)
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI || !GI->StatComp) return;
 	
-	// todo EXP 적용
-	// GI->StatComp->ApplyStatModifier(EStatTypes::, Amount);
+	GI->StatComp->AddExp(Amount);
 	
 	if (!FloatingUIActorClass) return;
 	AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), FRotator::ZeroRotator);

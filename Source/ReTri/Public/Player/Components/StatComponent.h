@@ -108,7 +108,7 @@ public:
 	float GetSpellPower() const { return BaseSpellPower + AddedSpellPower; }
 
 	UFUNCTION(BlueprintPure, Category="Stats")
-	float GetAttackSpeed() const { return FMath::Max(0.1f, BaseAttackSpeed / AddedAttackSpeed); }
+	float GetAttackSpeed() const { return FMath::Max(0.1f, BaseAttackSpeed * AddedAttackSpeed); }
 
 	UFUNCTION(BlueprintPure, Category="Stats")
 	float GetCritRate() const { return FMath::Clamp(BaseCritRate + AddedCritRate, 0.f, 1.f); }
@@ -225,7 +225,7 @@ private:
 	float AddedSpellPower = 0.f;
 	
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
-	float AddedAttackSpeed = 0.f;
+	float AddedAttackSpeed = 1.f;
 	
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedCritRate = 0.f;
@@ -240,7 +240,7 @@ private:
 	float AddedDefense = 0.f;
 	
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
-	float AddedMemoryAcceleration = 0.f;
+	float AddedMemoryAcceleration = 1.f;
 	
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedAttackRange = 0.f;

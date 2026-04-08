@@ -21,6 +21,22 @@ void AInteractChaos::BeginPlay()
 	//InteractableType = EInteractableType::Chaos;
 }
 
+void AInteractChaos::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// GC에서 해결 되지 않고 플레이를 끈 경우 
+	if (SelectUIInstance)
+	{
+		SelectUIInstance->ClearButtons();
+		if (SelectUIInstance->IsInViewport())
+		{
+			SelectUIInstance->RemoveFromParent();
+		}
+		SelectUIInstance = nullptr;
+	}
+	
+	Super::EndPlay(EndPlayReason);
+}
+
 void AInteractChaos::Interact_Implementation()
 {
 	Super::Interact_Implementation();
@@ -127,4 +143,49 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	GI->DebugStat();
 	
 	HideSelectUI();
+}
+
+void AInteractChaos::ShowSelectUI()
+{
+	Super::ShowSelectUI();
+	
+	if (!SelectUIClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
+		return;
+	}
+	
+	// 최소한 한 번만 생성, 이후에는 인스턴스 재사용
+	if (!SelectUIInstance)
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+		SelectUIInstance = CreateWidget<USelectUI>(PC, SelectUIClass);
+		if (SelectUIInstance)
+		{
+			// PIE Undo Buffer Leaks 방지
+			// 위 코드는 위젯을 생성하자마자 
+			// "이 위젯은 실행 취소 기록에 남기지 마! 넌 그냥 게임 플레이 도중에 쓰고 버릴 일회용이야!" 
+			// 라고 플래그(RF_Transactional)를 강제로 지워버리는 역할
+			SelectUIInstance->ClearFlags(RF_Transactional);
+		}
+	}
+
+	if (!SelectUIInstance) return;
+
+	// 이전 버튼들 정리 
+	SelectUIInstance->ClearButtons();
+	if (!SelectUIInstance->IsInViewport())
+	{
+		SelectUIInstance->AddToViewport();
+	}
+}
+
+void AInteractChaos::HideSelectUI()
+{
+	Super::HideSelectUI();
+	
+	if (SelectUIInstance->IsInViewport())
+	{
+		SelectUIInstance->RemoveFromParent();
+	}
 }

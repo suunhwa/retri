@@ -17,16 +17,24 @@ class RETRI_API AInteractWell : public AInteractableBase
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	virtual void Interact_Implementation() override;
 	
 	UFUNCTION()
-	void OnChaosSelected(int32 Index);
+	void OnWellSelected(int32 Index);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Chaos")
 	UDataTable* WellDataTable;
 	
+	UPROPERTY()
+	class UWellSelectUI* WellSelectUIInstance;
+	
+	virtual void ShowSelectUI() override;
+	virtual void HideSelectUI() override;
+	
 private:
 	TArray<FWellRewardData*> PickedWellReward;
 };
+ 

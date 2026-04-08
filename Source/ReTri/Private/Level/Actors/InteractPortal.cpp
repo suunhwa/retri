@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Level/UI/MapUI.h"
+#include "ReTri/ReTri.h"
 
 void AInteractPortal::BeginPlay()
 {
