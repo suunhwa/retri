@@ -4,6 +4,7 @@
 #include "Enemy/DarkMoon/DarkMoon.h"
 
 #include "AIController.h"
+#include "ReTriGameInstance.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -174,6 +175,11 @@ void ADarkMoon::BossDead()
 		AIC->StopMovement();
 		AIC->UnPossess();	// AI 제어권 회수
 	}
+	
+	// === GamePlay Save ===
+	auto* GI = Cast<UReTriGameInstance>(GetGameInstance());
+	if (!GI) return; 
+	GI->PlayerPlayData.SetKillBoss(1);
 	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

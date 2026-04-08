@@ -82,18 +82,21 @@ void AMinionSpawner::CreateMinion()
 
 void AMinionSpawner::AddMinionDeathCount()
 {
+	auto* GI = Cast<UReTriGameInstance>(GetGameInstance());
+	if (!GI) return; 
+	
 	CurrentDeathCount++;
+	
+	// === GamePlay 저장 ===
+	GI->PlayerPlayData.SetKillEnemy(CurrentDeathCount);
 	
 	if (CurrentDeathCount >= MaxlMinionCount)
 	{
 		SCREENLOG("전멸.");
 		
-		if (auto GI = UGameplayStatics::GetGameInstance(GetWorld()))
+		if (auto MapSub = GI->GetSubsystem<UMapSubSystem>())
 		{
-			if (auto MapSub = GI->GetSubsystem<UMapSubSystem>())
-			{
-				MapSub->LevelClear();
-			}
+			MapSub->LevelClear();
 		}
 	}
 }

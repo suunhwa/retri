@@ -31,6 +31,7 @@
 #include "Level/Actors/FloatingUIActor.h"
 #include "Player/UI/HPBar.h"
 #include "Player/UI/PlayerHUD.h"
+#include "Level/UI/GameOverUI.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -153,6 +154,7 @@ APlayerCharacter::APlayerCharacter()
 	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 300.f)); // 머리 위 높이 조절
 	HPBarComp->SetWidgetSpace(EWidgetSpace::Screen); // 항상 카메라 향함
 	HPBarComp->SetDrawSize(FVector2D(100.f, 15.f)); // 크기 조절
+	
 }
 
 // Called when the game starts or when spawned
@@ -466,6 +468,9 @@ float APlayerCharacter::TakeDamage(float DamageAmount,
 	// === Damage UI ===
 	if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
 	{
+		// === GamePlay Save ===
+		GI->PlayerPlayData.SetGetDamage(Damage);
+		
 		if (GI->FloatingUIActorClass)
 		{
 			AFloatingUIActor* DamageText = GetWorld()->SpawnActor<AFloatingUIActor>(
@@ -475,7 +480,7 @@ float APlayerCharacter::TakeDamage(float DamageAmount,
 			);
 				
 			FString DmgString = FString::Printf(TEXT("%d"), FMath::RoundToInt(Damage));
-			DamageText->ShowFloatingUI(FText::FromString(DmgString), FLinearColor::Red);
+			DamageText->ShowScaleUI(FText::FromString(DmgString), FLinearColor::Red);
 		}
 	}
 
@@ -518,38 +523,20 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 	GetWorldTimerManager().SetTimer(DeathPauseHandle, [this]()
 	{
 		UGameplayStatics::SetGamePaused(this, true);
+		
+		// === GameOverUI === 
+		if (GameOverUIClass != nullptr)
+		{
+			GameOverUI = CreateWidget<UGameOverUI>(GetWorld(), GameOverUIClass);
+		}
+		if (GameOverUI != nullptr)
+		{
+			GameOverUI->SetUIData();
+			GameOverUI->AddToViewport(10);
+		}
+		
 	}, DeathAnimDuration, false);
 	
-	/*// 사망 몽타주 재생
-	if (DeathMontage)
-	{
-		UAnimInstance* ai = GetMesh()->GetAnimInstance();
-		if (ai)
-		{
-			// 몽타주 종료 시점에 정확히 실행
-			FOnMontageEnded EndDelegate;
-			EndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted)
-			{
-				if (!bInterrupted && GetMesh())
-				{
-					GetMesh()->bPauseAnims = true;
-					UGameplayStatics::SetGamePaused(this, true);
-				}
-			});
-			ai->Montage_Play(DeathMontage);
-			ai->Montage_SetEndDelegate(EndDelegate, DeathMontage);
-		}
-	}*/
-
-	/*// 일정 시간 후 레벨 재시작
-	FTimerHandle DeathTimerHandle;
-	GetWorldTimerManager().SetTimer(DeathTimerHandle,
-	                                [this]()
-	                                {
-		                                UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
-	                                },
-	                                3.f,
-	                                false);*/
 }
 
 void APlayerCharacter::HoverInteractable()

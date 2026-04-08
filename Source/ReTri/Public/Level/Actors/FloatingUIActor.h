@@ -21,6 +21,8 @@ public:
 	
 	void ShowFloatingUI(FText Text, FLinearColor Color);
 	
+	void ShowFloatingLongUI(FText Text, FLinearColor Color);
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	UWidgetComponent* WidgetComp;
 };

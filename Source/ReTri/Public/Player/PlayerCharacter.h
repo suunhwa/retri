@@ -206,6 +206,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<UPlayerHUD> PlayerHUDClass;
 	
+	// === GameOverUI === 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UGameOverUI> GameOverUIClass;
+	UPROPERTY()
+	UGameOverUI* GameOverUI;
+	
 	UFUNCTION(Exec)
 	void DebugAddExp(int32 Amount);
 

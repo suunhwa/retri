@@ -81,16 +81,26 @@ void UStatComponent::ApplyStatModifier(EStatTypes Type, float Delta)
 {
 	float NewValue = 0.f;
 
+	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	
 	switch (Type)
 	{
 	case EStatTypes::Gold:
 		Gold = FMath::Max(0, Gold + static_cast<int32>(Delta));
 		NewValue = static_cast<float>(Gold);
+		
+		// === GamePlay Save ===
+		if (!GI) break; 
+		GI->PlayerPlayData.SetGold(static_cast<int32>(Delta));
 		break;
 
 	case EStatTypes::DreamDust:
 		DreamDust = FMath::Max(0, DreamDust + static_cast<int32>(Delta));
 		NewValue = static_cast<float>(DreamDust);
+		
+		// === GamePlay Save ===
+		if (!GI) break; 
+		GI->PlayerPlayData.SetDreamDust(static_cast<int32>(Delta));
 		break;
 
 	case EStatTypes::MaxHP:
@@ -228,7 +238,8 @@ void UStatComponent::AddExp(int32 Amount)
 {
 	if (Amount <= 0) return;
 	CurrentExp += Amount;
-
+	TotalExp += Amount;
+	
 	// 레벨업 체크 — 누적 경험치가 다음 레벨 조건 충족 시 반복 처리
 	int32 NextLevel = CurrentLevel + 1;
 	int32 Required = GetRequiredExpForLevel(NextLevel);

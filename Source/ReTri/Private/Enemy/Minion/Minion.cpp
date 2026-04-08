@@ -104,6 +104,9 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 		// === Damage UI ===
 		if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
 		{
+			// === GamePlay Save ===
+			GI->PlayerPlayData.SetGiveDamage(ActualDamage);
+			
 			if (GI->FloatingUIActorClass)
 			{
 				AFloatingUIActor* DamageText = GetWorld()->SpawnActor<AFloatingUIActor>(
@@ -113,7 +116,7 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 				);
 				
 				FString DmgString = FString::Printf(TEXT("%d"), FMath::RoundToInt(ActualDamage));
-				DamageText->ShowFloatingUI(FText::FromString(DmgString), FLinearColor(1.0f, 0.612f, 0.057, 1.0f));
+				DamageText->ShowScaleUI(FText::FromString(DmgString), FLinearColor(1.0f, 0.612f, 0.057, 1.0f));
 			}
 		}
 		
@@ -147,10 +150,6 @@ void AMinion::OnAttackOverlap(AActor* OtherActor)
 		);
 		
 		bHasHitTarget = true;
-		
-		// === Spawn EXP Goods ===
-		auto EXP = GetWorld()->SpawnActor<AGoodsExp>(GoodsEXPClass, GetActorLocation(), GetActorRotation());
-		EXP->Amount = AmountExp;
 
 		//UE_LOG(LogTemp, Warning, TEXT("플레이어에게 %f 데미지를 입혔다!"), 1.0f);
 	}
@@ -163,6 +162,10 @@ void AMinion::DoRagdoll()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	GetMesh()->SetSimulatePhysics(true);
+	
+	// === Spawn EXP Goods ===
+	auto EXP = GetWorld()->SpawnActor<AGoodsExp>(GoodsEXPClass, GetActorLocation(), GetActorRotation());
+	EXP->Amount = AmountExp;
 	
 	// 미안.. 이거말고 다른거 있어...
 	// if (APlayerCharacter* Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))

@@ -86,6 +86,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category="Stats")
 	int32 GetCurrentExp() const { return CurrentExp; }
+	
+	UFUNCTION(BlueprintPure, Category="Stats")
+	int32 GetTotalExp() const { return TotalExp; }
 
 	// 성소 / 레벨 시스템에서 현재 스탯 전체를 읽을 때 사용
 	UFUNCTION(BlueprintPure, Category="Stats")
@@ -163,6 +166,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Stats|Level", meta=(AllowPrivateAccess=true))
 	int32 CurrentExp = 0;
 
+	UPROPERTY(VisibleAnywhere, Category="Stats|Level", meta=(AllowPrivateAccess=true))
+	int32 TotalExp = 0;
+	
 	// ── Currency: 단순 누적 잔액 ──────────────────────────────────────────
 	UPROPERTY(VisibleAnywhere, Category="Stats|Currency", meta=(AllowPrivateAccess=true))
 	int32 Gold = 0;
