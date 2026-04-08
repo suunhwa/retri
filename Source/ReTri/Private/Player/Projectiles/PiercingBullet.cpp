@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -57,6 +58,15 @@ void APiercingBullet::BeginPlay()
 		TrailComp->SetTemplate(TrailEffect);
 		TrailComp->Activate();
 	}
+
+	if (NiagaraTrailEffect)
+	{
+		NiagaraTrailComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			NiagaraTrailEffect, CollisionComp, NAME_None,
+			FVector::ZeroVector, FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset, true
+		);
+	}
 }
 
 // Called every frame
@@ -95,11 +105,24 @@ void APiercingBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleEffect, GetActorLocation());
 	}
 	
-	if (ImpactSound)
+	// 히트 스파크
+	const FVector HitPoint = SweepResult.ImpactPoint.IsZero() ? OtherActor->GetActorLocation() : FVector(SweepResult.ImpactPoint);
+
+	if (HitSparkEffect)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitSparkEffect, HitPoint);
 	}
-	
+
+	if (HitSparkParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitSparkParticle, HitPoint);
+	}
+
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+	}
+
 	// 최대 관통 수 초과 시 소멸
 	if (PierceCount >= MaxPierceCount)
 	{

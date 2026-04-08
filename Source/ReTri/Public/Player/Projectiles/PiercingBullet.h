@@ -10,6 +10,7 @@ class USphereComponent;
 class UStaticMeshComponent;
 class UProjectileMovementComponent;
 class UNiagaraSystem;
+class UNiagaraComponent;
 class UParticleSystem;
 class UParticleSystemComponent;
 
@@ -40,9 +41,13 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> MoveComp;
 	
-	// 발사체 트레일
+	// 발사체 트레일 (Particle)
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UParticleSystemComponent> TrailComp;
+
+	// 발사체 트레일 (Niagara)
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UNiagaraComponent> NiagaraTrailComp;
 	
 public:
 	// 피해량
@@ -56,15 +61,26 @@ public:
 	// effects
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UParticleSystem> TrailEffect;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UNiagaraSystem> NiagaraTrailEffect;
+
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> ImpactEffect;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UParticleSystem> ParticleEffect;
-	
+
+	// 히트 스파크 (Niagara)
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
-	TObjectPtr<USoundBase> ImpactSound;
+	TObjectPtr<UNiagaraSystem> HitSparkEffect;
+
+	// 히트 스파크 (Particle)
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UParticleSystem> HitSparkParticle;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<USoundBase> HitSound;
 	
 	void SetDamage(float InDamage) { Damage = InDamage; }
 	

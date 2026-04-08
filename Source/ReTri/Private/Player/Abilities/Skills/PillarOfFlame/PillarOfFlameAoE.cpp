@@ -66,6 +66,14 @@ void APillarOfFlameAoE::BeginPlay()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 	}
+
+	if (ImpactCS)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			PC->ClientStartCameraShake(ImpactCS);
+		}
+	}
 }
 
 void APillarOfFlameAoE::Init(float InAbilityPower, AController* InInstigator)
@@ -155,6 +163,22 @@ void APillarOfFlameAoE::FinishDoT()
 	BurnEffectComps.Empty();
 
 	GetWorldTimerManager().ClearTimer(DoTTimerHandle);
+
+	// FireEffect 자연 페이드아웃 후 액터 제거
+	if (FireEffect)
+	{
+		FireEffect->Deactivate();
+	}
+
+	GetWorldTimerManager().SetTimer(
+		DestroyTimerHandle,
+		this, &APillarOfFlameAoE::DestroyAfterFade,
+		EffectFadeOutDelay, false
+	);
+}
+
+void APillarOfFlameAoE::DestroyAfterFade()
+{
 	Destroy();
 }
 

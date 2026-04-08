@@ -9,6 +9,7 @@
 class AHandCannonBullet;
 class UNiagaraSystem;
 class UParticleSystem;
+class UCameraShakeBase;
 
 UCLASS()
 class RETRI_API UHandCannonSkill : public UAbilityBase
@@ -45,4 +46,8 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> FireSound;
+
+	// 발사 + 반동 시 카메라 셰이크
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> FireCS;
 };

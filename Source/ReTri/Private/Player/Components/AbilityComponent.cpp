@@ -92,6 +92,18 @@ void UAbilityComponent::SetSkill(EAbilitySlot Slot, TSubclassOf<UAbilityBase> Ab
 
 bool UAbilityComponent::EquipAcquiredSkill(TSubclassOf<UAbilityBase> AbilityClass)
 {
+	if (!AbilityClass) return false;
+
+	// 이미 같은 스킬이 장착되어 있으면 중복 장착 거부
+	for (auto& Pair : Abilities)
+	{
+		if (Pair.Value && Pair.Value->GetClass() == AbilityClass)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[AbilityComponent] 중복 스킬 장착 거부: %s"), *AbilityClass->GetName());
+			return false;
+		}
+	}
+
 	// 교체 가능한 4개 슬롯 중 빈 슬롯에 장착 (Q→E→RMB→R 순)
 	// 슬롯 간 스왑으로 배치가 바뀔 수 있으므로 고정 슬롯(Dash)만 제외하고 전부 확인
 	constexpr EAbilitySlot Swappable[] = {

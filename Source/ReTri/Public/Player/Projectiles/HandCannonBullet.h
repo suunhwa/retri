@@ -41,9 +41,13 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> MoveComp;
 	
-	// 발사체 트레일
+	// 발사체 트레일 (Particle)
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UParticleSystemComponent> TrailComp;
+
+	// 발사체 트레일 (Niagara)
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UNiagaraComponent> NiagaraTrailComp;
 	
 public:
 	// 근거리 판정 거리
@@ -67,15 +71,24 @@ public:
 	// effects
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UParticleSystem> TrailEffect;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UNiagaraSystem> NiagaraTrailEffect;
+
+	// 충돌 이펙트 (Niagara)
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> ImpactEffect;
-	
+
+	// 히트 스파크 (Niagara)
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
-	TObjectPtr<UParticleSystem> ParticleEffect;
-	
+	TObjectPtr<UNiagaraSystem> HitSparkEffect;
+
+	// 히트 스파크 (Particle)
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
-	TObjectPtr<USoundBase> ImpactSound;
+	TObjectPtr<UParticleSystem> HitSparkParticle;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<USoundBase> HitSound;
 	
 private:
 	FVector SpawnLocation;

@@ -241,7 +241,7 @@ void AEnemyBase::PlayDeathEffect()
 void AEnemyBase::BroadcastDeath()
 {
 	OnMinionDieDelegate.Broadcast();
-	
+
 	// === 증오 ===
 	if (UGameInstance* GI = GetWorld()->GetGameInstance())
 	{

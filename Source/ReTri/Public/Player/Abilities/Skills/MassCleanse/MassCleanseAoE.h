@@ -8,6 +8,7 @@
 
 class UCapsuleComponent;
 class UNiagaraComponent;
+class UCameraShakeBase;
 
 /**
  * 대규모 정화 AoE 액터
@@ -55,6 +56,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> ImpactSound;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> ImpactCS;
 
 	TWeakObjectPtr<AController> InstigatorController;
 

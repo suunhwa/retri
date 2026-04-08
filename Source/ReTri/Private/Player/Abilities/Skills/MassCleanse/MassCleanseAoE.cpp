@@ -43,6 +43,14 @@ void AMassCleanseAoE::BeginPlay()
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 	}
 
+	if (ImpactCS)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			PC->ClientStartCameraShake(ImpactCS);
+		}
+	}
+
 	GetWorldTimerManager().SetTimer(
 		LifeTimerHandle,
 		this, &AMassCleanseAoE::FinishEffect,

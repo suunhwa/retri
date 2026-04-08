@@ -9,15 +9,16 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 
 ACoinProjectile::ACoinProjectile()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
-	CollisionComp->SetSphereRadius(12.f);
+	CollisionComp->SetSphereRadius(30.f);
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel5);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -45,9 +46,28 @@ void ACoinProjectile::BeginPlay()
 
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ACoinProjectile::OnOverlap);
 
+	if (FlightEffect)
+	{
+		FlightEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			FlightEffect, BodyMesh, NAME_None,
+			FVector::ZeroVector, FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset, true
+		);
+	}
+
 	if (FlightSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), FlightSound, GetActorLocation());
+	}
+}
+
+void ACoinProjectile::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!bHasExploded)
+	{
+		BodyMesh->AddLocalRotation(FRotator(0.f, SpinRate * DeltaTime, 0.f));
 	}
 }
 
@@ -77,6 +97,11 @@ void ACoinProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 void ACoinProjectile::Explode(FVector ExplosionLocation)
 {
+	if (FlightEffectComp)
+	{
+		FlightEffectComp->DeactivateImmediate();
+	}
+
 	// VFX
 	if (ExplosionEffect)
 	{
@@ -91,6 +116,14 @@ void ACoinProjectile::Explode(FVector ExplosionLocation)
 	if (ExplosionSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, ExplosionLocation);
+	}
+
+	if (ExplosionCS)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			PC->ClientStartCameraShake(ExplosionCS);
+		}
 	}
 
 	// AoE 범위 내 적 탐색

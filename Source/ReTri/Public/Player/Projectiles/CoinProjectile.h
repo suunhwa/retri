@@ -10,6 +10,8 @@ class UProjectileMovementComponent;
 class USphereComponent;
 class UStaticMeshComponent;
 class UNiagaraSystem;
+class UNiagaraComponent;
+class UCameraShakeBase;
 
 // 폭발 완료 후 스킬에 통보 (50/50 판정용)
 DECLARE_DELEGATE(FOnCoinExploded);
@@ -30,6 +32,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 public:
 	// 스킬에서 스폰 직후 호출
@@ -64,6 +67,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="CoinExplosion")
 	float StunDuration = 1.f;
 
+	// 비행 중 메시 회전 속도 (도/초)
+	UPROPERTY(EditDefaultsOnly, Category="CoinExplosion")
+	float SpinRate = 720.f;
+
+	// 비행 중 VFX (스폰 후 붙어서 따라다님)
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UNiagaraSystem> FlightEffect;
+
 	// 폭발 VFX
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> ExplosionEffect;
@@ -75,6 +86,14 @@ private:
 	// 코인 날아갈 때 SFX
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> FlightSound;
+
+	// 폭발 시 카메라 셰이크
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> ExplosionCS;
+
+	// 비행 중 활성화된 Niagara 컴포넌트 (폭발 시 비활성화)
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> FlightEffectComp;
 
 	float Damage = 0.f;
 	bool bHasExploded = false;

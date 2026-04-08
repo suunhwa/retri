@@ -8,6 +8,7 @@
 
 class UCapsuleComponent;
 class UNiagaraComponent;
+class UCameraShakeBase;
 
 /**
  * 중력반전 스킬이 소환하는 범위 Actor
@@ -61,6 +62,14 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> LandSound;
+
+	// 부양 시 카메라 셰이크 (약하게)
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> LiftCS;
+
+	// 착지 피해 시 카메라 셰이크 (강하게)
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> LandCS;
 
 	TWeakObjectPtr<AController> InstigatorController;
 

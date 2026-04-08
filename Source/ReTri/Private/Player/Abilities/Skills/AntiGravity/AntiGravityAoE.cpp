@@ -101,6 +101,14 @@ void AAntiGravityAoE::ApplyLift()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, LiftSound, GetActorLocation());
 	}
+
+	if (LiftCS)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			PC->ClientStartCameraShake(LiftCS);
+		}
+	}
 }
 
 void AAntiGravityAoE::ApplyLandingDamage()
@@ -134,5 +142,13 @@ void AAntiGravityAoE::ApplyLandingDamage()
 	if (LandSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, LandSound, GetActorLocation());
+	}
+
+	if (LandCS)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			PC->ClientStartCameraShake(LandCS);
+		}
 	}
 }

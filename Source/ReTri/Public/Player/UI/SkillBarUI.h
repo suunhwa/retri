@@ -87,6 +87,9 @@ private:
 	UFUNCTION()
 	void OnAttackCountChanged(int32 Count);
 
+	UFUNCTION()
+	void OnDashChargeChanged(int32 Current, int32 Max);
+
 	void RefreshSlot(USkillSlotUI* SlotWidget, EAbilitySlot AbilitySlot);
 
 	USkillSlotUI* FindSlotWidget(EAbilitySlot AbilitySlot) const;

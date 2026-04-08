@@ -49,6 +49,12 @@ void UCoinExplosionSkill::Activate(ACharacter* Owner)
 
 	if (!StatComp->SpendGold(GoldCost)) return;
 
+	// 던지는 발사음
+	if (CastSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(Owner->GetWorld(), CastSound, Owner->GetActorLocation());
+	}
+
 	// 피해량 = 소모 골드 × 현재 배율
 	const float FinalDamage = GoldCost * ExplosionDamageCoeff;
 
