@@ -86,6 +86,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
 	class UAnimMontage* MirrorBladeMontage;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
+	TSubclassOf<class UCameraShakeBase> BossCameraShake;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
+	TSubclassOf<class UCameraShakeBase> DashCameraShake;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
 	TSubclassOf<class UCameraShakeBase> DeathCameraShake;
@@ -247,5 +252,7 @@ public:
 	
 protected:
 	virtual void UpdatePhase() { }
+	
+	void PlayCameraShake();
 	
 };

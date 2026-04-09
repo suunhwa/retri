@@ -261,6 +261,16 @@ void UBP_StateTreeTask::ExecuteDash(AEnemyBase* Boss, ACharacter* Player, UAnimM
 			
 			Boss->DashTrailComp->ResetSystem();
 			Boss->DashTrailComp->Activate(true);
+			
+			// 카메라
+			if (Boss->DashCameraShake)
+			{
+				APlayerController* pc = Boss->GetWorld()->GetFirstPlayerController();
+				if (pc)
+				{
+					pc->ClientStartCameraShake(Boss->DashCameraShake);
+				}
+			}
 
 			Boss->PlayAnimMontage(Montage);
 		}
@@ -436,6 +446,16 @@ void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
 					}
 
 					Clone->Destroy();
+				}
+			}
+			
+			// 카메라
+			if (Boss->DashCameraShake)
+			{
+				APlayerController* pc = Boss->GetWorld()->GetFirstPlayerController();
+				if (pc)
+				{
+					pc->ClientStartCameraShake(Boss->DashCameraShake);
 				}
 			}
 
