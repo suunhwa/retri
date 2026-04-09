@@ -83,6 +83,8 @@ void AEnemyBase::Landed(const FHitResult& Hit)
 	
 	if (bIsJumpDownAttacking)
 	{
+		PlayCameraShake();
+		
 		if (bIsEnhancedJump)
 		{
 			
@@ -254,6 +256,20 @@ void AEnemyBase::BroadcastDeath()
 	}
 }
 
+void AEnemyBase::PlayCameraShake()
+{
+	if (BossCameraShake)
+	{
+		APlayerController* pc = GetWorld()->GetFirstPlayerController();
+		if (pc)
+		{
+			pc->ClientStartCameraShake(BossCameraShake);
+		}
+	}
+}
+
+
+
 void AEnemyBase::StartCharging(AActor* NewTarget)
 {
 	if (NewTarget)
@@ -355,7 +371,6 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 			
 			if (Progress >= 0.5f) // 0.5 크기까지 커지면 
 			{
-				
 				// Progress = 0.0f; // 초기화
 				Boss->GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
 				
