@@ -57,11 +57,19 @@ void UAntiGravitySkill::Activate(ACharacter* Owner)
 	{
 		if (UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(Owner->GetWorld(), CastEffect, TargetPoint))
 		{
+			// NC->SetAutoDestroy(true);
+			// FTimerHandle TimerHandle;
+			// Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [NC]()
+			// {
+			// 	if (NC) NC->DeactivateImmediate();
+			// }, EffectDuration, false);
+			
 			NC->SetAutoDestroy(true);
 			FTimerHandle TimerHandle;
-			Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [NC]()
+			TWeakObjectPtr<UNiagaraComponent> WeakNC = NC;
+			Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [WeakNC]()
 			{
-				if (NC) NC->DeactivateImmediate();
+				if (WeakNC.IsValid()) WeakNC->DeactivateImmediate();
 			}, EffectDuration, false);
 		}
 	}

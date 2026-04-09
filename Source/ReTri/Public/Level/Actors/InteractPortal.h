@@ -28,4 +28,7 @@ public:
 	
 	UPROPERTY()
 	UMapUI* MapUI;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* PortalSound;
 };

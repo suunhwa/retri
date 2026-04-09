@@ -48,4 +48,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	int32 NodeIndexNumber; 
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* HoverSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* ClickSound;
 };

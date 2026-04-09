@@ -25,6 +25,7 @@ void AInteractPortal::BeginPlay()
 	// InteractableType = EInteractableType::Portal;
 	
 	NiagaraComp->Activate();
+	UGameplayStatics::PlaySound2D(GetWorld(), PortalSound);
 	
 	MapUI = CreateWidget<UMapUI>(GetWorld(), MapUIClass);
 }

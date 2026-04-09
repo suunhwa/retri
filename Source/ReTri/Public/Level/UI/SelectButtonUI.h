@@ -29,6 +29,8 @@ public:
 	FOnSelectButtonClicked OnSelectClicked;
 
 	UFUNCTION()
+	void OnHover();
+	UFUNCTION()
 	void OnClicked();
 	
 	UFUNCTION(BlueprintCallable)
@@ -48,4 +50,9 @@ public:
 	
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* TextInfo;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* HoverSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* ClickSound;
 };

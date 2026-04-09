@@ -184,9 +184,9 @@ void UMapSubSystem::ProceduralGenerateMap()
 		return;
 	}
 	
-	int32 MaxDepth = 3;
+	int32 MaxDepth = 2;
 	int32 MinWidth = 2;
-	int32 MaxWidth = 4;
+	int32 MaxWidth = 3;
 	
 	TArray<TArray<int32>> NodeGrid;
 	NodeGrid.SetNum(MaxDepth);
@@ -457,6 +457,12 @@ TArray<FPlayerSkillData*> UMapSubSystem::GetRandomAcquiredItemList()
 	{
 		if (Skill->SkillCategory == ESkillCategory::Acquired)
 		{
+			if (Skill->SkillID.Equals(FString::Printf(TEXT("boss_drop"))))
+			{
+				BossDropItem = Skill;
+				continue;
+			}
+			
 			AcquiredSkills.Add(Skill);
 		}
 	}

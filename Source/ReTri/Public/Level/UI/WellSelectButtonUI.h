@@ -27,6 +27,8 @@ public:
 
 	UFUNCTION()
 	void OnClicked();
+	UFUNCTION()
+	void OnHover();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetTextDescription(FString Title);
@@ -45,4 +47,9 @@ public:
 	
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* TextCost;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* HoverSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* ClickSound;
 };

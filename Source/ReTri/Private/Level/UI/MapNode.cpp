@@ -6,6 +6,7 @@
 #include "ReTri/ReTri.h"
 #include "MapSubSystem.h"
 #include "Components/Button.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMapNode::NativeConstruct()
 {
@@ -32,6 +33,8 @@ void UMapNode::NativeConstruct()
 void UMapNode::OnNodeHover()
 {
 	PlayAnimation(Hover, 0, 0);
+	
+	UGameplayStatics::PlaySound2D(GetWorld(), HoverSound);
 }
 
 void UMapNode::OnNodeHoverEnd()
@@ -41,6 +44,7 @@ void UMapNode::OnNodeHoverEnd()
 
 void UMapNode::OnNodeClicked()
 {
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
 	auto MapSub = GetGameInstance()->GetSubsystem<UMapSubSystem>();
 	if (!MapSub) return;
 	MapSub->EnterMap(NodeIndexNumber);
