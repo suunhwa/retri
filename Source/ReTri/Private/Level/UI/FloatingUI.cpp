@@ -35,3 +35,16 @@ void UFloatingUI::PlayFloating(FText Text, FLinearColor OutLinearColor)
 	
 	PlayAnimation(Floating);
 }
+
+void UFloatingUI::PlayFloatingLong(FText Text, FLinearColor OutLinearColor)
+{
+	//ShowText->SetText(FText::FromString(Text));
+	ShowText->SetText(Text);
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *Text.ToString());
+	FSlateFontInfo FontInfo = ShowText->GetFont();
+	FontInfo.OutlineSettings.OutlineColor = OutLinearColor;
+	FontInfo.OutlineSettings.OutlineSize = 2;
+	ShowText->SetFont(FontInfo);
+	
+	PlayAnimation(FloatingLong);
+}

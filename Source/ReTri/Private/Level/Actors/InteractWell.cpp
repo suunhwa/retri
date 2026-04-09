@@ -3,6 +3,7 @@
 
 #include "Level/Actors/InteractWell.h"
 
+#include "NiagaraComponent.h"
 #include "ReTriGameInstance.h"
 #include "Level/Actors/FloatingUIActor.h"
 #include "Level/UI/WellSelectButtonUI.h"
@@ -14,9 +15,18 @@
 #include "ReTri/ReTri.h"
 
 
+AInteractWell::AInteractWell()
+{
+	// ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Script/Niagara.NiagaraSystem'/Game/Free_Magic/VFX_Niagara/NS_Sanctuary.NS_Sanctuary'"));
+	// if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
+	// NiagaraComp->SetRelativeRotation(FRotator(-90.0f, -0.0f, 0.0f));
+	// NiagaraComp->bAutoActivate = false;
+}
+
 void AInteractWell::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	
 	// InteractableType = EInteractableType::Well;
 }
@@ -95,7 +105,7 @@ void AInteractWell::OnWellSelected(int32 Index)
 	FString FloatingText = FString::Printf(TEXT("꿈가루 부족!"));
 	FLinearColor FloatingColor = FLinearColor::Red;
 	
-	if (GI->StatComp->GetDreamDust() < WellRewardData->DreamDustCost)
+	if (!GI->StatComp->SpendDreamDust(WellRewardData->DreamDustCost))
 	{
 		if (GI->FloatingUIActorClass && !FloatingText.IsEmpty())
 		{

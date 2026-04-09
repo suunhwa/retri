@@ -15,6 +15,8 @@ class RETRI_API AInteractRemnants : public AInteractableBase
 	GENERATED_BODY()
 
 protected:
+	AInteractRemnants();
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

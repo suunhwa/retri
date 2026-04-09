@@ -14,7 +14,6 @@ void AInteractPortal::BeginPlay()
 	InteractableType = EInteractableType::Portal;
 	
 	MapUI = CreateWidget<UMapUI>(GetWorld(), MapUIClass);
-
 }
 
 void AInteractPortal::Interact_Implementation()

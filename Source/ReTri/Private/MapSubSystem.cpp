@@ -172,6 +172,11 @@ void UMapSubSystem::ProceduralGenerateMap()
 	CurMapDatas.Empty();
 	CurMapIndex = 0;
 	
+	MerchantItemDatas.Empty();
+	ActiveCurseQuests.Empty();
+	MinionSpawnerCount = 0;
+	CurClearSpawnerCount = 0;
+	
 	// InteractionData 확인 예외처리
 	if (!InteractionData)
 	{
@@ -179,9 +184,9 @@ void UMapSubSystem::ProceduralGenerateMap()
 		return;
 	}
 	
-	int32 MaxDepth = 4;
-	int32 MinWidth = 1;
-	int32 MaxWidth = 3;
+	int32 MaxDepth = 3;
+	int32 MinWidth = 2;
+	int32 MaxWidth = 4;
 	
 	TArray<TArray<int32>> NodeGrid;
 	NodeGrid.SetNum(MaxDepth);
@@ -378,6 +383,11 @@ void UMapSubSystem::EnterMap(int32 MapIndex)
 		LevelName = TEXT("Lv_BossMap");
 		JIWONLOG("Boss Map")
 		break;
+	}
+	
+	if (UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetGameInstance()))
+	{
+		GI->PlayerPlayData.SetVisitLevel(1);
 	}
 	
 	// 5단계 UGameplayStatics::OpenLevel 노드를 호출해 해당 맵 이름으로 화면을 텔레포트

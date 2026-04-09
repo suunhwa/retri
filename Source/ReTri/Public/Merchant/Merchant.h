@@ -44,8 +44,15 @@ public:
 	UFUNCTION()
 	void MerchantEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
-	// UFUNCTION(BlueprintCallable)
-	// void DataInit(FName InRowName, FInteractableData RowData);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxHp = 500;
+	float CurHp = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Dialogue")
+	UDataTable* MerchantDialogueDataTable;
+	TArray<struct FMerchantDialogueRow*> MerchantDialogue;
+	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
 public:
 	// 상인 일 때
@@ -79,4 +86,5 @@ public:
 	
 	UFUNCTION()
 	void OnClickedMerchantSlotUI(int32 SlotNum);
+	
 };

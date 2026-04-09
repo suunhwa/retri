@@ -3,22 +3,31 @@
 
 #include "Level/Actors/InteractChaos.h"
 
-#include "MapSubSystem.h"
+#include "ReTriGameInstance.h"
 #include "Level/UI/SelectButtonUI.h"
 #include "Level/UI/SelectUI.h"
-#include "ReTriGameInstance.h"
 #include "Player/Components/StatComponent.h"
 #include "Player/Components/HealthComponent.h"
 #include "Level/Actors/FloatingUIActor.h"
+#include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 
+
+AInteractChaos::AInteractChaos()
+{
+	// ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Script/Niagara.NiagaraSystem'/Game/Free_Magic/VFX_Niagara/NS_Chaos.NS_Chaos'"));
+	// if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
+	// NiagaraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 30.0f));
+	// NiagaraComp->bAutoActivate = false;
+}
 
 void AInteractChaos::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	//InteractableType = EInteractableType::Chaos;
+	
 }
 
 void AInteractChaos::EndPlay(const EEndPlayReason::Type EndPlayReason)

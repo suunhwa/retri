@@ -16,6 +16,8 @@ class RETRI_API AInteractCurse : public AInteractableBase
 	GENERATED_BODY()
 
 protected:
+	AInteractCurse();
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

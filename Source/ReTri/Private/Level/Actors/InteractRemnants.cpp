@@ -5,14 +5,24 @@
 
 #include "Item/ItemBase.h"
 #include "MapSubSystem.h"
+#include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
+AInteractRemnants::AInteractRemnants()
+{
+	// ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Script/Niagara.NiagaraSystem'/Game/Free_Magic/VFX_Niagara/NS_Remnants.NS_Remnants'"));
+	// if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
+	// NiagaraComp->SetRelativeLocation(FVector(0.0f, 0.0f, -180.0f));
+	// NiagaraComp->SetRelativeRotation(FRotator(-90.0f, 180.0f, 180.0f));
+	// NiagaraComp->bAutoActivate = false;
+}
 
 void AInteractRemnants::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	InteractableType = EInteractableType::Remnants;
+	// InteractableType = EInteractableType::Remnants;
 }
 
 void AInteractRemnants::Interact_Implementation()

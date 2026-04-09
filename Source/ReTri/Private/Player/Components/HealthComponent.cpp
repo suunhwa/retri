@@ -3,6 +3,8 @@
 
 #include "Player/Components/HealthComponent.h"
 
+#include "ReTriGameInstance.h"
+
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -52,6 +54,11 @@ void UHealthComponent::Heal(float Amount)
 	
 	CurrentHP = FMath::Clamp(CurrentHP + Amount, 0.0f, AppliedMaxHP);
 	OnHPChanged.Broadcast(CurrentHP, AppliedMaxHP);
+	
+	// === GamePlay 저장 ===
+	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+	if (!GI) return; 
+	GI->PlayerPlayData.SetKillEnemy(Amount);
 }
 
 // StatComponent가 계산한 최종 MaxHP를 Health 시스템에 반영

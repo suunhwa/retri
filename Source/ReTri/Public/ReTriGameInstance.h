@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ReTriGameData.h"
 #include "Engine/GameInstance.h"
 
 #include "Player/Data/PlayerStatData.h"
@@ -70,7 +71,12 @@ public:
 	TSubclassOf<class ALootDreamPowderPillar> DreamPowderClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Map|NodeMap")
 	TSubclassOf<class AFloatingUIActor> FloatingUIActorClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI|GameOver")
+	FPlayerPlayData PlayerPlayData;
 	// =========== Level ===============================================
+	
+	// void PlayerDeadInit();
 	
 	void DebugStat() const;
 };

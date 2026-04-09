@@ -41,3 +41,13 @@ void AFloatingUIActor::ShowFloatingUI(FText Text, FLinearColor Color)
 
 	SetLifeSpan(1.0f);
 }
+
+void AFloatingUIActor::ShowFloatingLongUI(FText Text, FLinearColor Color)
+{
+	if (UFloatingUI* FloatingUI = Cast<UFloatingUI>(WidgetComp->GetUserWidgetObject()))
+	{
+		FloatingUI->PlayFloatingLong(Text, Color);
+	}
+
+	SetLifeSpan(1.5f);
+}

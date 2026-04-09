@@ -21,11 +21,15 @@ public:
 	void PlayScale(FText Text, FLinearColor OutLinearColor);
 	UFUNCTION()
 	void PlayFloating(FText Text, FLinearColor OutLinearColor);
+	UFUNCTION()
+	void PlayFloatingLong(FText Text, FLinearColor OutLinearColor);
 	
 	UPROPERTY(meta=(BindWidgetAnim), Transient)
 	UWidgetAnimation* Scale;
 	UPROPERTY(meta=(BindWidgetAnim), Transient)
 	UWidgetAnimation* Floating;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	UWidgetAnimation* FloatingLong;
 	
 	UPROPERTY(meta=(BindWidget))	
 	UTextBlock* ShowText;

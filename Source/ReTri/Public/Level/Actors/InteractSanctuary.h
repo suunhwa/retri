@@ -14,12 +14,18 @@ class RETRI_API AInteractSanctuary : public AInteractableBase
 {
 	GENERATED_BODY()
 	
+public:
+	AInteractSanctuary();
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
 	virtual void Interact_Implementation() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* HealStaticMesh;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HealHP = 100;

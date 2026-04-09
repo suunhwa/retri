@@ -4,6 +4,7 @@
 #include "Level/Actors/InteractCurse.h"
 
 #include "MapSubSystem.h"
+#include "NiagaraComponent.h"
 #include "Level/UI/SelectButtonUI.h"
 #include "Level/UI/SelectUI.h"
 #include "ReTri/ReTri.h"
@@ -11,9 +12,18 @@
 #include "Kismet/GameplayStatics.h"
 
 
+AInteractCurse::AInteractCurse()
+{
+	// ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Script/Niagara.NiagaraSystem'/Game/Free_Magic/VFX_Niagara/NS_Curse.NS_Curse'"));
+	// if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
+	// NiagaraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 90.0f));
+	// NiagaraComp->bAutoActivate = false;
+}
+
 void AInteractCurse::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	
 	//InteractableType = EInteractableType::Curse;
 }

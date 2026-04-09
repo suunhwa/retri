@@ -8,6 +8,7 @@
 #include "Level/UI/InteractableUI.h"
 #include "Level/UI/SelectUI.h"
 #include "MapSubSystem.h"
+#include "NiagaraComponent.h"
 #include "Level/Actors/InteractChaos.h"
 
 #include "Components/CapsuleComponent.h"
@@ -45,6 +46,9 @@ AInteractableBase::AInteractableBase()
 	PaperComp->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));
 	PaperComp->SetRelativeScale3D(FVector(8.f, 1.f, 8.f));
 	PaperComp->SetCastShadow(false);
+	
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComp"));
+	NiagaraComp->SetupAttachment(CapsuleComp);
 	
 	InteractUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractUI"));
 	InteractUI->SetupAttachment(CapsuleComp);

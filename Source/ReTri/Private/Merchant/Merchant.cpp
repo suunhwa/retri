@@ -13,6 +13,8 @@
 #include "Level/UI/InteractableUI.h"
 #include "MapSubSystem.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Level/Actors/FloatingUIActor.h"
+#include "Merchant/Data/MerchantData.h"
 #include "Merchant/UI/ShopBGUI.h"
 #include "Merchant/UI/ShopSlotUI.h"
 #include "Player/Abilities/AbilityBase.h"
@@ -51,6 +53,8 @@ void AMerchant::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CurHp = MaxHp;
+	
 	// 상점 Collider Overlap 
 	MerchantCollision->OnComponentBeginOverlap.AddDynamic(this, &AMerchant::MerchantBeginOverlap);
 	MerchantCollision->OnComponentEndOverlap.AddDynamic(this, &AMerchant::MerchantEndOverlap);
@@ -62,6 +66,11 @@ void AMerchant::BeginPlay()
 			InteractableUI->InteractableName->SetText(FText::FromString(TEXT("[상인] 조너스")));
 	}
 	
+	if (MerchantDialogueDataTable)
+	{
+		MerchantDialogue.Empty();
+		MerchantDialogueDataTable->GetAllRows<FMerchantDialogueRow>(TEXT("Curse::Interact"), MerchantDialogue);
+	}
 }
 
 void AMerchant::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -156,6 +165,32 @@ void AMerchant::MerchantEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	InteractUI->SetVisibility(false);
 	if (MerchantUIInstance)
 		HideMerchantUI();
+}
+
+float AMerchant::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
+	{
+		if (GI->FloatingUIActorClass)
+		{
+			AFloatingUIActor* DamageText = GetWorld()->SpawnActor<AFloatingUIActor>(
+				GI->FloatingUIActorClass, 
+				GetActorLocation(),
+				FRotator::ZeroRotator
+				);
+			
+			int32 RanNum = FMath::RandRange(0, MerchantDialogue.Num()-1);
+			
+			DamageText->ShowFloatingLongUI(FText::FromString(MerchantDialogue[RanNum]->Dialogue), FLinearColor(0.0f, 0.0f, 0.0f, 1.0f));
+		}
+	}
+	
+	// UE_LOG(LogTemp, Warning, TEXT("[Merchant] 상인이 %f 의 데미지를 입었습니다! (공격자: %s)"), Damage, DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"));
+	
+	return Damage;
 }
 
 void AMerchant::ShowMerchantUI()
