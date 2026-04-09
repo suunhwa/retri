@@ -164,8 +164,23 @@ void AMinion::DoRagdoll()
 	GetMesh()->SetSimulatePhysics(true);
 	
 	// === Spawn EXP Goods ===
-	auto EXP = GetWorld()->SpawnActor<AGoodsExp>(GoodsEXPClass, GetActorLocation(), GetActorRotation());
-	EXP->Amount = AmountExp;
+	if (GoodsEXPClass)
+	{
+		FTransform SpawnTransform(GetActorRotation(), GetActorLocation());
+		AGoodsExp* EXP = GetWorld()->SpawnActorDeferred<AGoodsExp>(
+			GoodsEXPClass, 
+			SpawnTransform, 
+			nullptr, 
+			nullptr, 
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+		);
+		
+		if (EXP)
+		{
+			EXP->Amount = AmountExp;
+			UGameplayStatics::FinishSpawningActor(EXP, SpawnTransform);
+		}
+	}
 	
 	// 미안.. 이거말고 다른거 있어...
 	// if (APlayerCharacter* Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))

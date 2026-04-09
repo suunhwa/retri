@@ -15,6 +15,7 @@ class RETRI_API AInteractWell : public AInteractableBase
 	GENERATED_BODY()
 	
 protected:
+	AInteractWell();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

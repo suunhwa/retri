@@ -13,6 +13,7 @@
 class UCapsuleComponent;
 class UWidgetComponent;
 class UPaperSpriteComponent;
+class UNiagaraComponent;
 class USelectUI;
 
 UCLASS()
@@ -58,6 +59,8 @@ public:
 	UStaticMeshComponent* MeshComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UPaperSpriteComponent* PaperComp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* NiagaraComp;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractableType InteractableType;
