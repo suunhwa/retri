@@ -144,11 +144,22 @@ void USkillSlotUI::SetupMaterials()
 		IconImg->SetBrushFromMaterial(IconMI);
 	}
 
-	// ---- 쿨다운 radial MID ----
+	// ---- 쿨다운 radial MID (테두리) ----
 	if (CooldownOverlayImg && MCooldownRadial)
 	{
 		CooldownMI = UMaterialInstanceDynamic::Create(MCooldownRadial, this);
 		CooldownOverlayImg->SetBrushFromMaterial(CooldownMI);
+	}
+
+	// ---- 쿨다운 내부 채움 MID ----
+	if (CooldownFillImg)
+	{
+		CooldownFillImg->SetVisibility(ESlateVisibility::Collapsed);
+		if (MCooldownFill)
+		{
+			CooldownFillMI = UMaterialInstanceDynamic::Create(MCooldownFill, this);
+			CooldownFillImg->SetBrushFromMaterial(CooldownFillMI);
+		}
 	}
 
 	/*// ---- 테두리 링 MID ----
@@ -197,6 +208,20 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("CooldownMI is NULL"));
+	}
+
+	if (CooldownFillImg)
+	{
+		if (bOnCooldown)
+		{
+			CooldownFillImg->SetVisibility(ESlateVisibility::HitTestInvisible);
+			if (CooldownFillMI)
+				CooldownFillMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
+		}
+		else
+		{
+			CooldownFillImg->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 
 	// 재질 없으면 Visibility로 폴백

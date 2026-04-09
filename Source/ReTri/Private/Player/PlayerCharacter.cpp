@@ -615,24 +615,6 @@ void APlayerCharacter::OnPickUp(const struct FInputActionValue& inputValue)
 {
 	const float PickUpRadius = 200.f;
 
-	// 보스 드랍 아이템 우선 체크
-	TArray<AActor*> BossDropItems;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABossDropItem::StaticClass(), BossDropItems);
-	for (AActor* Actor : BossDropItems)
-	{
-		if (FVector::Dist(GetActorLocation(), Actor->GetActorLocation()) <= PickUpRadius)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[PlayerCharacter] 보스 아이템 획득 → 다음 레벨로 전환"));
-			Actor->Destroy();
-
-			// TODO: 다음 레벨 이름 확정되면 아래 주석 해제
-			// ABossDropItem* DropItem = Cast<ABossDropItem>(Actor);
-			// if (DropItem && !DropItem->NextLevelName.IsNone())
-			//     UGameplayStatics::OpenLevel(GetWorld(), DropItem->NextLevelName);
-			return;
-		}
-	}
-
 	// ISkillItemInterface 구현 액터 전체에서 거리 체크 (콜리전 채널 무시)
 	TArray<AActor*> AllItems;
 	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), USkillItemInterface::StaticClass(), AllItems);
