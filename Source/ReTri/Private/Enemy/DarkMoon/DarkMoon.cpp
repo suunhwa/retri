@@ -155,7 +155,7 @@ float ADarkMoon::TakeDamage(float DamageAmount, struct FDamageEvent const& Damag
 
 void ADarkMoon::BossDead()
 {
-	//if (bIsDead) return;
+	if (bIsDead) return;
 	bIsDead = true;
 	
 	PlayDeathEffect();
@@ -178,11 +178,26 @@ void ADarkMoon::BossDead()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
+	float DieLength = 0.f;
 	if (DieMontage)
 	{
-		PlayAnimMontage(DieMontage);
+		DieLength = PlayAnimMontage(DieMontage);
 	}
 	
+	GetWorldTimerManager().SetTimer(
+		DeathTimerHandle, this,
+		&ADarkMoon::DeathAnimFinished,
+		DieLength > 0.2f ? DieLength-0.2f : 0.4f,
+		false);
+}
+
+void ADarkMoon::DeathAnimFinished()
+{
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	
+	// ======================== 보스 마무리 추가
+	
+	Destroy();
 }
 
 void ADarkMoon::StartBattleEvent()
@@ -195,7 +210,7 @@ void ADarkMoon::StartBattleEvent()
 	if (StateTreeComp && StateTreeComp->IsRunning())
 	{
 		StateTreeComp->SendStateTreeEvent(FGameplayTag::RequestGameplayTag(TEXT("Boss.StartBattle")));
-		UE_LOG(LogTemp, Error, TEXT("Battle 시작"));
+		// UE_LOG(LogTemp, Error, TEXT("Battle 시작"));
 	}
 }
 

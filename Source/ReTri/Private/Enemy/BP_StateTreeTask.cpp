@@ -14,7 +14,6 @@
 #include "Enemy/EnemyBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Level/Data/InteractableData.h"
 #include "ReTri/ReTri.h"
 
 UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer)
@@ -94,13 +93,13 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		RealPhase = 1;
 		if (Distance >= 400.f && Distance <= 1000.f)
 		{
-			// 중거리면 돌진, 점프만
+			// 중거리
 			SkillPool = { 1, 1, 3 }; // 1, 1, 3
 		}
 		else if (Distance < 400.f)
 		{
-			// 가까우면 모든 스킬
-			SkillPool = { 0, 1, 1, 3, 3 };
+			// 근거리
+			SkillPool = { 0, 1, 1 };
 		}
 		else
 		{
@@ -250,10 +249,23 @@ void UBP_StateTreeTask::ExecuteDash(AEnemyBase* Boss, ACharacter* Player, UAnimM
 			
 			// 발사!
 			Boss->LaunchCharacter(Boss->GetActorForwardVector() * 10000.0f, true, false);
-            
+			
+			
+			// 이펙트
+			Boss->DashTrailComp->Deactivate();
+			Boss->DashTrailComp->SetAbsolute(false, true, false);
+			
+			FRotator DashRot = Boss->GetActorForwardVector().Rotation();
+			DashRot.Pitch += 90.f;
+			Boss->DashTrailComp->SetWorldRotation(DashRot);
+			
+			Boss->DashTrailComp->ResetSystem();
+			Boss->DashTrailComp->Activate(true);
+
 			Boss->PlayAnimMontage(Montage);
 		}
 	}, 1.5f, false);
+	
 }
 
 void UBP_StateTreeTask::ExecuteFlash(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
@@ -272,7 +284,17 @@ void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UA
 	
 	Boss->PlayAnimMontage(Montage);
 	
-	// 올라가는 이펙트 생성 필요 ==============!!!!!! ================
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		Boss->JumpVFX,
+		FVector(Boss->GetActorLocation().X, Boss->GetActorLocation().Y, Boss->GetActorLocation().Z - 700.f),
+		Boss->GetActorRotation(),
+		FVector(4.0f),
+		true,
+		true,
+		ENCPoolMethod::None,
+		true
+		);
 	
 	Boss->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	Boss->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -294,8 +316,7 @@ void UBP_StateTreeTask::ExecuteMirrorBlade(AEnemyBase* Boss, ACharacter* Player,
 	
 	BladeRepeatCount = 0;	// 카운트 초기화
 	
-	// 사라지는 몽타주
-	Boss->PlayAnimMontage(Montage, 3.0);
+	Boss->PlayAnimMontage(Montage, 0.2);
 
 	// 패턴 시작
 	ExecutePatternCycle(Boss);	
@@ -305,6 +326,11 @@ void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
 {
 	if (!IsValid(Boss)) return;
 
+	if (BladeRepeatCount == 0)
+	{
+		Boss->PlayAnimMontage(Boss->MirrorBladeMontage, 0.5);
+	}
+	
 	if (BladeRepeatCount >= 4)
 	{
 		Boss->SetActorHiddenInGame(false);
@@ -426,6 +452,7 @@ void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
 					if (BladeRepeatCount < 4)
 					{
 						Boss->SpawnClones();
+						
 						ExecutePatternCycle(Boss);
 					}
 					else
@@ -463,6 +490,17 @@ void UBP_StateTreeTask::ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Play
 
 		  Boss->LaunchCharacter(Boss->GetActorForwardVector() * 10000.0f, true, false);
 		  Boss->PlayAnimMontage(Montage);
+	   	
+	   		// 이펙트
+			Boss->DashTrailComp->Deactivate();
+			Boss->DashTrailComp->SetAbsolute(false, true, false);
+			
+			FRotator DashRot = Boss->GetActorForwardVector().Rotation();
+			DashRot.Pitch += 90.f;
+			Boss->DashTrailComp->SetWorldRotation(DashRot);
+			
+			Boss->DashTrailComp->ResetSystem();
+			Boss->DashTrailComp->Activate(true);
 	   }
 	}, 1.5f, false);
 }
@@ -482,6 +520,18 @@ void UBP_StateTreeTask::ExecutePowerJumpDown(AEnemyBase* Boss, ACharacter* Playe
 	LandingPosition = Player->GetActorLocation();
 
 	Boss->PlayAnimMontage(Montage);
+	
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		Boss->EnhancedJumpVFX,
+		FVector(Boss->GetActorLocation().X, Boss->GetActorLocation().Y, Boss->GetActorLocation().Z - 700.f),
+		Boss->GetActorRotation(),
+		FVector(4.0f),
+		true,
+		true,
+		ENCPoolMethod::None,
+		true
+		);
 
 	Boss->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	Boss->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

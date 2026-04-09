@@ -26,4 +26,19 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Collision)
+	class UBoxComponent* SwordCollision = nullptr;
+	
+	UFUNCTION()
+	void OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+							   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION(BlueprintCallable, category=Collision)
+	void OnSwordCollision();
+	UFUNCTION(BlueprintCallable, category=Collision)
+	void OffSwordCollision();
+	
+	
 };
