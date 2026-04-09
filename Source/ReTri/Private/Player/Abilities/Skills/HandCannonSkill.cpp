@@ -57,6 +57,14 @@ void UHandCannonSkill::Activate(ACharacter* Owner)
 	
 	// 플레이어 반동 (발사 반대 방향으로)
 	Owner->LaunchCharacter(-Direction * RecoilForce, true, false);
+
+	if (FireCS)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(Owner->GetController()))
+		{
+			PC->ClientStartCameraShake(FireCS);
+		}
+	}
 	
 	// effects
 	// niagara

@@ -9,6 +9,7 @@
 class UCapsuleComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
+class UCameraShakeBase;
 
 /**
  * 불기둥 스킬이 소환하는 범위 Actor
@@ -70,6 +71,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> ImpactSound;
 
+	// 즉발 타격 시 카메라 셰이크
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> ImpactCS;
+
 	// DoT 중 적에게 붙는 불타는 이펙트
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> BurnEffect;
@@ -78,6 +83,10 @@ private:
 
 	// 붙인 번 이펙트 추적 (제거용)
 	TArray<TWeakObjectPtr<UNiagaraComponent>> BurnEffectComps;
+
+	// DoT 종료 후 이펙트 페이드아웃 대기 시간
+	UPROPERTY(EditDefaultsOnly, Category="PillarOfFlame")
+	float EffectFadeOutDelay = 1.5f;
 
 	FTimerHandle DoTTimerHandle;
 	FTimerHandle LifeTimerHandle;

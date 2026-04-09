@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyData.h"
+#include "NiagaraComponent.h"
 #include "Components/StateTreeComponent.h"
 #include "EnemyBase.generated.h"
 
@@ -81,6 +82,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
 	class UAnimMontage* CloneAttackMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
+	class UAnimMontage* MirrorBladeMontage;
 	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX)
@@ -171,10 +175,28 @@ public:
 	
 	// ---------------------- 이펙트
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* JumpVFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	UNiagaraSystem* JumpDownVFX;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* EnhancedJumpVFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	UNiagaraSystem* EnhancedJumpDownVFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	USceneComponent* DashTrailScene;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraComponent* DashTrailComp;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* DashVFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* MirrorVFX;
 	
 	
 public:

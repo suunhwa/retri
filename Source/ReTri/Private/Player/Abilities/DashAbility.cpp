@@ -6,6 +6,18 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+
+UDashAbility::UDashAbility()
+{
+	// 충전 시스템이 쿨타임을 직접 관리하므로 기반 쿨타임 비활성화
+	Cooldown = 0.f;
+}
+
+bool UDashAbility::CanActivate(ACharacter* Owner)
+{
+	return CurrentCharges > 0;
+}
 
 void UDashAbility::Activate(ACharacter* Owner)
 {
@@ -23,6 +35,32 @@ void UDashAbility::Activate(ACharacter* Owner)
 
 	Owner->LaunchCharacter(Dir * DashImpulse, true, false);
 
+	// 충전 소모
+	CurrentCharges--;
+	OnChargeChanged.Broadcast(CurrentCharges, MaxDashCharges);
+
+	// 개별 충전 회복 타이머
+	FTimerHandle NewHandle;
+	RechargeHandles.Add(NewHandle);
+	Owner->GetWorldTimerManager().SetTimer(
+		RechargeHandles.Last(),
+		this, &UDashAbility::RestoreCharge,
+		DashRechargeTime, false
+	);
+
+	if (DashSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(Owner->GetWorld(), DashSound, Owner->GetActorLocation());
+	}
+
+	if (DashCS)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(Owner->GetController()))
+		{
+			PC->ClientStartCameraShake(DashCS);
+		}
+	}
+
 	// 잔상 생성 시작
 	if (GhostActorClass)
 	{
@@ -34,6 +72,12 @@ void UDashAbility::Activate(ACharacter* Owner)
 			GhostSpawnInterval, true
 		);
 	}
+}
+
+void UDashAbility::RestoreCharge()
+{
+	CurrentCharges = FMath::Min(CurrentCharges + 1, MaxDashCharges);
+	OnChargeChanged.Broadcast(CurrentCharges, MaxDashCharges);
 }
 
 void UDashAbility::SpawnGhost()

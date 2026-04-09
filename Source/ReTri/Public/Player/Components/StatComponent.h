@@ -34,6 +34,8 @@ enum class EStatTypes : uint8
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChanged, EStatTypes, StatType, float, NewValue);
 // CurrentExp, 다음 레벨까지 필요한 누적 경험치, 현재 레벨
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnExpChanged, int32, CurrentExp, int32, RequiredExp, int32, CurrentLevel);
+// 레벨업 시 브로드캐스트 — 새 레벨 전달
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelUp, int32, NewLevel);
 
 UCLASS(ClassGroup=(Player), meta=(BlueprintSpawnableComponent))
 class RETRI_API UStatComponent : public UActorComponent
@@ -149,10 +151,16 @@ public:
 	// 스탯 변경 시 브로드캐스트 — UI / 성소 / 레벨 시스템에서 구독
 	UPROPERTY(BlueprintAssignable, Category="Stats")
 	FOnStatChanged OnStatChanged;
-	
+
 	// 경험치/레벨 변경 시 브로드캐스트 — ExpBar UI에서 구독
 	UPROPERTY(BlueprintAssignable, Category="Stats")
 	FOnExpChanged OnExpChanged;
+
+	// 레벨업 시 브로드캐스트 — 이펙트/연출 등에서 구독
+	UPROPERTY(BlueprintAssignable, Category="Stats")
+	FOnLevelUp OnLevelUp;
+
+	static constexpr int32 MaxLevel = 10;
 
 private:
 	UPROPERTY()

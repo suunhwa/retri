@@ -14,6 +14,7 @@
 
 #include "CoreMinimal.h"
 #include "Player/Abilities/AbilityBase.h"
+#include "Sound/SoundBase.h"
 #include "CoinExplosionSkill.generated.h"
 
 class ACoinProjectile;
@@ -46,6 +47,10 @@ private:
 public:
 	UPROPERTY(EditDefaultsOnly, Category="CoinExplosion")
 	TSubclassOf<ACoinProjectile> CoinProjectileClass;
+
+	// 동전 던지는 순간 재생되는 발사음
+	UPROPERTY(EditDefaultsOnly, Category="CoinExplosion|Sound")
+	TObjectPtr<USoundBase> CastSound;
 
 	// 현재 폭발 배율 조회 (UI 등에서 사용)
 	UFUNCTION(BlueprintPure, Category="CoinExplosion")

@@ -8,6 +8,7 @@
 
 class APiercingBullet;
 class UNiagaraSystem;
+class UParticleSystem;
 
 /**
 * R 고유 스킬 - 빠른 손
@@ -48,11 +49,20 @@ public:
 	TSubclassOf<APiercingBullet> PiercingBullet;
 	
 	// effects
+	// 발당 머즐 이펙트 (Niagara)
 	UPROPERTY(EditDefaultsOnly, Category="FastHands|Effects")
 	TObjectPtr<UNiagaraSystem> FireEffect;
-	
+
+	// 발당 머즐 이펙트 (Particle)
+	UPROPERTY(EditDefaultsOnly, Category="FastHands|Effects")
+	TObjectPtr<UParticleSystem> MuzzleParticleEffect;
+
 	UPROPERTY(EditDefaultsOnly, Category="FastHands|Effects")
 	TObjectPtr<USoundBase> FireSound;
+
+	// 스킬 발동 시 1회 (매 발마다 X)
+	UPROPERTY(EditDefaultsOnly, Category="FastHands|Effects")
+	TSubclassOf<UCameraShakeBase> FireCS;
 	
 	UFUNCTION(BlueprintPure, Category="FastHands")
 	int32 GetCurrentCharges() const { return CurrentCharges; }

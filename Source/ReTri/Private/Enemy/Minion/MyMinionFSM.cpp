@@ -4,7 +4,6 @@
 #include "Enemy/Minion/MyMinionFSM.h"
 
 #include "AIController.h"
-#include "Components/CapsuleComponent.h"
 #include "Enemy/Minion/Minion.h"
 #include "Enemy/EnemyBase.h"
 #include "Enemy/EnemyData.h"

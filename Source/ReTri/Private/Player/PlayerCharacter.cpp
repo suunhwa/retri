@@ -29,6 +29,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Level/Actors/FloatingUIActor.h"
+#include "Level/Actors/BossDropItem.h"
 #include "Player/UI/HPBar.h"
 #include "Player/UI/PlayerHUD.h"
 #include "Level/UI/GameOverUI.h"
@@ -152,6 +153,7 @@ APlayerCharacter::APlayerCharacter()
 	HPBarComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarComp"));
 	HPBarComp->SetupAttachment(GetMesh());
 	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 300.f)); // 머리 위 높이 조절
+	// HPBarComp->SetupAttachment(GetMesh(), TEXT("HP_Bar"));
 	HPBarComp->SetWidgetSpace(EWidgetSpace::Screen); // 항상 카메라 향함
 	HPBarComp->SetDrawSize(FVector2D(100.f, 15.f)); // 크기 조절
 	
@@ -174,6 +176,7 @@ void APlayerCharacter::BeginPlay()
 
 	// OnDeath 델리게이트 바인딩
 	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
+	StatComp->OnLevelUp.AddDynamic(this, &APlayerCharacter::HandleLevelUp);
 	// 메인 메뉴에서는 UI 표시 안 함
 	const bool bIsMainMenu = GetWorld()->GetMapName().Contains(TEXT("Lv_Main"));
 	if (bIsMainMenu)
@@ -377,6 +380,14 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
 		UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
 
+		if (EnhancedShotCS)
+		{
+			if (APlayerController* PC = Cast<APlayerController>(Controller))
+			{
+				PC->ClientStartCameraShake(EnhancedShotCS);
+			}
+		}
+
 		if (EnhancedShotEffect)
 		{
 			if (UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAttached(
@@ -402,7 +413,7 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 				PSC->SetWorldScale3D(FVector(EnhancedShotEffectScale));
 			}
 		}
-		
+
 		// 총구에 남아있는 이펙트 (총알과 별개로 제자리에 터짐)
 		if (EnhancedMuzzleParticle)
 		{
@@ -414,6 +425,13 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	}
 	else if (SpawnedBullet)
 	{
+		if (NormalShotCS)
+		{
+			if (APlayerController* PC = Cast<APlayerController>(Controller))
+			{
+				PC->ClientStartCameraShake(NormalShotCS);
+			}
+		}
 		// UE_LOG(LogTemp, Log, TEXT("[Attack] 일반탄 %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
 	}
 }
@@ -595,11 +613,30 @@ void APlayerCharacter::Interaction()
 
 void APlayerCharacter::OnPickUp(const struct FInputActionValue& inputValue)
 {
+	const float PickUpRadius = 200.f;
+
+	// 보스 드랍 아이템 우선 체크
+	TArray<AActor*> BossDropItems;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABossDropItem::StaticClass(), BossDropItems);
+	for (AActor* Actor : BossDropItems)
+	{
+		if (FVector::Dist(GetActorLocation(), Actor->GetActorLocation()) <= PickUpRadius)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[PlayerCharacter] 보스 아이템 획득 → 다음 레벨로 전환"));
+			Actor->Destroy();
+
+			// TODO: 다음 레벨 이름 확정되면 아래 주석 해제
+			// ABossDropItem* DropItem = Cast<ABossDropItem>(Actor);
+			// if (DropItem && !DropItem->NextLevelName.IsNone())
+			//     UGameplayStatics::OpenLevel(GetWorld(), DropItem->NextLevelName);
+			return;
+		}
+	}
+
 	// ISkillItemInterface 구현 액터 전체에서 거리 체크 (콜리전 채널 무시)
 	TArray<AActor*> AllItems;
 	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), USkillItemInterface::StaticClass(), AllItems);
 
-	const float PickUpRadius = 200.f;
 	for (AActor* Actor : AllItems)
 	{
 		if (FVector::Dist(GetActorLocation(), Actor->GetActorLocation()) <= PickUpRadius)
@@ -660,4 +697,55 @@ void APlayerCharacter::OnSalvage(const struct FInputActionValue& inputValue)
 void APlayerCharacter::DebugAddExp(int32 Amount)
 {
 	StatComp->AddExp(Amount);
+}
+
+void APlayerCharacter::HandleLevelUp(int32 NewLevel)
+{
+	UNiagaraSystem* EffectToPlay = nullptr;
+	USoundBase* SoundToPlay = nullptr;
+
+	if (NewLevel >= UStatComponent::MaxLevel)
+	{
+		EffectToPlay = MaxLevelEffect;
+		SoundToPlay = MaxLevelSound;
+	}
+	else if (NewLevel >= 5)
+	{
+		EffectToPlay = MidLevelEffect;
+		SoundToPlay = MidLevelSound;
+	}
+	else
+	{
+		EffectToPlay = LevelUpEffect;
+		SoundToPlay = LevelUpSound;
+	}
+
+	if (SoundToPlay)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
+	}
+
+	if (EffectToPlay)
+	{
+		UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			EffectToPlay, GetMesh(), LevelUpSocketName,
+			FVector::ZeroVector, FRotator::ZeroRotator,
+			EAttachLocation::SnapToTarget, true
+		);
+
+		if (NC)
+		{
+			NC->SetWorldScale3D(LevelUpEffectScale);
+
+			FTimerHandle FadeHandle;
+			TWeakObjectPtr<UNiagaraComponent> WeakNC(NC);
+			GetWorld()->GetTimerManager().SetTimer(FadeHandle, [WeakNC]()
+			{
+				if (WeakNC.IsValid())
+				{
+					WeakNC->DeactivateImmediate();
+				}
+			}, LevelUpEffectDuration, false);
+		}
+	}
 }

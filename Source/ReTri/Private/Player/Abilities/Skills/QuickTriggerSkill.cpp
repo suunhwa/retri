@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/ReTriPlayerController.h"
 #include "Player/Components/StatComponent.h"
@@ -86,14 +87,19 @@ void UQuickTriggerSkill::Activate(ACharacter* Owner)
 	Del3.BindUObject(this, &UQuickTriggerSkill::FireShot, WeakOwner, 2, Direction, AttackDamage, MuzzleLocation);
 	Owner->GetWorldTimerManager().SetTimer(FireTimerHandle3, Del3, FireDelay * 2.f, false);
 	
-	// effects
-	if (FireEffect)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(Owner->GetWorld(), FireEffect, Owner->GetActorLocation());
-	}
+	// 사운드는 첫 발에만 (3발 모두 틀면 너무 시끄러움)
 	if (FireSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(Owner->GetWorld(), FireSound, Owner->GetActorLocation());
+	}
+
+	// 셰이크도 발동 시 1회
+	if (FireCS)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(Owner->GetController()))
+		{
+			PC->ClientStartCameraShake(FireCS);
+		}
 	}
 }
 
@@ -123,6 +129,17 @@ void UQuickTriggerSkill::FireShot(TWeakObjectPtr<ACharacter> WeakOwner,
 	if (Bullet)
 	{
 		Bullet->SetDamage(AttackDamage * DamageMultipliers[ShotIndex]);
+	}
+
+	// 발당 머즐 이펙트
+	if (FireEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FireEffect, MuzzleLocation);
+	}
+
+	if (MuzzleParticleEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticleEffect, MuzzleLocation);
 	}
 }
 

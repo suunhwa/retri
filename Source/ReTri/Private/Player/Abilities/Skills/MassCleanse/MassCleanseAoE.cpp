@@ -43,6 +43,14 @@ void AMassCleanseAoE::BeginPlay()
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 	}
 
+	if (ImpactCS)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			PC->ClientStartCameraShake(ImpactCS);
+		}
+	}
+
 	GetWorldTimerManager().SetTimer(
 		LifeTimerHandle,
 		this, &AMassCleanseAoE::FinishEffect,
@@ -85,6 +93,8 @@ TArray<TWeakObjectPtr<AActor>> AMassCleanseAoE::GetEnemiesInRange() const
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel2)); // Boss
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel7)); // Minion
 
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(GetOwner());

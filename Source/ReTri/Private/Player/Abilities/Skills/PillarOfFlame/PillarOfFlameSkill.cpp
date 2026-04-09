@@ -1,5 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameSkill.h"
 
@@ -11,7 +10,6 @@
 #include "Player/ReTriPlayerController.h"
 #include "Player/Components/StatComponent.h"
 #include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameAoE.h"
-#include "Player/Abilities/Skills/PillarOfFlame/FireOrbProjectile.h"
 
 UPillarOfFlameSkill::UPillarOfFlameSkill()
 {
@@ -32,42 +30,22 @@ void UPillarOfFlameSkill::Activate(ACharacter* Owner)
 		AP = Player->GetStatComponent()->GetSpellPower();
 	}
 
-	// 손에서 타겟 방향으로 Orb 발사
-	if (FireOrbClass)
+	if (!PillarAoEClass) return;
+
+	const FTransform SpawnTransform(FRotator::ZeroRotator, TargetPoint);
+	APillarOfFlameAoE* Pillar = Owner->GetWorld()->SpawnActorDeferred<APillarOfFlameAoE>(
+		PillarAoEClass, SpawnTransform, Owner, Owner,
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+	);
+	if (Pillar)
 	{
-		FVector MuzzleLocation = Owner->GetMesh()->GetSocketLocation(TEXT("hand_r"));
-		UE_LOG(LogTemp, Warning, TEXT("[PillarOfFlame] Orb 스폰 위치: %s"), *MuzzleLocation.ToString());
-		FVector Direction = TargetPoint - MuzzleLocation;
-		Direction.Z = 0.f;
-		Direction.Normalize();
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = Owner;
-		SpawnParams.Instigator = Owner;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		AFireOrbProjectile* Orb = Owner->GetWorld()->SpawnActor<AFireOrbProjectile>(
-			FireOrbClass, MuzzleLocation, Direction.Rotation(), SpawnParams
-		);
-
-		if (Orb)
-		{
-			Orb->Init(AP, Owner->GetController(), PillarAoEClass);
-		}
+		Pillar->Init(AP, Owner->GetController());
+		UGameplayStatics::FinishSpawningActor(Pillar, SpawnTransform);
 	}
 
-	// 타겟 위치 이펙트
 	if (CastEffect)
 	{
-		if (UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(Owner->GetWorld(), CastEffect, TargetPoint))
-		{
-			NC->SetAutoDestroy(true);
-			FTimerHandle TimerHandle;
-			Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [NC]()
-			{
-				if (NC) NC->DeactivateImmediate();
-			}, EffectDuration, false);
-		}
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(Owner->GetWorld(), CastEffect, TargetPoint);
 	}
 
 	if (CastSound)

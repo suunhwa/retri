@@ -2,11 +2,13 @@
 
 
 #include "Player/Projectiles/HandCannonBullet.h"
+
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Particles/ParticleSystem.h"
 
@@ -60,6 +62,15 @@ void AHandCannonBullet::BeginPlay()
 		TrailComp->Activate();
 	}
 
+	if (NiagaraTrailEffect)
+	{
+		NiagaraTrailComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			NiagaraTrailEffect, CollisionComp, NAME_None,
+			FVector::ZeroVector, FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset, true
+		);
+	}
+
 }
 
 // Called every frame
@@ -109,16 +120,23 @@ void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactEffect, GetActorLocation());
 	}
-	
-	// particle
-	if (ParticleEffect)
+
+	// 히트 스파크 — 맞은 표면 위치 기준
+	const FVector HitPoint = SweepResult.ImpactPoint.IsZero() ? OtherActor->GetActorLocation() : FVector(SweepResult.ImpactPoint);
+
+	if (HitSparkEffect)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleEffect, GetActorLocation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitSparkEffect, HitPoint);
 	}
-	
-	if (ImpactSound)
+
+	if (HitSparkParticle)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitSparkParticle, HitPoint);
+	}
+
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 	}
 	
 	Destroy();

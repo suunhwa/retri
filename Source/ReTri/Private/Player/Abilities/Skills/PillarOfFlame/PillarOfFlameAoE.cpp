@@ -11,16 +11,19 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
+#include "Util/ColorConstants.h"
 
 APillarOfFlameAoE::APillarOfFlameAoE()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	HitVolume = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitVolume"));
-	HitVolume->SetCapsuleSize(200.f, 200.f);  // 기본값; BeginPlay에서 HitRadius로 재설정
+	HitVolume->SetCapsuleSize(400.f, 200.f); 
+	HitVolume->SetCollisionProfileName(TEXT("AoE")); 
 	HitVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	HitVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
-	HitVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	HitVolume->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
+	HitVolume->SetCollisionResponseToChannel(ECC_GameTraceChannel7, ECR_Overlap);
 	RootComponent = HitVolume;
 
 	FireEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("FireEffect"));
@@ -66,6 +69,14 @@ void APillarOfFlameAoE::BeginPlay()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 	}
+
+	if (ImpactCS)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			PC->ClientStartCameraShake(ImpactCS);
+		}
+	}
 }
 
 void APillarOfFlameAoE::Init(float InAbilityPower, AController* InInstigator)
@@ -89,7 +100,9 @@ void APillarOfFlameAoE::ApplyInitialHit()
 			this,
 			UDamageType::StaticClass()
 		);
-
+		
+		UE_LOG(LogTemp, Warning, TEXT("[불기둥] 주문력=%f, ImmediateDamage=%f"), AbilityPower, ImmediateDamage);
+		
 		// 불타는 이펙트 붙이기
 		if (BurnEffect)
 		{
@@ -104,7 +117,7 @@ void APillarOfFlameAoE::ApplyInitialHit()
 			);
 			if (NC) BurnEffectComps.Add(NC);
 		}
-
+		
 		// 경직: 짧은 시간 동안 이동 비활성화
 		if (ACharacter* EnemyChar = Cast<ACharacter>(WeakEnemy.Get()))
 		{
@@ -155,6 +168,13 @@ void APillarOfFlameAoE::FinishDoT()
 	BurnEffectComps.Empty();
 
 	GetWorldTimerManager().ClearTimer(DoTTimerHandle);
+
+	if (FireEffect)
+	{
+		FireEffect->DeactivateImmediate();
+		FireEffect->SetVisibility(false);
+	}
+
 	Destroy();
 }
 
@@ -164,6 +184,8 @@ TArray<TWeakObjectPtr<AActor>> APillarOfFlameAoE::GetEnemiesInRange() const
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel2)); // Boss
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel7)); // Minion
 
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(GetOwner());

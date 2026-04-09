@@ -243,9 +243,10 @@ void UStatComponent::AddExp(int32 Amount)
 	// 레벨업 체크 — 누적 경험치가 다음 레벨 조건 충족 시 반복 처리
 	int32 NextLevel = CurrentLevel + 1;
 	int32 Required = GetRequiredExpForLevel(NextLevel);
-	while (Required != -1 && CurrentExp >= Required)
+	while (Required != -1 && CurrentExp >= Required && NextLevel <= MaxLevel)
 	{
 		LoadStatsForLevel(NextLevel);
+		OnLevelUp.Broadcast(NextLevel);
 		NextLevel++;
 		Required = GetRequiredExpForLevel(NextLevel);
 	}

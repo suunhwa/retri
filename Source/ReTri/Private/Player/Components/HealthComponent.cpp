@@ -3,6 +3,8 @@
 
 #include "Player/Components/HealthComponent.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "ReTriGameInstance.h"
 
 
@@ -51,9 +53,27 @@ float UHealthComponent::HandleDamage(float DamageAmount, AController* Instigator
 void UHealthComponent::Heal(float Amount)
 {
 	if (bIsDead || Amount <= 0.0f) return;
-	
+
 	CurrentHP = FMath::Clamp(CurrentHP + Amount, 0.0f, AppliedMaxHP);
 	OnHPChanged.Broadcast(CurrentHP, AppliedMaxHP);
+
+	if (HealEffect)
+	{
+		UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			this, HealEffect,
+			GetOwner()->GetActorLocation(),
+			GetOwner()->GetActorRotation()
+		);
+		if (NC)
+		{
+			FTimerHandle HealEffectTimer;
+			TWeakObjectPtr<UNiagaraComponent> WeakNC(NC);
+			GetWorld()->GetTimerManager().SetTimer(HealEffectTimer, [WeakNC]()
+			{
+				if (WeakNC.IsValid()) WeakNC->DeactivateImmediate();
+			}, HealEffectDuration, false);
+		}
+	}
 	
 	// === GamePlay 저장 ===
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());

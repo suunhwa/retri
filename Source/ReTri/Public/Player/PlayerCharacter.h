@@ -19,6 +19,8 @@ class UInputAction;
 class UInputMappingContext;
 class UNiagaraSystem;
 class UParticleSystem;
+class ABossDropItem;
+class UCameraShakeBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttackCountChanged, int32, Count);
 
@@ -117,6 +119,42 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	
+	// 레벨업 이펙트 (1~4레벨)
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	TObjectPtr<UNiagaraSystem> LevelUpEffect;
+
+	// 중간 레벨업 이펙트 (5~9레벨)
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	TObjectPtr<UNiagaraSystem> MidLevelEffect;
+
+	// 최대 레벨(10) 달성 이펙트
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	TObjectPtr<UNiagaraSystem> MaxLevelEffect;
+
+	// 머리 위 이펙트 소켓 이름
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	FName LevelUpSocketName = TEXT("head");
+
+	// 레벨업 이펙트 재생 시간 (초)
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	float LevelUpEffectDuration = 2.f;
+
+	// 레벨업 이펙트 스케일 (X=가로, Y=가로, Z=세로)
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	FVector LevelUpEffectScale = FVector(1.f, 1.f, 1.f);
+
+	// 레벨업 사운드 (1~4)
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	TObjectPtr<USoundBase> LevelUpSound;
+
+	// 중간 레벨업 사운드 (5~9)
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	TObjectPtr<USoundBase> MidLevelSound;
+
+	// 최대 레벨 사운드 (10)
+	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
+	TObjectPtr<USoundBase> MaxLevelSound;
+
 	// 4타 강화탄 이펙트
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TObjectPtr<UNiagaraSystem> EnhancedShotEffect;
@@ -129,6 +167,14 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	float EnhancedShotEffectScale = 1.f;
+
+	// 기본 공격 카메라 셰이크 (1~3타)
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> NormalShotCS;
+
+	// 4타 강화탄 카메라 셰이크
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> EnhancedShotCS;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> HitMontage;
@@ -138,7 +184,7 @@ private:
 	
 	// 사망 애니메이션 길이 (초) - 이 시간 후 게임 일시정지
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	float DeathAnimDuration = 2.3f;
+	float DeathAnimDuration = 1.4f;
 	
 public:
 	UPROPERTY(BlueprintAssignable, Category="Combat")
@@ -183,6 +229,9 @@ private:
 private:
 	UFUNCTION()
 	void HandleDeath(AController* Killer);
+
+	UFUNCTION()
+	void HandleLevelUp(int32 NewLevel);
 	
 	/*FVector direction;
 	

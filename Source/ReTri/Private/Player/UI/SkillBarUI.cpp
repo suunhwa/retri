@@ -5,6 +5,7 @@
 #include "Player/UI/SkillSlotUI.h"
 #include "Player/Components/AbilityComponent.h"
 #include "Player/Abilities/AbilityBase.h"
+#include "Player/Abilities/DashAbility.h"
 #include "Player/PlayerCharacter.h"
 #include "GameFramework/Character.h"
 
@@ -33,6 +34,13 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 			AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::Dash) : nullptr,
 			/*OwningBar=*/this
 		);
+
+		// 충전 횟수 표시 바인딩
+		if (UDashAbility* Dash = Cast<UDashAbility>(AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::Dash) : nullptr))
+		{
+			Dash->OnChargeChanged.AddDynamic(this, &USkillBarUI::OnDashChargeChanged);
+			SlotDash->UpdateStackDisplay(Dash->GetCurrentCharges(), Dash->GetMaxCharges());
+		}
 	}
 
 	// ---- 핸드캐논 (RMB) — 초기 장착, 교체 가능 ----
@@ -139,6 +147,14 @@ void USkillBarUI::OnAttackCountChanged(int32 Count)
 	if (SlotLMB)
 	{
 		SlotLMB->UpdateStackDisplay(Count, 4);
+	}
+}
+
+void USkillBarUI::OnDashChargeChanged(int32 Current, int32 Max)
+{
+	if (SlotDash)
+	{
+		SlotDash->UpdateStackDisplay(Current, Max);
 	}
 }
 

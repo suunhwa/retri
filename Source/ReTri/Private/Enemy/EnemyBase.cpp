@@ -22,12 +22,13 @@ AEnemyBase::AEnemyBase()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	// BoxDecalComp->SetupAttachment(RootComponent);
-	//
-	// BoxDecalComp->SetVisibility(false);
-	// BoxDecalComp->SetComponentTickEnabled(false);
-	// BoxDecalComp->SetRelativeLocation(FVector(0, 0, -1000.f));
-	// GetMesh()->SetReceivesDecals(false);
+	DashTrailScene = CreateDefaultSubobject<USceneComponent>(TEXT("DashTrailScene"));
+	DashTrailScene->SetupAttachment(RootComponent);
+	
+	DashTrailComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DashTrailComp"));
+	DashTrailComp->SetupAttachment(DashTrailScene);
+	DashTrailComp->bAutoActivate = false;
+	DashTrailComp->SetRelativeLocation(FVector::ZeroVector);
 }
 
 // Called when the game starts or when spawned
@@ -53,7 +54,7 @@ void AEnemyBase::BeginPlay()
 			// BasicAttack = MyStatInfo->BasicAttackID;
 			BossSkills = MyStatInfo->BossSkillsID;
 			
-			UE_LOG(LogTemp, Warning, TEXT("성공!! %s의 체력은 %f, 스킬은 %d개"), *EnemyRowName.ToString(), CurrentHP, BossSkills.Num());
+			// UE_LOG(LogTemp, Warning, TEXT("성공!! %s의 체력은 %f, 스킬은 %d개"), *EnemyRowName.ToString(), CurrentHP, BossSkills.Num());
 		}
 	}
 	
@@ -72,6 +73,7 @@ void AEnemyBase::BeginPlay()
 			}
 		}
 	}, 0.2f, false);
+	
 	
 }
 
@@ -185,7 +187,7 @@ void AEnemyBase::OnAttackOverlap(AActor* OtherActor)
 		
 		bHasHitTarget = true;
 
-		UE_LOG(LogTemp, Warning, TEXT("플레이어에게 %f 데미지를 입혔다!"), CurrentSkillDamage);
+		// UE_LOG(LogTemp, Warning, TEXT("플레이어에게 %f 데미지를 입혔다!"), CurrentSkillDamage);
 	}
 }
 
@@ -215,7 +217,7 @@ float AEnemyBase::TakeDamage(float DamageAmount, struct FDamageEvent const& Dama
 		}
 	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("%s 적중! 남은 체력: %f"), *EnemyRowName.ToString(), CurrentHP);
+	// UE_LOG(LogTemp, Warning, TEXT("%s 적중! 남은 체력: %f"), *EnemyRowName.ToString(), CurrentHP);
 	
 
 	return ActualDamage;
@@ -234,14 +236,14 @@ void AEnemyBase::PlayDeathEffect()
 	
 	if (DeathVFX)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, GetActorLocation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathVFX, GetActorLocation(), GetActorRotation(), FVector(10.0f));
 	}
 }
 
 void AEnemyBase::BroadcastDeath()
 {
 	OnMinionDieDelegate.Broadcast();
-	
+
 	// === 증오 ===
 	if (UGameInstance* GI = GetWorld()->GetGameInstance())
 	{
@@ -529,13 +531,13 @@ void AEnemyBase::StartDecalProgress(float Duration)
 // ---------------------------------------- 점프다운 대미지
 void AEnemyBase::ExecuteJumpDownDamage()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ExecuteJumpDownDamage Called"));
 	FVector ImpactLocation = GetActorLocation();
 	
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(this);
 	
-	bool bHit = UGameplayStatics::ApplyRadialDamage(
+	// bool bHit = 
+		UGameplayStatics::ApplyRadialDamage(
 		GetWorld(),
 		CurrentSkillDamage,
 		ImpactLocation,
@@ -794,9 +796,8 @@ void AEnemyBase::SpawnEnhancedJumpDecal(FVector Location, class UMaterialInterfa
 }
 
 // ---------------------------------------- 강화 점프다운 원형 대미지
-void AEnemyBase::ExecuteEnhancedJumpDownDamage()
+void AEnemyBase::ExecuteEnhancedJumpDownDamage() 
 {
-	// UE_LOG(LogTemp, Warning, TEXT("ExecuteEnhancedJumpDownDamage Called"));
 	UWorld* World = GetWorld();
 	if (!World) return;
 
