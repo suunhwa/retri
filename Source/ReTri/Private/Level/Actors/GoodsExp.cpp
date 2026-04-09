@@ -4,6 +4,7 @@
 #include "Level/Actors/GoodsExp.h"
 
 #include "ReTriGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "Level/Actors/FloatingUIActor.h"
 #include "Player/PlayerCharacter.h"
 
@@ -33,5 +34,7 @@ void AGoodsExp::NotifyActorBeginOverlap(AActor* OtherActor)
 
 	GI->DebugStat();
 	
+	UGameplayStatics::PlaySound2D(GetWorld(), AcquireSound, 0.5f);
+
 	Destroy();
 }

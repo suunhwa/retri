@@ -3,6 +3,7 @@
 
 #include "Level/Actors/LootGoldCoinPot.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Level/Actors/GoodsGoldCoin.h"
 
 ALootGoldCoinPot::ALootGoldCoinPot()
@@ -15,6 +16,8 @@ void ALootGoldCoinPot::Break()
 {
 	// Destory 함수가 부모한테 있으니까
 	Super::Break();
+
+	UGameplayStatics::PlaySound2D(GetWorld(), BreakSound1);
 	
 	// Spawn Goods!
 	GetWorld()->SpawnActor<AGoodsGoldCoin>(GoodsClass, GetActorLocation(), GetActorRotation());

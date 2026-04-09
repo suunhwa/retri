@@ -62,6 +62,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraComponent* NiagaraComp;
 	
+	//사운드
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* OverlapSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* InteractSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* SelectSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* FailedSound;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractableType InteractableType;
 	//FInteractableData InteractableData;

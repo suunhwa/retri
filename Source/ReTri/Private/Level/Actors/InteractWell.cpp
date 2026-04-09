@@ -4,6 +4,7 @@
 #include "Level/Actors/InteractWell.h"
 
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "ReTriGameInstance.h"
 #include "Level/Actors/FloatingUIActor.h"
 #include "Level/UI/WellSelectButtonUI.h"
@@ -17,10 +18,10 @@
 
 AInteractWell::AInteractWell()
 {
-	// ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Script/Niagara.NiagaraSystem'/Game/Free_Magic/VFX_Niagara/NS_Sanctuary.NS_Sanctuary'"));
-	// if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
-	// NiagaraComp->SetRelativeRotation(FRotator(-90.0f, -0.0f, 0.0f));
-	// NiagaraComp->bAutoActivate = false;
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Game/Free_Magic/VFX_Niagara/NS_Sanctuary.NS_Sanctuary"));
+	if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
+	NiagaraComp->SetRelativeRotation(FRotator(-90.0f, -0.0f, 0.0f));
+	NiagaraComp->bAutoActivate = false;
 }
 
 void AInteractWell::BeginPlay()
@@ -51,9 +52,8 @@ void AInteractWell::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
-	// todo: 꿈가루로 스탯 업그레이드
-	UE_LOG(jiwon, Warning, TEXT("꿈가루로 스탯 업그레이드 UI"));
-	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	// UE_LOG(jiwon, Warning, TEXT("꿈가루로 스탯 업그레이드 UI"));
+	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
 	if (!WellDataTable)
 	{
@@ -114,6 +114,8 @@ void AInteractWell::OnWellSelected(int32 Index)
 				AFloatingUIActor* FloatingUIActor = GetWorld()->SpawnActor<AFloatingUIActor>(
 					GI->FloatingUIActorClass, Player->GetActorLocation(), FRotator::ZeroRotator);
 				FloatingUIActor->ShowFloatingUI(FText::FromString(FloatingText), FloatingColor);
+				
+				UGameplayStatics::PlaySound2D(GetWorld(), FailedSound);
 			}
 		}
 		
@@ -185,6 +187,9 @@ void AInteractWell::OnWellSelected(int32 Index)
 	GI->DebugStat();
 	
 	HideSelectUI();
+	
+	UGameplayStatics::PlaySound2D(GetWorld(), SelectSound);
+	NiagaraComp->Activate();
 }
 
 void AInteractWell::ShowSelectUI()
@@ -219,6 +224,7 @@ void AInteractWell::ShowSelectUI()
 	if (!WellSelectUIInstance->IsInViewport())
 	{
 		WellSelectUIInstance->AddToViewport();
+		UGameplayStatics::PlaySound2D(GetWorld(), InteractSound);
 	}
 }
 

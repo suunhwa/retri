@@ -36,6 +36,13 @@ public:
 	UCapsuleComponent* CapsuleComp;
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComp;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* DamageSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* BreakSound1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* BreakSound2;
 
 	UPROPERTY()
 	bool bIsBroken = false;

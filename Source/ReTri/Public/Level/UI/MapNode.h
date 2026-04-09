@@ -36,7 +36,13 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	UButton* Node;
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	UWidgetAnimation* Hover;
 
+	UFUNCTION(BlueprintCallable)
+	void OnNodeHover();
+	UFUNCTION(BlueprintCallable)
+	void OnNodeHoverEnd();
 	UFUNCTION(BlueprintCallable)
 	void OnNodeClicked();
 	
