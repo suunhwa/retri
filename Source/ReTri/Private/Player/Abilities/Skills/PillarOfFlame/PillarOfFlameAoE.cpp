@@ -11,13 +11,14 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
+#include "Util/ColorConstants.h"
 
 APillarOfFlameAoE::APillarOfFlameAoE()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	HitVolume = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitVolume"));
-	HitVolume->SetCapsuleSize(200.f, 200.f);  // 기본값; BeginPlay에서 HitRadius로 재설정
+	HitVolume->SetCapsuleSize(400.f, 200.f);  
 	HitVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	HitVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
 	HitVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
@@ -97,7 +98,9 @@ void APillarOfFlameAoE::ApplyInitialHit()
 			this,
 			UDamageType::StaticClass()
 		);
-
+		
+		UE_LOG(LogTemp, Warning, TEXT("[불기둥] 주문력=%f, ImmediateDamage=%f"), AbilityPower, ImmediateDamage);
+		
 		// 불타는 이펙트 붙이기
 		if (BurnEffect)
 		{
@@ -112,7 +115,7 @@ void APillarOfFlameAoE::ApplyInitialHit()
 			);
 			if (NC) BurnEffectComps.Add(NC);
 		}
-
+		
 		// 경직: 짧은 시간 동안 이동 비활성화
 		if (ACharacter* EnemyChar = Cast<ACharacter>(WeakEnemy.Get()))
 		{
@@ -164,21 +167,12 @@ void APillarOfFlameAoE::FinishDoT()
 
 	GetWorldTimerManager().ClearTimer(DoTTimerHandle);
 
-	// FireEffect 자연 페이드아웃 후 액터 제거
 	if (FireEffect)
 	{
-		FireEffect->Deactivate();
+		FireEffect->DeactivateImmediate();
+		FireEffect->SetVisibility(false);
 	}
 
-	GetWorldTimerManager().SetTimer(
-		DestroyTimerHandle,
-		this, &APillarOfFlameAoE::DestroyAfterFade,
-		EffectFadeOutDelay, false
-	);
-}
-
-void APillarOfFlameAoE::DestroyAfterFade()
-{
 	Destroy();
 }
 

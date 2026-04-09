@@ -180,7 +180,7 @@ private:
 	
 	// 사망 애니메이션 길이 (초) - 이 시간 후 게임 일시정지
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	float DeathAnimDuration = 2.3f;
+	float DeathAnimDuration = 1.4f;
 	
 public:
 	UPROPERTY(BlueprintAssignable, Category="Combat")

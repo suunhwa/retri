@@ -16,7 +16,7 @@ AAntiGravityAoE::AAntiGravityAoE()
 	PrimaryActorTick.bCanEverTick = false;
 
 	HitVolume = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitVolume"));
-	HitVolume->SetCapsuleSize(200.f, 200.f);  // 기본값; BeginPlay에서 HitRadius로 재설정
+	HitVolume->SetCapsuleSize(200.f, 200.f);  
 	HitVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	HitVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
 	HitVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);

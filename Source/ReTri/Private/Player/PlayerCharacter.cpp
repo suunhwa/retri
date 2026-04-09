@@ -150,8 +150,7 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 	HPBarComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarComp"));
-	HPBarComp->SetupAttachment(GetMesh());
-	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 300.f)); // 머리 위 높이 조절
+	HPBarComp->SetupAttachment(GetMesh(), TEXT("HP_Bar"));
 	HPBarComp->SetWidgetSpace(EWidgetSpace::Screen); // 항상 카메라 향함
 	HPBarComp->SetDrawSize(FVector2D(100.f, 15.f)); // 크기 조절
 }

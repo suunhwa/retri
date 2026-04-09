@@ -35,7 +35,6 @@ private:
 	void ApplyInitialHit();
 	void ApplyDoTTick();
 	void FinishDoT();
-	void DestroyAfterFade();
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCapsuleComponent> HitVolume;
@@ -91,7 +90,6 @@ private:
 
 	FTimerHandle DoTTimerHandle;
 	FTimerHandle LifeTimerHandle;
-	FTimerHandle DestroyTimerHandle;
 
 	float DoTDamagePerTick = 0.f;
 

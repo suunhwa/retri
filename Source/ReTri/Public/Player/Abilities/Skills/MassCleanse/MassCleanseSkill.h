@@ -36,6 +36,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> CastEffect;
 
+	// 플레이어 몸에 붙는 힐 이펙트 (체력 회복 중 표시)
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UNiagaraSystem> HealEffect;
+
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	float CastEffectDuration = 1.5f;
 

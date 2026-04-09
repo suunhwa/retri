@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -10,11 +10,10 @@ class USphereComponent;
 class UProjectileMovementComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
-class APillarOfFlameAoE;
 
 /**
- * 불기둥 스킬 발사체
- * 손에서 타겟으로 날아가고, 도착하면 PillarOfFlameAoE 소환
+ * 불기둥 스킬 발사체 - 순수 비주얼 전용
+ * 타겟으로 날아간 뒤 사라짐. AoE 소환은 PillarOfFlameSkill에서 처리.
  */
 UCLASS()
 class RETRI_API AFireOrbProjectile : public AActor
@@ -28,9 +27,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void Init(float InAbilityPower, AController* InInstigator, TSubclassOf<APillarOfFlameAoE> InAoEClass);
-
-private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> CollisionComp;
 
@@ -40,21 +36,6 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNiagaraComponent> OrbEffectComp;
 
-	// Orb 비주얼 이펙트
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> OrbEffect;
-
-	// 착지 시 이펙트
-	UPROPERTY(EditDefaultsOnly, Category="Effects")
-	TObjectPtr<UNiagaraSystem> ImpactEffect;
-
-	float AbilityPower = 0.f;
-	TWeakObjectPtr<AController> InstigatorController;
-	TSubclassOf<APillarOfFlameAoE> AoEClass;
-
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	void SpawnPillar();
 };
