@@ -17,9 +17,11 @@ AAntiGravityAoE::AAntiGravityAoE()
 
 	HitVolume = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitVolume"));
 	HitVolume->SetCapsuleSize(200.f, 200.f);  
+	HitVolume->SetCollisionProfileName(TEXT("AoE"));
 	HitVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	HitVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
-	HitVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	HitVolume->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
+	HitVolume->SetCollisionResponseToChannel(ECC_GameTraceChannel7, ECR_Overlap);
 	RootComponent = HitVolume;
 
 	GravityEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("GravityEffect"));
@@ -64,6 +66,8 @@ void AAntiGravityAoE::ApplyLift()
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel2)); // Boss
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel7)); // Minion
 
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(GetOwner());
@@ -80,7 +84,7 @@ void AAntiGravityAoE::ApplyLift()
 		if (!Actor || Actor == GetOwner()) continue;
 
 		AEnemyBase* Enemy = Cast<AEnemyBase>(Actor);
-		if (!Enemy && Enemy->bIsBoss) continue;
+		if (!Enemy || Enemy->bIsBoss) continue;
 		
 		ACharacter* EnemyChar = Cast<ACharacter>(Actor);
 		if (!EnemyChar) continue;

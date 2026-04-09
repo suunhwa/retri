@@ -411,7 +411,7 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 				PSC->SetWorldScale3D(FVector(EnhancedShotEffectScale));
 			}
 		}
-		
+
 		// 총구에 남아있는 이펙트 (총알과 별개로 제자리에 터짐)
 		if (EnhancedMuzzleParticle)
 		{
@@ -423,6 +423,13 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	}
 	else if (SpawnedBullet)
 	{
+		if (NormalShotCS)
+		{
+			if (APlayerController* PC = Cast<APlayerController>(Controller))
+			{
+				PC->ClientStartCameraShake(NormalShotCS);
+			}
+		}
 		// UE_LOG(LogTemp, Log, TEXT("[Attack] 일반탄 %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
 	}
 }

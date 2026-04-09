@@ -18,10 +18,12 @@ APillarOfFlameAoE::APillarOfFlameAoE()
 	PrimaryActorTick.bCanEverTick = false;
 
 	HitVolume = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitVolume"));
-	HitVolume->SetCapsuleSize(400.f, 200.f);  
+	HitVolume->SetCapsuleSize(400.f, 200.f); 
+	HitVolume->SetCollisionProfileName(TEXT("AoE")); 
 	HitVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	HitVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
-	HitVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	HitVolume->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
+	HitVolume->SetCollisionResponseToChannel(ECC_GameTraceChannel7, ECR_Overlap);
 	RootComponent = HitVolume;
 
 	FireEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("FireEffect"));
@@ -182,6 +184,8 @@ TArray<TWeakObjectPtr<AActor>> APillarOfFlameAoE::GetEnemiesInRange() const
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel2)); // Boss
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel7)); // Minion
 
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(GetOwner());

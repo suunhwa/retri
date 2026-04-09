@@ -168,6 +168,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	float EnhancedShotEffectScale = 1.f;
 
+	// 기본 공격 카메라 셰이크 (1~3타)
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TSubclassOf<UCameraShakeBase> NormalShotCS;
+
 	// 4타 강화탄 카메라 셰이크
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TSubclassOf<UCameraShakeBase> EnhancedShotCS;

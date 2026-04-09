@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "NiagaraSystem.h"
 #include "HealthComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHPChanged, float, CurrentHP, float, MaxHP);
@@ -63,4 +64,10 @@ private:
 	float CurrentHP = 0;
 	
 	bool bIsDead = false;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UNiagaraSystem> HealEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	float HealEffectDuration = 2.f;
 };
