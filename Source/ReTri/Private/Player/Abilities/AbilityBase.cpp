@@ -32,10 +32,17 @@ bool UAbilityBase::TryActivate(ACharacter* Owner)
 					Owner->SetActorRotation(FRotator(0.f, Dir.Rotation().Yaw, 0.f));
 
 					FTimerHandle RotHandle;
-					Owner->GetWorldTimerManager().SetTimer(RotHandle, [Owner]()
+					TWeakObjectPtr<ACharacter> WeakOwner = Owner;
+					Owner->GetWorldTimerManager().SetTimer(RotHandle, [WeakOwner]()
 					{
-						if (Owner) Owner->GetCharacterMovement()->bOrientRotationToMovement = true;
+						if (WeakOwner.IsValid()) WeakOwner->GetCharacterMovement()->bOrientRotationToMovement = true;
 					}, 0.8f, false);
+					
+					// FTimerHandle RotHandle;
+					// Owner->GetWorldTimerManager().SetTimer(RotHandle, [Owner]()
+					// {
+					// 	if (Owner) Owner->GetCharacterMovement()->bOrientRotationToMovement = true;
+					// }, 0.8f, false);
 				}
 			}
 		}

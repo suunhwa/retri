@@ -23,7 +23,7 @@ protected:
 	virtual void Tick( float DeltaTime ) override;
 	
 	
-	
+
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Collision)
 	class UBoxComponent* SwordCollision = nullptr;
@@ -63,6 +63,12 @@ public:
 	UFUNCTION(BlueprintCallable, category=Collision)
 	void OffSwordCollision();
 	
-	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Skills")
+	TSubclassOf<class AItemBase> ItemClass;
+	// SkillID(DataTable Row Key) → ability class 매핑
+	// BP에서 획득 스킬(Acquired) 목록 추가해야됩니당
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Player|Skills")
+	TMap<FName, TSubclassOf<class UAbilityBase>> SkillIDToClassMap;
 };
 

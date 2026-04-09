@@ -6,26 +6,39 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Fonts/SlateFontInfo.h"
+#include "Kismet/GameplayStatics.h"
 
 void USelectButtonUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
 	if (ButtonSelect)
+	{
 		ButtonSelect->OnClicked.AddUniqueDynamic(this, &USelectButtonUI::OnClicked);
+		ButtonSelect->OnHovered.AddUniqueDynamic(this, &USelectButtonUI::OnHover);
+	}
 }
 
 void USelectButtonUI::NativeDestruct()
 {
 	if (ButtonSelect)
+	{
 		ButtonSelect->OnClicked.RemoveDynamic(this, &USelectButtonUI::OnClicked);
+		ButtonSelect->OnHovered.RemoveDynamic(this, &USelectButtonUI::OnHover);
+	}
 		
 	Super::NativeDestruct();
 }
 
 
+void USelectButtonUI::OnHover()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), HoverSound);
+}
+
 void USelectButtonUI::OnClicked()
 {
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
 	OnSelectClicked.Broadcast(ThisIndex);
 }
 

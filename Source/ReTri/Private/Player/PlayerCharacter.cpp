@@ -526,6 +526,12 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[Death] 플레이어 사망"));
 
+	// 사망 직후 스탯 스냅샷 저장 (레벨 전환 전에 미리 저장해둠)
+	if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
+	{
+		GI->SaveStatSnapshot();
+	}
+	
 	// 입력 차단
 	DisableInput(Cast<APlayerController>(Controller));
 

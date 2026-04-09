@@ -124,6 +124,7 @@ public:
 	FInteractableData GetRowInteractionData(FName RowName, bool& bSuccess); 
 	
 	TArray<FPlayerSkillData*> GetRandomAcquiredItemList();
+	FPlayerSkillData* BossDropItem;
 	
 	// === Level Setting API? ===
 	/** 사용된 Interactable 저장 */

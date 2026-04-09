@@ -4,9 +4,11 @@
 #include "Enemy/DarkMoon/DarkMoon.h"
 
 #include "AIController.h"
+#include "MapSubSystem.h"
 #include "ReTriGameInstance.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Item/ItemBase.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -202,6 +204,52 @@ void ADarkMoon::DeathAnimFinished()
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 	
 	// ======================== 보스 마무리 추가
+	
+	// === Boss Drop Item ===
+	auto* GI = Cast<UReTriGameInstance>(GetGameInstance());
+	if (!GI) { Destroy(); return; }
+	auto* MapSub = GI->GetSubsystem<UMapSubSystem>();
+	if (!MapSub) { Destroy(); return; }
+	
+	// 안전장치: BossDropItem이 아직 검색되지 않아 비어있다면, 강제로 한 번 돌려서 세팅합니다.
+	if (!MapSub->BossDropItem)
+	{
+		MapSub->GetRandomAcquiredItemList();
+	}
+	
+	FPlayerSkillData* PickedData = MapSub->BossDropItem;
+	// 그래도 비어있다면 데이터 테이블 자체에 boss_drop 행이 없는 것입니다!
+	if (!PickedData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 데이터테이블(SkillDataTable)에 boss_drop 행이 없거나 불러오지 못했습니다."));
+		Destroy();
+		return;
+	}
+	
+	// BP에서 ItemClass가 할당되어 있는지 확인
+	if (!ItemClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 보스 블루프린트(BP_DarkMoon)의 ItemClass 속성이 None으로 비어있습니다. BP_ItemBase를 할당해주세요!"));
+		Destroy();
+		return;
+	}
+
+	auto* Item = GetWorld()->SpawnActor<AItemBase>(ItemClass, GetActorLocation(), FRotator::ZeroRotator);
+	if (Item)
+	{
+		Item->DataInit(*PickedData);
+
+		// Row 이름으로 AbilityClass 찾아서 설정
+		FName RowName = FName(*PickedData->SkillID);
+		if (TSubclassOf<UAbilityBase>* Found = SkillIDToClassMap.Find(RowName))
+		{
+			Item->AbilityClass = *Found;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 보스 블루프린트의 'SkillIDToClassMap' 에 %s 라는 Key값이 아직 없습니다. 해당 Key를 추가하고 보스 스킬을 연결해주세요!"), *RowName.ToString());
+		}
+	}
 	
 	Destroy();
 }

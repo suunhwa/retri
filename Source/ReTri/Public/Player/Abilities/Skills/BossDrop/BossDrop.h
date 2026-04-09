@@ -29,6 +29,6 @@ public:
 	FName NextLevelName = NAME_None;
 
 	// TODO: 스킬 장착 방식으로 바꿀 경우 사용
-	// UPROPERTY(EditDefaultsOnly, Category="BossDrop")
-	// TSubclassOf<UAbilityBase> SkillToGive;
+	UPROPERTY(EditDefaultsOnly, Category="BossDrop")
+	TSubclassOf<UAbilityBase> SkillToGive;
 };

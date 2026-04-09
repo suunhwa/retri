@@ -18,6 +18,25 @@ void UReTriGameInstance::Init()
 		UE_LOG(LogTemp, Error, TEXT("[UReTriGameInstance] GameDataClass 할당안됨"));
 }
 
+
+void UReTriGameInstance::SaveStatSnapshot()
+{
+	if (HealthComp)
+	{
+		Snapshot_MaxHP = HealthComp->GetMaxHP();
+	}
+	if (StatComp)
+	{
+		Snapshot_AttackPower        = StatComp->GetAttackPower();
+		Snapshot_SpellPower         = StatComp->GetSpellPower();
+		Snapshot_AttackSpeed        = StatComp->GetAttackSpeed();
+		Snapshot_MemoryAcceleration = StatComp->GetMemoryAcceleration();
+		Snapshot_CritRate           = StatComp->GetCritRate();
+		Snapshot_BurnDamageBonus    = StatComp->GetBurnDamageBonus();
+		Snapshot_CurrentExp         = StatComp->GetCurrentExp();
+	}
+}
+
 void UReTriGameInstance::DebugStat() const
 {
 	UE_LOG(jiwon, Log, TEXT("==================== Player Stats ===================="));

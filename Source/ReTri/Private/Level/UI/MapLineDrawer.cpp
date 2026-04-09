@@ -15,7 +15,7 @@ int32 UMapLineDrawer::NativePaint(const FPaintArgs& Args, const FGeometry& Allot
 	if (!MapSub) return ReturnLayerId;
 	
 	// 선 설정
-	FLinearColor LineColor = FLinearColor::White;
+	FLinearColor LineColor = FLinearColor(.8f, .8f, .8f, .4f);
 	float LineThickness = 2.0f;
 	
 	// 맵 데이터를 돌면서 선 그리기
