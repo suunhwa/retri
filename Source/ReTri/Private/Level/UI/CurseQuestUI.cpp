@@ -71,8 +71,8 @@ void UCurseQuestUI::UpdateCurseQuestText()
 			QuestVerticalBox->AddChildToVerticalBox(TB);
 		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("MapSub 안불러와짐"));
-	}
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("MapSub 안불러와짐"));
+	// }
 }

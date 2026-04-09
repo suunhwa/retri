@@ -378,7 +378,7 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	if (SpawnedBullet && bIsEnhancedShot)
 	{
 		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
-		UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
+		// UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
 
 		if (EnhancedShotCS)
 		{
@@ -502,12 +502,12 @@ float APlayerCharacter::TakeDamage(float DamageAmount,
 		}
 	}
 
-	UE_LOG(LogTemp,
-	       Warning,
-	       TEXT("[Hit] Damage: %.1f | HP: %.1f / %.1f"),
-	       Damage,
-	       HealthComp->GetCurrentHP(),
-	       HealthComp->GetMaxHP());
+	// UE_LOG(LogTemp,
+	//        Warning,
+	//        TEXT("[Hit] Damage: %.1f | HP: %.1f / %.1f"),
+	//        Damage,
+	//        HealthComp->GetCurrentHP(),
+	//        HealthComp->GetMaxHP());
 
 	if (!HealthComp->IsDead() && HitMontage)
 	{

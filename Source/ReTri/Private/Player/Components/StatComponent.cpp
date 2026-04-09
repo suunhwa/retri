@@ -17,11 +17,11 @@ void UStatComponent::SyncToGameInstance()
 	GI->CurPlayerStats = GetStatInfo();
 	GI->bHasSavedStats = true;
 
-	UE_LOG(LogTemp,
-	       Warning,
-	       TEXT("[StatSync] Gold: %d | DreamDust: %d"),
-	       GI->CurPlayerStats.Gold,
-	       GI->CurPlayerStats.DreamDust);
+	// UE_LOG(LogTemp,
+	//        Warning,
+	//        TEXT("[StatSync] Gold: %d | DreamDust: %d"),
+	//        GI->CurPlayerStats.Gold,
+	//        GI->CurPlayerStats.DreamDust);
 }
 
 void UStatComponent::BeginPlay()
@@ -254,7 +254,7 @@ void UStatComponent::AddExp(int32 Amount)
 	// ExpBar 브로드캐스트: 다음 레벨 필요 경험치 (-1이면 맥스 레벨)
 	const int32 RequiredForNext = GetRequiredExpForLevel(CurrentLevel + 1);
 
-	UE_LOG(LogTemp, Warning, TEXT("[EXP] Lv.%d | EXP: %d / %d"), CurrentLevel, CurrentExp, RequiredForNext);
+	// UE_LOG(LogTemp, Warning, TEXT("[EXP] Lv.%d | EXP: %d / %d"), CurrentLevel, CurrentExp, RequiredForNext);
 
 	OnExpChanged.Broadcast(CurrentExp, RequiredForNext, CurrentLevel);
 

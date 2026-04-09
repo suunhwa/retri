@@ -63,7 +63,7 @@ void ADarkMoon::BeginPlay()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("[오류] %s행 못 찾음"), *EnemyRowName.ToString());
+			// UE_LOG(LogTemp, Log, TEXT("[오류] %s행 못 찾음"), *EnemyRowName.ToString());
 		}
 	}
 	
@@ -91,7 +91,7 @@ void ADarkMoon::ReduceBossHP()	// 치트키
 	CurrentHP -=(MaxHP * 0.2f);
 	if (CurrentHP < 0) CurrentHP = 0;
 	
-	UE_LOG(LogTemp, Warning, TEXT("==== [치트키] 현재 체력: %.1f / %.1f ===="), CurrentHP, MaxHP);
+	// UE_LOG(LogTemp, Warning, TEXT("==== [치트키] 현재 체력: %.1f / %.1f ===="), CurrentHP, MaxHP);
 	
 	UpdatePhase();
 }
@@ -221,7 +221,7 @@ void ADarkMoon::DeathAnimFinished()
 	// 그래도 비어있다면 데이터 테이블 자체에 boss_drop 행이 없는 것입니다!
 	if (!PickedData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 데이터테이블(SkillDataTable)에 boss_drop 행이 없거나 불러오지 못했습니다."));
+		// UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 데이터테이블(SkillDataTable)에 boss_drop 행이 없거나 불러오지 못했습니다."));
 		Destroy();
 		return;
 	}
@@ -229,7 +229,7 @@ void ADarkMoon::DeathAnimFinished()
 	// BP에서 ItemClass가 할당되어 있는지 확인
 	if (!ItemClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 보스 블루프린트(BP_DarkMoon)의 ItemClass 속성이 None으로 비어있습니다. BP_ItemBase를 할당해주세요!"));
+		// UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 보스 블루프린트(BP_DarkMoon)의 ItemClass 속성이 None으로 비어있습니다. BP_ItemBase를 할당해주세요!"));
 		Destroy();
 		return;
 	}
@@ -245,10 +245,10 @@ void ADarkMoon::DeathAnimFinished()
 		{
 			Item->AbilityClass = *Found;
 		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 보스 블루프린트의 'SkillIDToClassMap' 에 %s 라는 Key값이 아직 없습니다. 해당 Key를 추가하고 보스 스킬을 연결해주세요!"), *RowName.ToString());
-		}
+		// else
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 보스 블루프린트의 'SkillIDToClassMap' 에 %s 라는 Key값이 아직 없습니다. 해당 Key를 추가하고 보스 스킬을 연결해주세요!"), *RowName.ToString());
+		// }
 	}
 	
 	Destroy();

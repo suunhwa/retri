@@ -194,10 +194,10 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 	{
 		CooldownMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("CooldownMI is NULL"));
-	}
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("CooldownMI is NULL"));
+	// }
 
 	// 재질 없으면 Visibility로 폴백
 	if (!CooldownMI && CooldownOverlayImg)

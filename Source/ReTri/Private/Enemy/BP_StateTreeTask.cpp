@@ -46,13 +46,13 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	}
 	if (!Boss)
 	{
-		UE_LOG(LogTemp, Error, TEXT("보스(Pawn)를 찾을 수 없습니다."));
+		// UE_LOG(LogTemp, Error, TEXT("보스(Pawn)를 찾을 수 없습니다."));
 		return EStateTreeRunStatus::Failed;
 	}
 
 	if (Boss->BossSkills.Num() < 8)
 	{
-		UE_LOG(LogTemp, Error, TEXT("보스 스킬 부족! (현재: %d개)"), Boss->BossSkills.Num());
+		// UE_LOG(LogTemp, Error, TEXT("보스 스킬 부족! (현재: %d개)"), Boss->BossSkills.Num());
 		return EStateTreeRunStatus::Failed;
 	}
 	
@@ -143,7 +143,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("==== [%d페이즈] [%s] 시전 중 (인덱스: %d) ===="), RealPhase, *SkillInfo->SkillName, FinalSkillIndex);
 				
-				SCREENLOG("==== [%d페이즈] ==== [%s] !!!! ====", RealPhase, *SkillInfo->SkillName);
+				// SCREENLOG("==== [%d페이즈] ==== [%s] !!!! ====", RealPhase, *SkillInfo->SkillName);
 				
 				Boss->SetCurrentSkillDamage(SkillInfo->Damage);
 				//Boss ->PlayAnimMontage(SkillInfo->MontageToPlay);

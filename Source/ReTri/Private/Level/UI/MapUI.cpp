@@ -49,7 +49,7 @@ void UMapUI::NativeConstruct()
 		}
 		else
 		{
-			JIWONLOG("[UMapUI] 에러: MapLineClass가 할당되지 않음");
+			// JIWONLOG("[UMapUI] 에러: MapLineClass가 할당되지 않음");
 		}
 	}
 	
@@ -67,7 +67,7 @@ void UMapUI::NativeConstruct()
 		FMapUIData* UIData = GI->MapUIData->FindRow<FMapUIData>(EnumName, TEXT("MapNode"));
 		if (!UIData)
 		{
-			JIWONLOG("[MapUI] UIData를 찾지 못함: %s", *EnumName.ToString());
+			// JIWONLOG("[MapUI] UIData를 찾지 못함: %s", *EnumName.ToString());
 			continue;
 		}
 		

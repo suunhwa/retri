@@ -92,7 +92,7 @@ void AMinionSpawner::AddMinionDeathCount()
 	
 	if (CurrentDeathCount >= MaxlMinionCount)
 	{
-		SCREENLOG("전멸.");
+		// SCREENLOG("전멸.");
 		
 		if (auto MapSub = GI->GetSubsystem<UMapSubSystem>())
 		{

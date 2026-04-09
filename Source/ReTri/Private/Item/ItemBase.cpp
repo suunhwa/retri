@@ -81,11 +81,11 @@ void AItemBase::Acquire_Implementation()
 	ISkillItemInterface::Acquire_Implementation();
 	
 	/*// todo F 습득 행동 
-	SCREENLOG("습득하는 경우와 인벤토리가 가득 차있는 경우");*/
+	// SCREENLOG("습득하는 경우와 인벤토리가 가득 차있는 경우");*/
 	
 	if (!AbilityClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[AItemBase::Acquire] ❌ 장착 실패: 이 아이템에 장착될 AbilityClass가 비어있습니다. 보스 BP에 스킬 클래스가 연결되었는지 확인해주세요."));
+		// UE_LOG(LogTemp, Error, TEXT("[AItemBase::Acquire] ❌ 장착 실패: 이 아이템에 장착될 AbilityClass가 비어있습니다. 보스 BP에 스킬 클래스가 연결되었는지 확인해주세요."));
 		return;
 	}
 
@@ -96,12 +96,12 @@ void AItemBase::Acquire_Implementation()
 	UAbilityComponent* AbilityComp = Player->GetAbilityComponent();
 	if (!AbilityComp) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("[AItemBase::Acquire] 플레이어가 아이템 습득 시도: 스킬(%s) 장착 시도 중..."), *AbilityClass->GetName());
+	// UE_LOG(LogTemp, Warning, TEXT("[AItemBase::Acquire] 플레이어가 아이템 습득 시도: 스킬(%s) 장착 시도 중..."), *AbilityClass->GetName());
 
 	// 빈 슬롯 있으면 장착
 	if (AbilityComp->EquipAcquiredSkill(AbilityClass))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[AItemBase::Acquire] ✅ 장착 성공! 슬롯에 스킬이 추가되었습니다."));
+		// UE_LOG(LogTemp, Warning, TEXT("[AItemBase::Acquire] ✅ 장착 성공! 슬롯에 스킬이 추가되었습니다."));
 		if (EquipSuccessSound)
 			UGameplayStatics::PlaySound2D(GetWorld(), EquipSuccessSound);
 
@@ -109,7 +109,7 @@ void AItemBase::Acquire_Implementation()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("[AItemBase::Acquire] ❌ 장착 실패: 슬롯이 가득 찼거나 이미 같은 스킬을 가지고 있습니다! 스킬을 버리고 다시 시도해야 합니다."));
+		// UE_LOG(LogTemp, Error, TEXT("[AItemBase::Acquire] ❌ 장착 실패: 슬롯이 가득 찼거나 이미 같은 스킬을 가지고 있습니다! 스킬을 버리고 다시 시도해야 합니다."));
 		// 모두 꽉 참 — 사운드만 재생
 		// 플레이어 쪽에서 스킬 버리고 다시 픽업
 		if (EquipFullSound)
@@ -138,11 +138,11 @@ void AItemBase::Hold_Implementation(AActor* PlayerActor)
 	
 	// CSV의 UpgradeCostDreamDust 값을 분해 보상으로 지급
 	int32 RewardAmount = CurSkillData.UpgradeCostDreamDust;
-	UE_LOG(LogTemp, Warning, TEXT("[Salvage] 꿈가루: %d"), RewardAmount);
+	// UE_LOG(LogTemp, Warning, TEXT("[Salvage] 꿈가루: %d"), RewardAmount);
 	if (RewardAmount <= 0) return;
 
 	StatComp->ApplyStatModifier(EStatTypes::DreamDust, static_cast<float>(RewardAmount));
-	UE_LOG(LogTemp, Warning, TEXT("[Salvage] 꿈가루 지급 성공: %d"), RewardAmount);
+	// UE_LOG(LogTemp, Warning, TEXT("[Salvage] 꿈가루 지급 성공: %d"), RewardAmount);
 	
 	Destroy();
 }
@@ -153,7 +153,7 @@ void AItemBase::DataInit(FPlayerSkillData SkillData)
 	
 	if (!ItemUI)
 	{
-		UE_LOG(jiwon, Error, TEXT("ItemUI 설정안됨 ㄷㄷ"));
+		// UE_LOG(jiwon, Error, TEXT("ItemUI 설정안됨 ㄷㄷ"));
 		return;
 	}
 	
@@ -169,7 +169,7 @@ void AItemBase::SetInteractionUIVisibility(bool isVisible)
 	UDropItemUI* DropItem = Cast<UDropItemUI>(ItemUI->GetUserWidgetObject());
 	if (!DropItem) 
 	{
-		UE_LOG(jiwon, Error, TEXT("DropItem 설정안됨 ㄷㄷ"));
+		// UE_LOG(jiwon, Error, TEXT("DropItem 설정안됨 ㄷㄷ"));
 		return;
 	}
 	

@@ -11,7 +11,7 @@ UShopSlotUI* UShopBGUI::AddButton(int32 Number, UTexture2D* ItemIcon, int32 Gold
 {
 	if (!ShopSlotUIClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ShopSlotUI: UShopSlotUI가 설정되지 않았습니다."));
+		// UE_LOG(LogTemp, Warning, TEXT("ShopSlotUI: UShopSlotUI가 설정되지 않았습니다."));
 		return nullptr;
 	}
 	

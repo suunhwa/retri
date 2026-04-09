@@ -35,10 +35,10 @@ void AInteractRemnants::Interact_Implementation()
 	if (FoundValue) *FoundValue = true; 
 	SetIsUsed(true);
 	
-	SCREENLOG("스킬을 랜덤으로 스폰");
+	// SCREENLOG("스킬을 랜덤으로 스폰");
 	if (!ItemClass)
 	{
-		UE_LOG(jiwon, Error, TEXT("ItemClass 설정안됨 ㄷㄷ"));
+		// UE_LOG(jiwon, Error, TEXT("ItemClass 설정안됨 ㄷㄷ"));
 		return;
 	}
 	
@@ -47,7 +47,7 @@ void AInteractRemnants::Interact_Implementation()
 	auto MapSub = GI->GetSubsystem<UMapSubSystem>();
 	if (!MapSub) return;
 	
-	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
 	TArray<FPlayerSkillData*> SkillRandomDatas = MapSub->GetRandomAcquiredItemList();
 	int32 RandomNum = FMath::RandRange(0, SkillRandomDatas.Num()-1);
@@ -67,10 +67,10 @@ void AInteractRemnants::Interact_Implementation()
 			Item->AbilityClass = *Found;
 			UGameplayStatics::PlaySound2D(GetWorld(), SelectSound);
 		}
-		else
-		{
-			UE_LOG(jiwon, Warning, TEXT("SkillClassMap에 %s 없음"), *PickedData->SkillID);
-		}
+		// else
+		// {
+		// 	UE_LOG(jiwon, Warning, TEXT("SkillClassMap에 %s 없음"), *PickedData->SkillID);
+		// }
 	}
 	
 	NiagaraComp->Activate();

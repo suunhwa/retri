@@ -50,14 +50,14 @@ void AInteractChaos::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
-	UE_LOG(jiwon, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
-	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	// UE_LOG(jiwon, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
+	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
 	SetIsUsed(true);
 	
 	if (!ChaosDataTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Chaos Data Table 할당 되지 않음"));
+		// UE_LOG(LogTemp, Warning, TEXT("Chaos Data Table 할당 되지 않음"));
 		return;
 	}
 	
@@ -95,7 +95,7 @@ void AInteractChaos::Interact_Implementation()
 void AInteractChaos::OnChaosSelected(int32 Index)
 {
 	FChaosData* ChaosData = PickedChaoses[Index];
-	JIWONLOG("선택된 혼돈: %s", *ChaosData->ChaosName);
+	// JIWONLOG("선택된 혼돈: %s", *ChaosData->ChaosName);
 	
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI || !GI->StatComp) return;
@@ -163,7 +163,7 @@ void AInteractChaos::ShowSelectUI()
 	
 	if (!SelectUIClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
+		// UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
 		return;
 	}
 	

@@ -48,6 +48,6 @@ void UMapNode::OnNodeClicked()
 	auto MapSub = GetGameInstance()->GetSubsystem<UMapSubSystem>();
 	if (!MapSub) return;
 	MapSub->EnterMap(NodeIndexNumber);
-	JIWONLOG("노드번호 : %d", NodeIndexNumber);
+	// JIWONLOG("노드번호 : %d", NodeIndexNumber);
 }
 

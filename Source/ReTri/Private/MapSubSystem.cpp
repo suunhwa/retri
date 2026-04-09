@@ -33,20 +33,20 @@ void UMapSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 		ProceduralGenerateMap();
 	}
 	
-	if (InteractionData)
-		JIWONLOG("[UMapSubSystem] InteractionData 로드완료/ 행 수:%d", InteractionData->GetRowNames().Num())
-	else
-		JIWONLOG("[UMapSubSystem] InteractionData 할당안됨")
-	
-	if (MapUIData)
-		JIWONLOG("[UMapSubSystem] MapUIData 로드완료/ 행 수:%d", MapUIData->GetRowNames().Num())
-	else
-		JIWONLOG("[UMapSubSystem] MapUIData 할당안됨")
-	
-	if (SkillDataTable)
-		JIWONLOG("[UMapSubSystem] SkillData 로드완료/ 행 수:%d", SkillDataTable->GetRowNames().Num())
-	else
-		JIWONLOG("[UMapSubSystem] SkillData 할당안됨")
+	// if (InteractionData)
+	// 	JIWONLOG("[UMapSubSystem] InteractionData 로드완료/ 행 수:%d", InteractionData->GetRowNames().Num())
+	// else
+	// 	JIWONLOG("[UMapSubSystem] InteractionData 할당안됨")
+	//
+	// if (MapUIData)
+	// 	JIWONLOG("[UMapSubSystem] MapUIData 로드완료/ 행 수:%d", MapUIData->GetRowNames().Num())
+	// else
+	// 	JIWONLOG("[UMapSubSystem] MapUIData 할당안됨")
+	//
+	// if (SkillDataTable)
+	// 	JIWONLOG("[UMapSubSystem] SkillData 로드완료/ 행 수:%d", SkillDataTable->GetRowNames().Num())
+	// else
+	// 	JIWONLOG("[UMapSubSystem] SkillData 할당안됨")
 }
 
 void UMapSubSystem::Deinitialize()
@@ -64,7 +64,7 @@ void UMapSubSystem::GenerateMap()
 	// 2단계 InteractionData 확인 예외처리
 	if (!InteractionData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[UMapSubSystem] No InteractionData"))
+		// UE_LOG(LogTemp, Error, TEXT("[UMapSubSystem] No InteractionData"))
 		return;
 	}
 	
@@ -123,7 +123,7 @@ void UMapSubSystem::GenerateMap()
 				
 				const UEnum* EnumPtr = StaticEnum<EMapNodeType>();
 				FString DisplayStr = EnumPtr->GetDisplayNameTextByValue((int64)NewNode.MapType).ToString();
-				JIWONLOG("%d번째 맵 : %s", NewNodeIndex, *DisplayStr)
+				// JIWONLOG("%d번째 맵 : %s", NewNodeIndex, *DisplayStr)
 				
 				// 3. 다음 층 루프를 돌 때 이 방에서부터 다시 뻗어나갈 수 있도록 임시 배열(NextDepthNodes)에 NewNodeIndex를 저장합니다.
 				ChildDepthNodes.Add(NewNodeIndex);
@@ -159,11 +159,11 @@ void UMapSubSystem::GenerateMap()
 		CurMapDatas[RandomBossIndex].MapType = EMapNodeType::Boss;
 		CurMapDatas[RandomBossIndex].SpawnInteractableRowNames.Empty();
 		CurMapDatas[RandomBossIndex].SpawnInteractableRowNames.Add(TEXT("Sanctuary"));
-		JIWONLOG("%d번째 맵 : Boss", RandomBossIndex)
+		// JIWONLOG("%d번째 맵 : Boss", RandomBossIndex)
 	}
 	
 	// 완료 로그 - 완성되었다면 CurrentMapData.Num() 개수를 언리얼 로그로 띄워주시면 생성 끝!
-	JIWONLOG("맵 개수 : %d", CurMapDatas.Num());
+	// JIWONLOG("맵 개수 : %d", CurMapDatas.Num());
 }
 
 void UMapSubSystem::ProceduralGenerateMap()
@@ -180,7 +180,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 	// InteractionData 확인 예외처리
 	if (!InteractionData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[UMapSubSystem] No InteractionData"))
+		// UE_LOG(LogTemp, Error, TEXT("[UMapSubSystem] No InteractionData"))
 		return;
 	}
 	
@@ -253,7 +253,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 			// 디버깅 출력
 			const UEnum* EnumPtr = StaticEnum<EMapNodeType>();
 			FString DisplayStr = EnumPtr->GetDisplayNameTextByValue((int64)CurMapDatas[NewNodeIndex].MapType).ToString();
-			JIWONLOG("[ProceduralGenerateMap] %d번째 맵 (Depth:%d) : %s / Pos: %s", NewNodeIndex, Depth, *DisplayStr, *NewNode.UIPosition.ToString())
+			// JIWONLOG("[ProceduralGenerateMap] %d번째 맵 (Depth:%d) : %s / Pos: %s", NewNodeIndex, Depth, *DisplayStr, *NewNode.UIPosition.ToString())
 		}
 	}
 	
@@ -328,7 +328,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 		
 		// 시작방을 현재 방으로 설정
 		CurMapIndex = StartIdxCandidate; 
-		UE_LOG(jiwon, Error, TEXT("CurMapIndex: %d"), CurMapIndex);
+		// UE_LOG(jiwon, Error, TEXT("CurMapIndex: %d"), CurMapIndex);
 	}
 	
 	// 보스방 지정 -> Depth 마지막 라인에서 선택 
@@ -341,7 +341,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 		CurMapDatas[BossIdxCandidate].SpawnInteractableRowNames.Add(TEXT("Sanctuary"));
 	}
 	
-	JIWONLOG("[GenerateMap_F] 맵 생성 완료! 총 노드 개수 : %d / 게임 셋업 시작 노드 인덱스: %d", CurMapDatas.Num(), CurMapIndex)
+	// JIWONLOG("[GenerateMap_F] 맵 생성 완료! 총 노드 개수 : %d / 게임 셋업 시작 노드 인덱스: %d", CurMapDatas.Num(), CurMapIndex)
 }
 
 void UMapSubSystem::EnterMap(int32 MapIndex)
@@ -349,14 +349,14 @@ void UMapSubSystem::EnterMap(int32 MapIndex)
 	// 1단계 인자로 들어온 MapIndex가 맵 배열 크기를 벗어나는 잘못된 번호가 아닌지 검사
 	if (!CurMapDatas.IsValidIndex(MapIndex))
 	{
-		UE_LOG(LogTemp, Error, TEXT("맵 배열 크기를 벗어나는 잘못된 번호!!"));
+		// UE_LOG(LogTemp, Error, TEXT("맵 배열 크기를 벗어나는 잘못된 번호!!"));
 		return;	
 	}
 	
 	// 2단계 갈래길 양방향 이동 검증
 	if (!CurMapDatas[CurMapIndex].ConnectMapIndexs.Contains(MapIndex))
 	{
-		JIWONLOG("멀리있는 장소 선택함! : %d", MapIndex)
+		// JIWONLOG("멀리있는 장소 선택함! : %d", MapIndex)
 		return;	
 	}
 	
@@ -369,19 +369,19 @@ void UMapSubSystem::EnterMap(int32 MapIndex)
 	{
 	case EMapNodeType::Start: 
 		LevelName = TEXT("Lv_StartMap");
-		JIWONLOG("Start Map")
+		// JIWONLOG("Start Map")
 		break;
 	case EMapNodeType::Combat:
 		LevelName = TEXT("Lv_BattleMap");
-		JIWONLOG("Combat Map")
+		// JIWONLOG("Combat Map")
 		break;
 	case EMapNodeType::Merchant:
 		LevelName = TEXT("Lv_ShopMap");
-		JIWONLOG("Merchant Map")
+		// JIWONLOG("Merchant Map")
 		break;	
 	case EMapNodeType::Boss:
 		LevelName = TEXT("Lv_BossMap");
-		JIWONLOG("Boss Map")
+		// JIWONLOG("Boss Map")
 		break;
 	}
 	
@@ -392,7 +392,7 @@ void UMapSubSystem::EnterMap(int32 MapIndex)
 	
 	// 5단계 UGameplayStatics::OpenLevel 노드를 호출해 해당 맵 이름으로 화면을 텔레포트
 	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
-	JIWONLOG("레벨 로드!!")
+	// JIWONLOG("레벨 로드!!")
 }
 
 // === Helpers / Utilities ===
@@ -415,7 +415,7 @@ TMap<FName, bool> UMapSubSystem::RandomInteractable(int32 RandomNum)
 			Count--;
 			
 			FString RowName = RowNames[R].ToString();
-			UE_LOG(jiwon, Display, TEXT("Interact Name: %s"), *RowName);
+			// UE_LOG(jiwon, Display, TEXT("Interact Name: %s"), *RowName);
 		}
 	}
 	
@@ -492,7 +492,7 @@ void UMapSubSystem::SetInteractableUsed(FName InRowName)
 		if (CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Contains(InRowName))
 		{
 			CurMapDatas[CurMapIndex].SpawnInteractableRowNames[InRowName] = true;
-			JIWONLOG("기물 [%s] 사용 완료! 맵에 상태 저장됨.", *InRowName.ToString());
+			// JIWONLOG("기물 [%s] 사용 완료! 맵에 상태 저장됨.", *InRowName.ToString());
 		}
 	}
 }
@@ -514,7 +514,7 @@ void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 		
 		if (!bSuccess)
 		{
-			JIWONLOG("샤갈 %s Row 못찾음", *RowNames[i].ToString())
+			// JIWONLOG("샤갈 %s Row 못찾음", *RowNames[i].ToString())
 			continue;
 		}
 		
@@ -527,10 +527,10 @@ void UMapSubSystem::SpawnInteractable(TArray<AActor*> TargetPoints)
 		bool* bIsUsedPtr = CurMapDatas[CurMapIndex].SpawnInteractableRowNames.Find(RowNames[i]);
 		bool bIsUsed = bIsUsedPtr ? *bIsUsedPtr : false;
 		
-		if (bIsUsed)
-			JIWONLOG("%s : 활성화 된거래!~~!", *RowNames[i].ToString())
-		else
-			JIWONLOG("%s : 활성화 XXX 래!~~!", *RowNames[i].ToString())
+		// if (bIsUsed)
+			// JIWONLOG("%s : 활성화 된거래!~~!", *RowNames[i].ToString())
+		// else
+			// JIWONLOG("%s : 활성화 XXX 래!~~!", *RowNames[i].ToString())
 		
 		I->SetIsUsed(bIsUsed);
 		I->DataInit(RowNames[i], IData);
@@ -544,7 +544,7 @@ void UMapSubSystem::SpawnPortal(AActor* TP)
 		
 	if (!bSuccess)
 	{
-		JIWONLOG("샤갈 Portal Row 못찾음")
+		// JIWONLOG("샤갈 Portal Row 못찾음")
 		return;
 	}
 		
@@ -576,8 +576,8 @@ void UMapSubSystem::SpawnLootPieces(TArray<AActor*> TargetPoints)
 		
 		if (Loot)
 			Loot->SetActorLocation(Loot->GetActorLocation() + FVector(0.f, 0.f, Loot->CapsuleComp->GetScaledCapsuleHalfHeight()));
-		else
-			JIWONLOG("[UMapSubSystem] Loot 생성 실패: 태그나 클래스 설정을 확인하세요.");
+		// else
+			// JIWONLOG("[UMapSubSystem] Loot 생성 실패: 태그나 클래스 설정을 확인하세요.");
 	}
 }
 
@@ -619,7 +619,7 @@ void UMapSubSystem::RemoveMerchantItemList(int32 CurrentMap,int32 RemoveItemSlot
 	}
 	
 	SkillDatas->ItemSkillDatas.RemoveAt(RemoveItemSlotNum);
-	SCREENLOG("현재 상점 아이템 개수: %d", SkillDatas->ItemSkillDatas.Num());
+	// SCREENLOG("현재 상점 아이템 개수: %d", SkillDatas->ItemSkillDatas.Num());
 }
 
 void UMapSubSystem::SetMinionSpawnerCount()
@@ -629,7 +629,7 @@ void UMapSubSystem::SetMinionSpawnerCount()
 	
 	MinionSpawnerCount = MinionSpawners.Num();
 	
-	SCREENLOG("미니언 스포너 개수: %d", MinionSpawnerCount);
+	// SCREENLOG("미니언 스포너 개수: %d", MinionSpawnerCount);
 }
 
 void UMapSubSystem::LevelClear()
@@ -637,7 +637,7 @@ void UMapSubSystem::LevelClear()
 	CurClearSpawnerCount++;
 	
 	if (MinionSpawnerCount > CurClearSpawnerCount) return;
-	SCREENLOG("전투맵 클리어!");
+	// SCREENLOG("전투맵 클리어!");
 
 	TArray<AActor*> TPs;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Portal"), TPs);
@@ -679,8 +679,8 @@ void UMapSubSystem::UpdateCurseQuest(EActiveCurseQuest Type, int32 Amount)
 			// 달성 시
 			if (Quest.CurCount >= Quest.TargetCount)
 			{
-				SCREENLOG("[저주 해제] %s", *Quest.RewardInfo);
-				JIWONLOG("[저주 해제] %s", *Quest.RewardInfo);
+				// SCREENLOG("[저주 해제] %s", *Quest.RewardInfo);
+				// JIWONLOG("[저주 해제] %s", *Quest.RewardInfo);
 				
 				FString FloatingTextStr;
 				FLinearColor FloatingColor = FLinearColor::White;
@@ -692,32 +692,32 @@ void UMapSubSystem::UpdateCurseQuest(EActiveCurseQuest Type, int32 Amount)
 					GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Quest.RewardValue);
 					FloatingTextStr = FString::Printf(TEXT("골드 +%d"), Quest.RewardValue);
 					FloatingColor = FLinearColor(1.f, 0.617f, 0.f, 1.f);
-					SCREENLOG("[저주 해제] 골드 보상: %d", Quest.RewardValue);
+					// SCREENLOG("[저주 해제] 골드 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardDreamPowder:
 					GI->StatComp->ApplyStatModifier(EStatTypes::DreamDust, Quest.RewardValue);
 					FloatingTextStr = FString::Printf(TEXT("꿈가루 +%d"), Quest.RewardValue);
 					FloatingColor = FLinearColor(0.053f, 0.510f, 1.0f, 1.f);
-					SCREENLOG("[저주 해제] 꿈가루 보상: %d", Quest.RewardValue);
+					// SCREENLOG("[저주 해제] 꿈가루 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardMaxHP:
 					GI->StatComp->ApplyStatModifier(EStatTypes::MaxHP, Quest.RewardValue);
 					GI->HealthComp->Heal(Quest.RewardValue);
 					FloatingTextStr = FString::Printf(TEXT("최대 체력 +%d"), Quest.RewardValue);
 					FloatingColor = FLinearColor(0.1f, 1.0f, 0.1f, 1.f);
-					SCREENLOG("[저주 해제] 최대체력 보상: %d", Quest.RewardValue);
+					// SCREENLOG("[저주 해제] 최대체력 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardAttackDamage:
 					GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Quest.RewardValue);
 					FloatingTextStr = FString::Printf(TEXT("공격력 +%d"), Quest.RewardValue);
 					FloatingColor = FLinearColor(1.0f, 0.1f, 0.1f, 1.f);
-					SCREENLOG("[저주 해제] 공격력 보상: %d", Quest.RewardValue);
+					// SCREENLOG("[저주 해제] 공격력 보상: %d", Quest.RewardValue);
 					break;
 				case ERewardType::RewardMemoryHaste:
 					GI->StatComp->ApplyStatModifier(EStatTypes::MemoryAcceleration, Quest.RewardValue);
 					FloatingTextStr = FString::Printf(TEXT("기억 가속 +%d"), Quest.RewardValue);
 					FloatingColor = FLinearColor(0.8f, 0.2f, 0.8f, 1.f);
-					SCREENLOG("[저주 해제] 기억가속 보상: %d", Quest.RewardValue);
+					// SCREENLOG("[저주 해제] 기억가속 보상: %d", Quest.RewardValue);
 					break;
 				}
 				
@@ -745,7 +745,7 @@ void UMapSubSystem::UpdateCurseQuest(EActiveCurseQuest Type, int32 Amount)
 			{
 				// 진행 상황 피드백
 				FString QuestName = (Type == EActiveCurseQuest::ClearMaps) ? TEXT("맵 클리어") : TEXT("몬스터 처치");
-				SCREENLOG("[증오의 저주] %s 진행 중... (%d / %d)", *QuestName, Quest.CurCount, Quest.TargetCount);
+				// SCREENLOG("[증오의 저주] %s 진행 중... (%d / %d)", *QuestName, Quest.CurCount, Quest.TargetCount);
 			}
 		}
 	}

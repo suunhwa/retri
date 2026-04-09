@@ -23,5 +23,5 @@ void ALootDreamPowderPillar::Break()
 	GetWorld()->SpawnActor<AGoodsDreamPowder>(GoodsClass, GetActorLocation(), GetActorRotation());
 	
 	// Effect Play
-	UE_LOG(jiwon, Warning, TEXT("ALootDreamPowderPillar"));
+	// UE_LOG(jiwon, Warning, TEXT("ALootDreamPowderPillar"));
 }

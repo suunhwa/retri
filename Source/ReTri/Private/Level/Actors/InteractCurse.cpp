@@ -49,8 +49,8 @@ void AInteractCurse::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
-	UE_LOG(jiwon, Warning, TEXT("3가지 선택지 UI 띄우기 -> 저주를 받고 스텟 레벨업"));
-	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	// UE_LOG(jiwon, Warning, TEXT("3가지 선택지 UI 띄우기 -> 저주를 받고 스텟 레벨업"));
+	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
 	// FName KeyName = FName("Curse");
 	// bool* FoundValue = GetGameInstance()->GetSubsystem<UMapSubSystem>()->GetCurMapData().SpawnInteractableRowNames.Find(KeyName);
@@ -60,7 +60,7 @@ void AInteractCurse::Interact_Implementation()
 	
 	if (!CurseDataTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Curse Data Table 할당 되지 않음"));
+		// UE_LOG(LogTemp, Warning, TEXT("Curse Data Table 할당 되지 않음"));
 		return;
 	}
 	
@@ -84,7 +84,7 @@ void AInteractCurse::Interact_Implementation()
 void AInteractCurse::OnCurseSelected(int32 Index)
 {
 	FCurseData* CurseData = CurseDatas[Index];
-	JIWONLOG("선택된 저주: %s", *CurseData->CurseName);
+	// JIWONLOG("선택된 저주: %s", *CurseData->CurseName);
 	
 	EActiveCurseQuest PickedQuestType = EActiveCurseQuest::None;
 	int32 PickedTargetCount = 0;
@@ -105,7 +105,7 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 		PickedTargetCount = CurseData->CurseMap;
 		QuestMessage = FString::Printf(TEXT("맵을 %d개 클리어하세요!"), PickedTargetCount);
 	}
-	SCREENLOG("%s", *QuestMessage);
+	// SCREENLOG("%s", *QuestMessage);
 	
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI) return;
@@ -129,7 +129,7 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 		
 		MapSub->AddCurseQuest(NewQuest);
 		
-		JIWONLOG("저주 퀘스트: %s", *QuestMessage);
+		// JIWONLOG("저주 퀘스트: %s", *QuestMessage);
 	}
 	
 	//todo InfoUI 띄우기 
@@ -148,7 +148,7 @@ void AInteractCurse::ShowSelectUI()
 	
 	if (!SelectUIClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
+		// UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
 		return;
 	}
 	

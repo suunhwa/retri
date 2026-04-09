@@ -118,8 +118,8 @@ void AInteractableBase::DataInit(FName InRowName, FInteractableData RowData)
 	UStaticMesh* LoadMesh = RowData.InteractableMesh.LoadSynchronous();
 	if (LoadMesh)
 		MeshComp->SetStaticMesh(LoadMesh);
-	else
-		UE_LOG(LogTemp, Warning, TEXT("Load 매시 로드 안됨 왜?"));
+	// else
+	// 	UE_LOG(LogTemp, Warning, TEXT("Load 매시 로드 안됨 왜?"));
 	
 	UInteractableUI* InteractableUI = Cast<UInteractableUI>(InteractUI->GetUserWidgetObject());
 	if (InteractableUI) 

@@ -101,7 +101,7 @@ void APillarOfFlameAoE::ApplyInitialHit()
 			UDamageType::StaticClass()
 		);
 		
-		UE_LOG(LogTemp, Warning, TEXT("[불기둥] 주문력=%f, ImmediateDamage=%f"), AbilityPower, ImmediateDamage);
+		// UE_LOG(LogTemp, Warning, TEXT("[불기둥] 주문력=%f, ImmediateDamage=%f"), AbilityPower, ImmediateDamage);
 		
 		// 불타는 이펙트 붙이기
 		if (BurnEffect)

@@ -57,7 +57,7 @@ void AInteractWell::Interact_Implementation()
 	
 	if (!WellDataTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Well Data Table 할당 되지 않음"));
+		// UE_LOG(LogTemp, Warning, TEXT("Well Data Table 할당 되지 않음"));
 		return;
 	}
 	
@@ -96,7 +96,7 @@ void AInteractWell::Interact_Implementation()
 void AInteractWell::OnWellSelected(int32 Index)
 {
 	FWellRewardData* WellRewardData = PickedWellReward[Index];
-	JIWONLOG("선택된 우물: %s", *WellRewardData->WellRewardNameKR);
+	// JIWONLOG("선택된 우물: %s", *WellRewardData->WellRewardNameKR);
 	
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI || !GI->StatComp) return;
@@ -198,7 +198,7 @@ void AInteractWell::ShowSelectUI()
 	
 	if (!SelectUIClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
+		/// UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
 		return;
 	}
 	

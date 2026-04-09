@@ -40,6 +40,6 @@ void AInteractPortal::Interact_Implementation()
 		UGameplayStatics::PlaySound2D(GetWorld(), SelectSound);
 	}
 	
-	UE_LOG(jiwon, Warning, TEXT("메뉴 UI띄우기"));
-	UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	// UE_LOG(jiwon, Warning, TEXT("메뉴 UI띄우기"));
+	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 }

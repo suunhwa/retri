@@ -112,7 +112,7 @@ void AMerchant::Interact_Implementation()
 {
 	IInteractableInterface::Interact_Implementation();
 	
-	UE_LOG(jiwon, Warning, TEXT("상점 UI 띄우기"));
+	// UE_LOG(jiwon, Warning, TEXT("상점 UI 띄우기"));
 	
 	ShowMerchantUI();
 	
@@ -121,8 +121,8 @@ void AMerchant::Interact_Implementation()
 		if (auto MapSub = GI->GetSubsystem<UMapSubSystem>())
 		{
 			
-			UE_LOG(LogTemp, Warning, TEXT("AMerchant: 현재 층 (CurMapIndex: %d)"), MapSub->CurMapIndex);
-			UE_LOG(LogTemp, Warning, TEXT("AMerchant:  (MerchantItemDatas 개수: %d)"), MapSub->MerchantItemDatas.Num());
+			// UE_LOG(LogTemp, Warning, TEXT("AMerchant: 현재 층 (CurMapIndex: %d)"), MapSub->CurMapIndex);
+			// UE_LOG(LogTemp, Warning, TEXT("AMerchant:  (MerchantItemDatas 개수: %d)"), MapSub->MerchantItemDatas.Num());
 			FShopItemSkillData* SkillDatas = MapSub->MerchantItemDatas.Find(MapSub->CurMapIndex);
 			// 데이터가 정상적으로 찾아졌는지 체크 (nullptr 방어)
 			if (SkillDatas)
@@ -141,10 +141,10 @@ void AMerchant::Interact_Implementation()
 					}
 				}
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("AMerchant: 상점 데이터를 찾을 수 없습니다. (CurMapIndex: %d)"), MapSub->CurMapIndex);
-			}
+			// else
+			// {
+			// 	UE_LOG(LogTemp, Warning, TEXT("AMerchant: 상점 데이터를 찾을 수 없습니다. (CurMapIndex: %d)"), MapSub->CurMapIndex);
+			// }
 		}
 	}
 }
@@ -197,7 +197,7 @@ void AMerchant::ShowMerchantUI()
 {
 	if (!MerchantUIClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MerchantUIClass 할당 안됨"));
+		// UE_LOG(LogTemp, Warning, TEXT("MerchantUIClass 할당 안됨"));
 		return;
 	}
 	
@@ -237,10 +237,10 @@ void AMerchant::HideMerchantUI()
 
 void AMerchant::OnClickedMerchantSlotUI(int32 SlotNum)
 {	
-	SCREENLOG("플레이어의 아이템 슬롯이 비어있으면 들어가고 꽉 차 있으면 바닥에 버려짐");
+	// SCREENLOG("플레이어의 아이템 슬롯이 비어있으면 들어가고 꽉 차 있으면 바닥에 버려짐");
 	if (!ItemClass)
 	{
-		JIWONLOG("ItemClass 설정안됨 ㄷㄷ");
+		// JIWONLOG("ItemClass 설정안됨 ㄷㄷ");
 		return;
 	}
 	
@@ -257,7 +257,7 @@ void AMerchant::OnClickedMerchantSlotUI(int32 SlotNum)
 			// 돈이 안되는 경우 
 			if (GI->StatComp->GetGold() < SkillDatas->ItemSkillDatas[SlotNum].UpgradeCostGold)
 			{
-				SCREENLOG("골드 부족!");
+				// SCREENLOG("골드 부족!");
 				return;
 			}
 			

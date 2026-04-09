@@ -10,7 +10,7 @@ USelectButtonUI* USelectUI::AddButton(FString Title, FString Info, int32 Index, 
 {
 	if (!ButtonClass) 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SelectUI: ButtonClass가 설정되지 않았습니다."));
+		// UE_LOG(LogTemp, Warning, TEXT("SelectUI: ButtonClass가 설정되지 않았습니다."));
 		return nullptr;
 	}
 	

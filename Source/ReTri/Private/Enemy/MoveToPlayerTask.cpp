@@ -68,7 +68,7 @@ EStateTreeRunStatus UMoveToPlayerTask::Tick(FStateTreeExecutionContext& Context,
 	
 	if (MyPawn == Player)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[오류] 보스가 플레이어로 잡힘"));
+		// UE_LOG(LogTemp, Error, TEXT("[오류] 보스가 플레이어로 잡힘"));
 		return EStateTreeRunStatus::Failed;
 	}
 	
