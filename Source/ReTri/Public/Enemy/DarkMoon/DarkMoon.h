@@ -31,6 +31,12 @@ protected:
 private:
 	bool bIsBattleStarted = false; // 전투가 이미 시작되었는지 체크
 	
+	FTimerHandle DeathTimerHandle;
+	
+	UFUNCTION()
+	void DeathAnimFinished();
+	
+	
 protected:
 	UFUNCTION(BlueprintCallable, category=Collision)
 	//void SetSwordCollisionEnabled(bool bEnabled);

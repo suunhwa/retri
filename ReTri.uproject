@@ -33,7 +33,11 @@
 			"Enabled": true
 		},
 		{
+
 			"Name": "CascadeToNiagaraConverter",
+
+			"Name": "NiagaraFluids",
+
 			"Enabled": true
 		}
 	]
