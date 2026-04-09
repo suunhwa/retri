@@ -71,6 +71,19 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	// 체력에 따른 페이즈
 	if (HPRatio <= 0.3f)			// 3페이즈
 	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		Boss->Phase3VFX,
+		FVector(Boss->GetActorLocation().X, Boss->GetActorLocation().Y, Boss->GetActorLocation().Z - 700.f),
+		Boss->GetActorRotation(),
+		FVector(4.0f),
+		true,
+		true,
+		ENCPoolMethod::None,
+		true
+		);
+		
+		
 		RealPhase = 3;
 		SkillPool = { 6, 7 };
 	}
@@ -458,6 +471,10 @@ void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
 					pc->ClientStartCameraShake(Boss->DashCameraShake);
 				}
 			}
+			
+			// 사운드
+			UGameplayStatics::PlaySoundAtLocation(Boss, Boss->MirrorBladeSFX, Boss->GetActorLocation());
+			
 
 			Boss->ActiveClones.Empty();
 			BladeRepeatCount++;

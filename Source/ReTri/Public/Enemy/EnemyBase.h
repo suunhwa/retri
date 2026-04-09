@@ -192,6 +192,9 @@ public:
 	UNiagaraSystem* EnhancedJumpDownVFX;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* CrossVFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	USceneComponent* DashTrailScene;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
@@ -202,6 +205,20 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	UNiagaraSystem* MirrorVFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* Phase2VFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* Phase3VFX;
+	
+	// ---------------------- 효과음
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SFX)
+	USoundBase* JumpDownSFX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SFX)
+	USoundBase* MirrorBladeSFX;
+	
 	
 	
 public:

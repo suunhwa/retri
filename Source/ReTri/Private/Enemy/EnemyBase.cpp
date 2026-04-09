@@ -3,6 +3,7 @@
 #include "Enemy/EnemyBase.h"
 
 #include "AIController.h"
+#include "AudioMixerTrace.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
@@ -13,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MapSubSystem.h"
 #include "ReTriGameInstance.h"
+#include "AssetTypeActions/AssetDefinition_SoundBase.h"
 #include "Level/Actors/FloatingUIActor.h"
 
 
@@ -84,11 +86,24 @@ void AEnemyBase::Landed(const FHitResult& Hit)
 	if (bIsJumpDownAttacking)
 	{
 		PlayCameraShake();
+		UGameplayStatics::PlaySoundAtLocation(this, JumpDownSFX, GetActorLocation());
 		
 		if (bIsEnhancedJump)
 		{
 			
 			// 강화 점프
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				CrossVFX,
+				FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z - 200.f),
+				FRotator::ZeroRotator,
+				FVector(4.0f),
+				true,
+				true,
+				ENCPoolMethod::None,
+				true
+				);
+			
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 				GetWorld(),
 				EnhancedJumpDownVFX,
@@ -392,6 +407,18 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 // ---------------------------------------- 분신 검기
 void AEnemyBase::SpawnClones()
 {
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				Phase2VFX,
+				GetActorLocation(),
+				GetActorRotation(),
+				FVector(4.0f),
+				true,
+				true,
+				ENCPoolMethod::None,
+				true
+				);
+	
 	for (AEnemyBase* Clone : ActiveClones)
 	{
 		if (Clone)
@@ -638,7 +665,7 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 			}
 		}
 	}
-
+	
 	DrawDebugBox(
 		World,
 		BoxCenter,
