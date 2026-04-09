@@ -100,6 +100,16 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 	if (ActualDamage > 0.0f && FSM != nullptr)
 	{
 		FlashRed();
+				
+		// === 피격 사운드 랜덤 재생 ===
+		if (HitSounds.Num() > 0)
+		{
+			int32 RandIdx = FMath::RandRange(0, HitSounds.Num() - 1);
+			if (HitSounds[RandIdx])
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, HitSounds[RandIdx], GetActorLocation());
+			}
+		}
 		
 		// === Damage UI ===
 		if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
