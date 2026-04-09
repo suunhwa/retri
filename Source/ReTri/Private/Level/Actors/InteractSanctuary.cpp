@@ -11,31 +11,34 @@
 #include "Player/Components/HealthComponent.h"
 #include "Player/Components/StatComponent.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 
 AInteractSanctuary::AInteractSanctuary()
 {
-	// ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Script/Niagara.NiagaraSystem'/Game/Free_Magic/VFX_Niagara/NS_Sanctuary.NS_Sanctuary'"));
-	// if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
-	// NiagaraComp->SetRelativeLocation(FVector(0.0f, 50.0f, 80.0f));
-	// NiagaraComp->bAutoActivate = false;
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Game/Free_Magic/VFX_Niagara/NS_Sanctuary.NS_Sanctuary"));
+	if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
+	NiagaraComp->SetRelativeLocation(FVector(0.0f, 50.0f, 80.0f));
+	NiagaraComp->bAutoActivate = false;
 	
-	// HealStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HealStaticMesh"));
-	// HealStaticMesh->SetupAttachment(RootComponent);
-	// ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/LevelInteraction/03_Assets/Mesh/DreamPowder_Test.DreamPowder_Test''"));
-	// if (TempMesh.Succeeded()) HealStaticMesh->SetStaticMesh(TempMesh.Object);
-	// HealStaticMesh->SetRelativeLocation(FVector(0.0f, 50.0f, 40.0f));
+	HealStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HealStaticMesh"));
+	HealStaticMesh->SetupAttachment(RootComponent);
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempMesh(TEXT("/Game/LevelInteraction/03_Assets/Mesh/DreamPowder_Test.DreamPowder_Test"));
+	if (TempMesh.Succeeded()) HealStaticMesh->SetStaticMesh(TempMesh.Object);
+	HealStaticMesh->SetRelativeLocation(FVector(0.0f, 50.0f, 40.0f));
+	HealStaticMesh->SetRelativeScale3D(FVector(0.4f, 0.4f, 0.4f));
 }
 
 void AInteractSanctuary::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	InteractableType = EInteractableType::Sanctuary;
+	// InteractableType = EInteractableType::Sanctuary;
 }
 
 void AInteractSanctuary::Interact_Implementation()
 {
-	// Super::Interact_Implementation();
+	Super::Interact_Implementation();
+	
 	if (!MyPlayer) return;
 	
 	auto GI = Cast<UReTriGameInstance>(GetGameInstance());
@@ -52,6 +55,8 @@ void AInteractSanctuary::Interact_Implementation()
 				AFloatingUIActor* FloatingUIActor = GetWorld()->SpawnActor<AFloatingUIActor>(
 					GI->FloatingUIActorClass, Player->GetActorLocation(), FRotator::ZeroRotator);
 				FloatingUIActor->ShowFloatingUI(FText::FromString(FloatingText), FloatingColor);
+	
+				UGameplayStatics::PlaySound2D(GetWorld(), FailedSound);
 			}
 		}
 		
@@ -79,6 +84,8 @@ void AInteractSanctuary::Interact_Implementation()
 	
 	SetIsUsed(true);
 	
+	UGameplayStatics::PlaySound2D(GetWorld(), SelectSound);
+	HealStaticMesh->SetVisibility(false);
+	NiagaraComp->Activate();
 	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
-	Super::Interact_Implementation();
 }

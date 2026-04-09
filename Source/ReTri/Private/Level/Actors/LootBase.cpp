@@ -4,7 +4,6 @@
 #include "Level/Actors/LootBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/PlayerCharacter.h"
 
 // Sets default values
 ALootBase::ALootBase()
@@ -21,6 +20,13 @@ ALootBase::ALootBase()
 	MeshComp->SetupAttachment(CapsuleComp);
 	//MeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, -CapsuleComp->GetScaledCapsuleHalfHeight()));
 	//MeshComp->SetRelativeScale3D(FVector(1.2f, 1.2f, 1.2f));
+	
+	ConstructorHelpers::FObjectFinder<USoundBase> TempDam(TEXT("/Game/LevelInteraction/03_Assets/Sound/sfxGemTap0.sfxGemTap0"));
+	if (TempDam.Succeeded()) DamageSound = TempDam.Object;
+	ConstructorHelpers::FObjectFinder<USoundBase> TempBre1(TEXT("/Game/LevelInteraction/03_Assets/Sound/Break1.Break1"));
+	if (TempBre1.Succeeded()) BreakSound1 = TempBre1.Object;
+	ConstructorHelpers::FObjectFinder<USoundBase> TempBre2(TEXT("/Game/LevelInteraction/03_Assets/Sound/Break2.Break2"));
+	if (TempBre2.Succeeded()) BreakSound2 = TempBre2.Object;
 }
 
 // Called when the game starts or when spawned
@@ -42,7 +48,6 @@ void ALootBase::NotifyActorBeginOverlap(AActor* OtherActor)
 	Super::NotifyActorBeginOverlap(OtherActor);
 	
 	if (OtherActor == UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) return;
-	
 	if (bIsBroken == true) return;
 	
 	OtherActor->Destroy();
@@ -54,7 +59,10 @@ void ALootBase::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		bIsBroken = true;
 		Break();
+		return;
 	}
+	
+	UGameplayStatics::PlaySound2D(GetWorld(), DamageSound);
 }
 
 void ALootBase::Break()

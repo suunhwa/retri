@@ -10,16 +10,17 @@
 #include "Player/Components/HealthComponent.h"
 #include "Level/Actors/FloatingUIActor.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 
 
 AInteractChaos::AInteractChaos()
 {
-	// ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Script/Niagara.NiagaraSystem'/Game/Free_Magic/VFX_Niagara/NS_Chaos.NS_Chaos'"));
-	// if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
-	// NiagaraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 30.0f));
-	// NiagaraComp->bAutoActivate = false;
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Game/Free_Magic/VFX_Niagara/NS_Chaos.NS_Chaos"));
+	if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
+	NiagaraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 30.0f));
+	NiagaraComp->bAutoActivate = false;
 }
 
 void AInteractChaos::BeginPlay()
@@ -27,7 +28,6 @@ void AInteractChaos::BeginPlay()
 	Super::BeginPlay();
 	
 	//InteractableType = EInteractableType::Chaos;
-	
 }
 
 void AInteractChaos::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -152,6 +152,9 @@ void AInteractChaos::OnChaosSelected(int32 Index)
 	GI->DebugStat();
 	
 	HideSelectUI();
+	
+	UGameplayStatics::PlaySound2D(GetWorld(), SelectSound);
+	NiagaraComp->Activate();
 }
 
 void AInteractChaos::ShowSelectUI()
@@ -186,6 +189,7 @@ void AInteractChaos::ShowSelectUI()
 	if (!SelectUIInstance->IsInViewport())
 	{
 		SelectUIInstance->AddToViewport();
+		UGameplayStatics::PlaySound2D(GetWorld(), InteractSound);
 	}
 }
 

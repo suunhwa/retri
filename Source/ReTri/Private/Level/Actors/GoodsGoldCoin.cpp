@@ -5,6 +5,7 @@
 
 #include "ReTriGameData.h"
 #include "ReTriGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "Level/Actors/FloatingUIActor.h"
 #include "Player/PlayerCharacter.h"
 
@@ -39,28 +40,7 @@ void AGoodsGoldCoin::NotifyActorBeginOverlap(AActor* OtherActor)
 	FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
 	GI->DebugStat();
 	
+	UGameplayStatics::PlaySound2D(GetWorld(), AcquireSound, 0.5f);
+
 	Destroy();
-	// if (OtherActor == TargetPlayer)
-	// {
-	// 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
-	// 	
-	// 	if (!GI || !GI->StatComp) return;
-	// 	
-	// 	// 랜덤의 경우 
-	// 	if (!bIsFixedAmount)
-	// 	{
-	// 		Amount = GI->GameData->GetRandomGold();
-	// 	}
-	// 	
-	// 	GI->StatComp->ApplyStatModifier(EStatTypes::Gold, Amount);
-	// 	
-	// 	if (!FloatingUIActorClass) return;
-	// 	AFloatingUIActor* FloatingUI = GetWorld()->SpawnActor<AFloatingUIActor>(FloatingUIActorClass, OtherActor->GetActorLocation(), FRotator::ZeroRotator);
-	// 	FString TempStr = FString::Printf(TEXT("골드 +%d"), Amount);
-	// 	FloatingUI->ShowFloatingUI(FText::FromString(TempStr), FLinearColor(1.f, 0.617f, 0.f, 1.f));
-	//
-	// 	GI->DebugStat();
-	// 	
-	// 	Destroy();
-	// }
 }

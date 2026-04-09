@@ -14,6 +14,8 @@ void UMapNode::NativeConstruct()
 	if (Node)
 	{
 		Node->OnClicked.AddDynamic(this, &UMapNode::OnNodeClicked);
+		Node->OnHovered.AddDynamic(this, &UMapNode::OnNodeHover);
+		Node->OnUnhovered.AddDynamic(this, &UMapNode::OnNodeHoverEnd);
 	}
 	
 	// auto GI = GetGameInstance();
@@ -25,6 +27,16 @@ void UMapNode::NativeConstruct()
 		CurUI->SetVisibility(ESlateVisibility::Visible);
 	else
 		CurUI->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMapNode::OnNodeHover()
+{
+	PlayAnimation(Hover, 0, 0);
+}
+
+void UMapNode::OnNodeHoverEnd()
+{
+	StopAnimation(Hover);
 }
 
 void UMapNode::OnNodeClicked()

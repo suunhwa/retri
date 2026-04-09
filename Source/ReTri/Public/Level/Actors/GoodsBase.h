@@ -53,4 +53,8 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class AFloatingUIActor> FloatingUIActorClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* AcquireSound;
+	
 };

@@ -5,6 +5,7 @@
 
 #include "MapSubSystem.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Level/UI/SelectButtonUI.h"
 #include "Level/UI/SelectUI.h"
 #include "ReTri/ReTri.h"
@@ -14,10 +15,10 @@
 
 AInteractCurse::AInteractCurse()
 {
-	// ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Script/Niagara.NiagaraSystem'/Game/Free_Magic/VFX_Niagara/NS_Curse.NS_Curse'"));
-	// if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
-	// NiagaraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 90.0f));
-	// NiagaraComp->bAutoActivate = false;
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TempNiagara(TEXT("/Game/Free_Magic/VFX_Niagara/NS_Curse.NS_Curse"));
+	if (TempNiagara.Succeeded()) NiagaraComp->SetAsset(TempNiagara.Object);
+	NiagaraComp->SetRelativeLocation(FVector(0.0f, 0.0f, 90.0f));
+	NiagaraComp->bAutoActivate = false;
 }
 
 void AInteractCurse::BeginPlay()
@@ -136,6 +137,9 @@ void AInteractCurse::OnCurseSelected(int32 Index)
 	// JIWONLOG("%s", *CurseRewardDatas[RandomReward]->Info);
 	
 	HideSelectUI();
+	
+	UGameplayStatics::PlaySound2D(GetWorld(), SelectSound);
+	NiagaraComp->Activate();
 }
 
 void AInteractCurse::ShowSelectUI()
@@ -170,6 +174,7 @@ void AInteractCurse::ShowSelectUI()
 	if (!SelectUIInstance->IsInViewport())
 	{
 		SelectUIInstance->AddToViewport();
+		UGameplayStatics::PlaySound2D(GetWorld(), InteractSound);
 	}
 }
 

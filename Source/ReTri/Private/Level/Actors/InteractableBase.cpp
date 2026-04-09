@@ -65,6 +65,15 @@ AInteractableBase::AInteractableBase()
 	ConstructorHelpers::FClassFinder<UInteractableInfoUI> TempInfoUI(TEXT("/Game/LevelInteraction/01_UI/WBP_InteractableInfoUI.WBP_InteractableInfoUI_C"));
 	if (TempInfoUI.Succeeded()) InteractInfoUI->SetWidgetClass(TempInfoUI.Class);
 	InteractInfoUI->SetVisibility(false); 
+
+	ConstructorHelpers::FObjectFinder<USoundBase> TempOverlap(TEXT("/Game/LevelInteraction/03_Assets/Sound/OverlapSound.OverlapSound"));
+	if (TempOverlap.Succeeded()) OverlapSound = TempOverlap.Object;
+	ConstructorHelpers::FObjectFinder<USoundBase> TempInteract(TEXT("/Game/LevelInteraction/03_Assets/Sound/InteractSound.InteractSound"));
+	if (TempInteract.Succeeded()) InteractSound = TempInteract.Object;
+	ConstructorHelpers::FObjectFinder<USoundBase> TempSelect(TEXT("/Game/LevelInteraction/03_Assets/Sound/SelectSound.SelectSound"));
+	if (TempSelect.Succeeded()) SelectSound = TempSelect.Object;
+	ConstructorHelpers::FObjectFinder<USoundBase> TempFaild(TEXT("/Game/LevelInteraction/03_Assets/Sound/NotEnoughMoney.NotEnoughMoney"));
+	if (TempFaild.Succeeded()) FailedSound = TempFaild.Object;
 }
 
 // Called when the game starts or when spawned
@@ -167,6 +176,9 @@ void AInteractableBase::NotifyActorBeginOverlap(AActor* OtherActor)
 	
 	bIsInteractable = true;
 	InteractUI->SetVisibility(true);
+	auto* IUI = Cast<UInteractableUI>(InteractUI->GetUserWidgetObject());
+	if (IUI) IUI->PlayBigAnimation();
+	UGameplayStatics::PlaySound2D(GetWorld(), OverlapSound);
 }
 
 void AInteractableBase::NotifyActorEndOverlap(AActor* OtherActor)
@@ -176,6 +188,8 @@ void AInteractableBase::NotifyActorEndOverlap(AActor* OtherActor)
 	MyPlayer = nullptr;
 	bIsInteractable = false;
 	InteractUI->SetVisibility(false);
+	auto* IUI = Cast<UInteractableUI>(InteractUI->GetUserWidgetObject());	
+	if (IUI) IUI->ReverseBigAnimation();
 }
 
 void AInteractableBase::UIFocus()

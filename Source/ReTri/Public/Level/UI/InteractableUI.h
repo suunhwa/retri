@@ -25,4 +25,10 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* InteractableName;
+	
+	UPROPERTY(meta=(BindWidgetAnim), Transient)
+	UWidgetAnimation* Big;
+	
+	void PlayBigAnimation();
+	void ReverseBigAnimation();
 };

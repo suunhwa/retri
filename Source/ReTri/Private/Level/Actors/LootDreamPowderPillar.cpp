@@ -2,6 +2,8 @@
 
 
 #include "Level/Actors/LootDreamPowderPillar.h"
+
+#include "Kismet/GameplayStatics.h"
 #include "Level/Actors/GoodsDreamPowder.h"
 
 ALootDreamPowderPillar::ALootDreamPowderPillar()
@@ -14,6 +16,8 @@ void ALootDreamPowderPillar::Break()
 {
 	// Destory 함수가 부모한테 있으니까
 	Super::Break();
+	
+	UGameplayStatics::PlaySound2D(GetWorld(), BreakSound2);
 	
 	// Spawn Goods!
 	GetWorld()->SpawnActor<AGoodsDreamPowder>(GoodsClass, GetActorLocation(), GetActorRotation());
