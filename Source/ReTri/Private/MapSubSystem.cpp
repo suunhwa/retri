@@ -184,7 +184,7 @@ void UMapSubSystem::ProceduralGenerateMap()
 		return;
 	}
 	
-	int32 MaxDepth = 2;
+	int32 MaxDepth = 4;
 	int32 MinWidth = 2;
 	int32 MaxWidth = 3;
 	
