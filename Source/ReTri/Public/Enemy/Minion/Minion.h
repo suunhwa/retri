@@ -54,6 +54,12 @@ public:
 	void DoRagdoll();
 	void PlayMontage(UAnimMontage* MontageToPlay);
 
+public:
+	// === Hit Sounds (랜덤 재생) ===
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TArray<class USoundBase*> HitSounds;
+
+	
 private:
 	// 맞았을 때 색 변경
 	void FlashRed();
