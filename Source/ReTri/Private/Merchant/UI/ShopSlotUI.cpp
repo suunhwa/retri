@@ -7,19 +7,28 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Fonts/SlateFontInfo.h"
+#include "Kismet/GameplayStatics.h"
 
 void UShopSlotUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
 	if (ItemSlotButton)
+	{
 		ItemSlotButton->OnClicked.AddDynamic(this, &UShopSlotUI::OnClicked);
+		ItemSlotButton->OnHovered.AddDynamic(this, &UShopSlotUI::OnHover);
+	}
 }
 
 void UShopSlotUI::OnClicked()
 {
 	OnSlotClicked.Broadcast(SlotNumber);
-	
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+}
+
+void UShopSlotUI::OnHover()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), HoverSound);
 }
 
 void UShopSlotUI::SetGoldText(int32 Gold, FLinearColor Color)

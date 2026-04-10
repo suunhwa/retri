@@ -65,6 +65,16 @@ public:
 	
 	bool bIsInteractable;
 	
+	//사운드
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* OverlapSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* InteractSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* SelectSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* FailedSound;
+	
 	// 상점 UI 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UShopBGUI* MerchantUIInstance;

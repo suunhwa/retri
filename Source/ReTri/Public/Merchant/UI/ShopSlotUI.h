@@ -27,6 +27,8 @@ public:
 	
 	UFUNCTION()
 	void OnClicked();
+	UFUNCTION()
+	void OnHover();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetGoldText(int32 Gold, FLinearColor Color = FLinearColor(0.8f, 0.8f, 0.5f, 1.0f));
@@ -44,4 +46,9 @@ public:
 	UTextBlock* GoldText;
 	
 	int32 SlotNumber;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* HoverSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+	USoundBase* ClickSound;
 };

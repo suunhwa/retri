@@ -63,7 +63,7 @@ void AMerchant::BeginPlay()
 	{
 		UInteractableUI* InteractableUI = Cast<UInteractableUI>(InteractUI->GetUserWidgetObject());
 		if (InteractableUI) 
-			InteractableUI->InteractableName->SetText(FText::FromString(TEXT("[상인] 조너스")));
+			InteractableUI->InteractableName->SetText(FText::FromString(TEXT("계월 <대가를 징수하는 자>")));
 	}
 	
 	if (MerchantDialogueDataTable)
@@ -156,6 +156,7 @@ void AMerchant::MerchantBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	
 	bIsInteractable = true;
 	InteractUI->SetVisibility(true);
+	UGameplayStatics::PlaySound2D(GetWorld(), OverlapSound);
 }
 
 void AMerchant::MerchantEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -223,6 +224,7 @@ void AMerchant::ShowMerchantUI()
 	if (!MerchantUIInstance->IsInViewport())
 	{
 		MerchantUIInstance->AddToViewport();
+		UGameplayStatics::PlaySound2D(GetWorld(), InteractSound);
 	}
 }
 
@@ -254,15 +256,26 @@ void AMerchant::OnClickedMerchantSlotUI(int32 SlotNum)
 			UE_LOG(jiwon, Warning, TEXT("AMerchant:  (MerchantItemDatas 개수: %d)"), MapSub->MerchantItemDatas.Num());
 			FShopItemSkillData* SkillDatas = MapSub->MerchantItemDatas.Find(MapSub->CurMapIndex);
 			
-			// 돈이 안되는 경우 
-			if (GI->StatComp->GetGold() < SkillDatas->ItemSkillDatas[SlotNum].UpgradeCostGold)
+			FString FloatingText = FString::Printf(TEXT("골드 부족!"));
+			FLinearColor FloatingColor = FLinearColor::Red;
+	
+			// 골드 소모
+			if (!GI->StatComp->SpendGold(SkillDatas->ItemSkillDatas[SlotNum].UpgradeCostGold))
 			{
-				// SCREENLOG("골드 부족!");
+				if (GI->FloatingUIActorClass)
+				{
+					if (ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
+					{
+						AFloatingUIActor* FloatingUIActor = GetWorld()->SpawnActor<AFloatingUIActor>(
+							GI->FloatingUIActorClass, Player->GetActorLocation(), FRotator::ZeroRotator);
+						FloatingUIActor->ShowFloatingUI(FText::FromString(FloatingText), FloatingColor);
+
+						UGameplayStatics::PlaySound2D(GetWorld(), FailedSound);
+					}
+				}
+		
 				return;
 			}
-			
-			// 골드 소모
-			GI->StatComp->SpendGold(SkillDatas->ItemSkillDatas[SlotNum].UpgradeCostGold);
 			
 			// 아이템 스폰
 			FVector Loc = GetActorLocation() + (GetActorRightVector() * 300.f);
@@ -280,25 +293,25 @@ void AMerchant::OnClickedMerchantSlotUI(int32 SlotNum)
 				{
 					Item->AbilityClass = *FoundClass;
 				}
-				else
-				{
-					UE_LOG(LogTemp, Warning,
-						TEXT("AMerchant: SkillID '%s' 에 매핑된 AbilityClass 없음. BP에서 SkillIDToClassMap 설정!"),
-						*SkillData.SkillID);
-				}
+				// else
+				// {
+				// 	UE_LOG(LogTemp, Warning,
+				// 		TEXT("AMerchant: SkillID '%s' 에 매핑된 AbilityClass 없음. BP에서 SkillIDToClassMap 설정!"),
+				// 		*SkillData.SkillID);
+				// }
 				
 				// 구매 한 아이템 상점 리스트에서 지우기 
 				MapSub->RemoveMerchantItemList(MapSub->CurMapIndex, SlotNum);
 			}
-			else
-			{
-				UE_LOG(jiwon, Error, TEXT("아이템 스폰 실패!"));
-			}
+		// 	else
+		// 	{
+		// 		UE_LOG(jiwon, Error, TEXT("아이템 스폰 실패!"));
+		// 	}
 		}
-		else
-		{
-			UE_LOG(jiwon, Error, TEXT("데이터가 없거나 잘못된 SlotNum입니다!"));
-		}
+		// else
+		// {
+		// 	UE_LOG(jiwon, Error, TEXT("데이터가 없거나 잘못된 SlotNum입니다!"));
+		// }
 	}
 }
 
