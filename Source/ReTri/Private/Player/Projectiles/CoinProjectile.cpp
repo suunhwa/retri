@@ -22,6 +22,8 @@ ACoinProjectile::ACoinProjectile()
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComp->SetCollisionObjectType(ECC_GameTraceChannel5);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel7, ECR_Overlap);
+	CollisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	CollisionComp->SetGenerateOverlapEvents(true);
 	RootComponent = CollisionComp;
@@ -128,6 +130,8 @@ void ACoinProjectile::Explode(FVector ExplosionLocation)
 
 	// AoE 범위 내 적 탐색
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel7));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel2));
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
 	TArray<AActor*> IgnoreActors;

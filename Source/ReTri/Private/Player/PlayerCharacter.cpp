@@ -185,6 +185,14 @@ void APlayerCharacter::BeginPlay()
 	}
 	if (!bIsMainMenu)
 	{
+		const bool bIsStartMap = GetWorld()->GetMapName().Contains(TEXT("LV_StartMap"));
+		if (bIsStartMap && IntroSound)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), IntroSound, GetActorLocation());
+
+		const bool bIsBossMap = GetWorld()->GetMapName().Contains(TEXT("Lv_BossMap"));
+		if (bIsBossMap && BossMapIntroSound)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), BossMapIntroSound, GetActorLocation());
+
 		HPBarComp->InitWidget();
 		if (UHPBar* HPWidget = Cast<UHPBar>(HPBarComp->GetUserWidgetObject()))
 		{
@@ -509,9 +517,27 @@ float APlayerCharacter::TakeDamage(float DamageAmount,
 	       HealthComp->GetCurrentHP(),
 	       HealthComp->GetMaxHP());
 
-	if (!HealthComp->IsDead() && HitMontage)
+	if (!HealthComp->IsDead())
 	{
-		PlayAnimMontage(HitMontage);
+		if (HitSound && bCanPlayHitSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+			bCanPlayHitSound = false;
+			GetWorldTimerManager().SetTimer(HitSoundTimerHandle, [this]()
+			{
+				bCanPlayHitSound = true;
+			}, HitSoundCooldown, false);
+		}
+
+		const float HPRatio = HealthComp->GetCurrentHP() / HealthComp->GetMaxHP();
+		if (HPRatio < 0.3f && !bLowHPSoundPlayed && LowHPSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), LowHPSound, GetActorLocation());
+			bLowHPSoundPlayed = true;
+		}
+
+		if (HitMontage)
+			PlayAnimMontage(HitMontage);
 	}
 
 	return Damage;
@@ -525,6 +551,9 @@ void APlayerCharacter::OnDash(const struct FInputActionValue& inputValue)
 void APlayerCharacter::HandleDeath(AController* Killer)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[Death] 플레이어 사망"));
+
+	if (DeathSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation());
 
 	// 입력 차단
 	DisableInput(Cast<APlayerController>(Controller));
