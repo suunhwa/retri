@@ -39,10 +39,8 @@ void UAbilityComponent::BeginPlay()
 					RegisterAbility(Slot, Pair.Value);
 			}
 			
-			// 저장 안 된 슬롯은 기본값으로 채움
+			// 대시는 항상 유지 (핸드캐논/퀵트리거는 StartMap에서만 지급, 이후 레벨에서 버리면 복구 안 함)
 			if (!GetAbility(EAbilitySlot::Dash)) RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);
-			if (!GetAbility(EAbilitySlot::TravelerMemory1)) RegisterAbility(EAbilitySlot::TravelerMemory1, TravelerMemory1Class);
-			if (!GetAbility(EAbilitySlot::TravelerMemory2)) RegisterAbility(EAbilitySlot::TravelerMemory2, TravelerMemory2Class);
 			return;
 		}
 	}
