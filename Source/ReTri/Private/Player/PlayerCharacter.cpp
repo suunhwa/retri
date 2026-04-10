@@ -143,6 +143,13 @@ APlayerCharacter::APlayerCharacter()
 		ia_Salvage = TempSalvageInput.Object;
 	}
 
+	ConstructorHelpers::FObjectFinder<UInputAction> TempHPInput(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_HP.IA_HP'"));
+	if (TempHPInput.Succeeded())
+	{
+		ia_HP = TempHPInput.Object;
+	}
+
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> TempIMC(
 		TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Player/Inputs/IMC_Player.IMC_Player'"));
 	if (TempIMC.Succeeded())
@@ -300,6 +307,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			playerInput->BindAction(ia_Interaction, ETriggerEvent::Started, this, &APlayerCharacter::OnInteraction);
 			playerInput->BindAction(ia_Interaction, ETriggerEvent::Started, this, &APlayerCharacter::OnPickUp);
 			playerInput->BindAction(ia_Salvage, ETriggerEvent::Started, this, &APlayerCharacter::OnSalvage);
+			playerInput->BindAction(ia_HP, ETriggerEvent::Started, this, &APlayerCharacter::OnCheatHP);
 		}
 	}
 }
@@ -383,9 +391,14 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 		SpawnParams
 	);
 
+	if (SpawnedBullet)
+	{
+		SpawnedBullet->SetBulletDamage(StatComp->GetAttackPower());
+	}
+
 	if (SpawnedBullet && bIsEnhancedShot)
 	{
-		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
+		SpawnedBullet->SetBulletDamage(StatComp->GetAttackPower() * EnhancedShotMultiplier);
 		UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
 
 		if (EnhancedShotCS)
@@ -703,6 +716,11 @@ void APlayerCharacter::OnSalvage(const struct FInputActionValue& inputValue)
 			return; 
 		}
 	}
+}
+
+void APlayerCharacter::OnCheatHP(const FInputActionValue& inputValue)
+{
+	HealthComp->Heal(50.f);
 }
 
 void APlayerCharacter::DebugAddExp(int32 Amount)
