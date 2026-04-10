@@ -107,7 +107,11 @@ private:
 	// item pick up
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Interaction")
 	TObjectPtr<UInputAction> ia_Salvage;
-	
+
+	// 치트: HP 50 회복
+	UPROPERTY(EditDefaultsOnly, Category="Inputs|Cheat")
+	TObjectPtr<UInputAction> ia_HP;
+
 	UPROPERTY(EditDefaultsOnly, Category="Inputs")
 	TObjectPtr<UInputMappingContext> imc_Player;
 
@@ -253,6 +257,7 @@ private:
 	void OnInteraction(const struct FInputActionValue& inputValue);
 	void OnPickUp(const struct FInputActionValue& inputValue);
 	void OnSalvage(const struct FInputActionValue& inputValue);
+	void OnCheatHP(const struct FInputActionValue& inputValue);
 	
 private:
 	UFUNCTION()

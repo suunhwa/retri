@@ -48,6 +48,12 @@ void UAbilityComponent::BeginPlay()
 	RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);
 	RegisterAbility(EAbilitySlot::TravelerMemory1, TravelerMemory1Class);
 	RegisterAbility(EAbilitySlot::TravelerMemory2, TravelerMemory2Class);
+	// 레벨 이동 시 복원할 수 있도록 GI에 저장
+	if (GI)
+	{
+		GI->SavedSkillSlots.Add(static_cast<uint8>(EAbilitySlot::TravelerMemory1), TravelerMemory1Class);
+		GI->SavedSkillSlots.Add(static_cast<uint8>(EAbilitySlot::TravelerMemory2), TravelerMemory2Class);
+	}
 	
 }
 

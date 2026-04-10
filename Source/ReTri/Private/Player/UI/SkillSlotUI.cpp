@@ -268,11 +268,20 @@ void USkillSlotUI::UpdateStackDisplay(int32 Current, int32 Max)
 	{
 		CooldownMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
 	}
-	/*if (BorderMI)
+
+	if (CooldownFillImg)
 	{
-		BorderMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
+		if (Current > 0)
+		{
+			CooldownFillImg->SetVisibility(ESlateVisibility::HitTestInvisible);
+			if (CooldownFillMI)
+				CooldownFillMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
+		}
+		else
+		{
+			CooldownFillImg->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
-	*/
 
 	// 텍스트로도 표시 (선택)
 	if (CooldownText)
