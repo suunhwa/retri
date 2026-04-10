@@ -101,7 +101,7 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 	{
 		FlashRed();
 		
-		PaperComp->SetActive(false);
+		PaperComp->SetVisibility(false);
 		// === 피격 사운드 랜덤 재생 ===
 		if (HitSounds.Num() > 0)
 		{

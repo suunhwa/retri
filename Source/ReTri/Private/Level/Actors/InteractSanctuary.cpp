@@ -39,7 +39,7 @@ void AInteractSanctuary::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
-	if (!MyPlayer) return;
+	// if (!MyPlayer) return;
 	
 	auto GI = Cast<UReTriGameInstance>(GetGameInstance());
 
