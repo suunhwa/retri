@@ -54,6 +54,10 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> CooldownOverlayImg;
 
+	// 내부 채움 오버레이 이미지 (BP에서 없어도 됨)
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UImage> CooldownFillImg;
+
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> BorderImg;
 
@@ -69,6 +73,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="SkillSlot|Materials")
 	TObjectPtr<UMaterialInterface> MCooldownRadial;
+
+	// 내부 어두운 채움 오버레이 (M_Cooltime)
+	UPROPERTY(EditDefaultsOnly, Category="SkillSlot|Materials")
+	TObjectPtr<UMaterialInterface> MCooldownFill;
 
 	UPROPERTY(EditDefaultsOnly, Category="SkillSlot|Materials")
 	TObjectPtr<UMaterialInterface> MBorderGlow;
@@ -105,6 +113,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> CooldownMI;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> CooldownFillMI;
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> BorderMI;

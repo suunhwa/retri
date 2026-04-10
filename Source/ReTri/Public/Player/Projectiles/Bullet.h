@@ -46,6 +46,9 @@ public:
 	TObjectPtr<UNiagaraSystem> HitEffect;		// 적 맞았을 때
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects|Normal")
+	TObjectPtr<USoundBase> FireSound;			// 발사 소리
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects|Normal")
 	TObjectPtr<USoundBase> HitSound;
 
 	// 강화탄
@@ -54,6 +57,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects|Enhanced")
 	TObjectPtr<UNiagaraSystem> EnhancedHitEffect;	// 강화탄 적 맞았을 때
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects|Enhanced")
+	TObjectPtr<USoundBase> EnhancedFireSound;	// 강화탄 발사 소리
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects|Enhanced")
 	TObjectPtr<USoundBase> EnhancedHitSound;

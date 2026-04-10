@@ -53,6 +53,10 @@ void ABullet::BeginPlay()
 		TrailEffectComp->SetAsset(TrailEffect);
 		TrailEffectComp->Activate();
 	}
+
+	USoundBase* ActiveFireSound = bIsEnhanced && EnhancedFireSound ? EnhancedFireSound.Get() : FireSound.Get();
+	if (ActiveFireSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ActiveFireSound, GetActorLocation());
 }
 
 void ABullet::SetEnhanced()

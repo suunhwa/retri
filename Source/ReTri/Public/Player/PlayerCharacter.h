@@ -143,6 +143,30 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
 	FVector LevelUpEffectScale = FVector(1.f, 1.f, 1.f);
 
+	// 게임 시작 시 대사
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	TObjectPtr<USoundBase> IntroSound;
+
+	// 보스맵 진입 사운드
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	TObjectPtr<USoundBase> BossMapIntroSound;
+
+	// 피격 사운드
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	TObjectPtr<USoundBase> HitSound;
+
+	// 피격 사운드 재생 간격 (초)
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	float HitSoundCooldown = 0.5f;
+
+	// HP 30% 이하 사운드
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	TObjectPtr<USoundBase> LowHPSound;
+
+	// 사망 신음
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	TObjectPtr<USoundBase> DeathSound;
+
 	// 레벨업 사운드 (1~4)
 	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
 	TObjectPtr<USoundBase> LevelUpSound;
@@ -210,6 +234,10 @@ public:
 	bool bCanAttack = true;
 
 	FTimerHandle AttackTimerHandle;
+	FTimerHandle HitSoundTimerHandle;
+
+	bool bCanPlayHitSound = true;
+	bool bLowHPSoundPlayed = false;
 
 private:
 	// Input Handlers

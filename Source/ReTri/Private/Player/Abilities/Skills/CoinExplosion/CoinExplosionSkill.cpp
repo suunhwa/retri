@@ -55,8 +55,9 @@ void UCoinExplosionSkill::Activate(ACharacter* Owner)
 		UGameplayStatics::PlaySoundAtLocation(Owner->GetWorld(), CastSound, Owner->GetActorLocation());
 	}
 
-	// 피해량 = 소모 골드 × 현재 배율
-	const float FinalDamage = GoldCost * ExplosionDamageCoeff;
+	// 피해량 = 공격력 × 소모 골드 × 현재 배율
+	const float AttackDamage = StatComp->GetAttackPower();
+	const float FinalDamage = AttackDamage * GoldCost * ExplosionDamageCoeff;
 
 	FVector MouseWorldPos;
 	if (!PC->GetMouseWorldPosition(MouseWorldPos)) return;

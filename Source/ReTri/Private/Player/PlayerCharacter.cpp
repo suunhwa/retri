@@ -185,6 +185,14 @@ void APlayerCharacter::BeginPlay()
 	}
 	if (!bIsMainMenu)
 	{
+		const bool bIsStartMap = GetWorld()->GetMapName().Contains(TEXT("LV_StartMap"));
+		if (bIsStartMap && IntroSound)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), IntroSound, GetActorLocation());
+
+		const bool bIsBossMap = GetWorld()->GetMapName().Contains(TEXT("Lv_BossMap"));
+		if (bIsBossMap && BossMapIntroSound)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), BossMapIntroSound, GetActorLocation());
+
 		HPBarComp->InitWidget();
 		if (UHPBar* HPWidget = Cast<UHPBar>(HPBarComp->GetUserWidgetObject()))
 		{
@@ -509,9 +517,27 @@ float APlayerCharacter::TakeDamage(float DamageAmount,
 	//        HealthComp->GetCurrentHP(),
 	//        HealthComp->GetMaxHP());
 
-	if (!HealthComp->IsDead() && HitMontage)
+	if (!HealthComp->IsDead())
 	{
-		PlayAnimMontage(HitMontage);
+		if (HitSound && bCanPlayHitSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
+			bCanPlayHitSound = false;
+			GetWorldTimerManager().SetTimer(HitSoundTimerHandle, [this]()
+			{
+				bCanPlayHitSound = true;
+			}, HitSoundCooldown, false);
+		}
+
+		const float HPRatio = HealthComp->GetCurrentHP() / HealthComp->GetMaxHP();
+		if (HPRatio < 0.3f && !bLowHPSoundPlayed && LowHPSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), LowHPSound, GetActorLocation());
+			bLowHPSoundPlayed = true;
+		}
+
+		if (HitMontage)
+			PlayAnimMontage(HitMontage);
 	}
 
 	return Damage;
@@ -532,6 +558,10 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 		GI->SaveStatSnapshot();
 	}
 	
+	if (DeathSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation());
+
+
 	// 입력 차단
 	DisableInput(Cast<APlayerController>(Controller));
 
@@ -620,24 +650,6 @@ void APlayerCharacter::Interaction()
 void APlayerCharacter::OnPickUp(const struct FInputActionValue& inputValue)
 {
 	const float PickUpRadius = 200.f;
-
-	// 보스 드랍 아이템 우선 체크
-	TArray<AActor*> BossDropItems;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABossDropItem::StaticClass(), BossDropItems);
-	for (AActor* Actor : BossDropItems)
-	{
-		if (FVector::Dist(GetActorLocation(), Actor->GetActorLocation()) <= PickUpRadius)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[PlayerCharacter] 보스 아이템 획득 → 다음 레벨로 전환"));
-			Actor->Destroy();
-
-			// TODO: 다음 레벨 이름 확정되면 아래 주석 해제
-			// ABossDropItem* DropItem = Cast<ABossDropItem>(Actor);
-			// if (DropItem && !DropItem->NextLevelName.IsNone())
-			//     UGameplayStatics::OpenLevel(GetWorld(), DropItem->NextLevelName);
-			return;
-		}
-	}
 
 	// ISkillItemInterface 구현 액터 전체에서 거리 체크 (콜리전 채널 무시)
 	TArray<AActor*> AllItems;
