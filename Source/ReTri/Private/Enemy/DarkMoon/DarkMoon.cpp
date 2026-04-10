@@ -234,7 +234,8 @@ void ADarkMoon::DeathAnimFinished()
 		return;
 	}
 
-	auto* Item = GetWorld()->SpawnActor<AItemBase>(ItemClass, GetActorLocation(), FRotator::ZeroRotator);
+	FVector Loc = GetActorLocation() + (GetActorRightVector() * 300.f);
+	auto* Item = GetWorld()->SpawnActor<AItemBase>(ItemClass, Loc, FRotator::ZeroRotator);
 	if (Item)
 	{
 		Item->DataInit(*PickedData);
@@ -245,10 +246,10 @@ void ADarkMoon::DeathAnimFinished()
 		{
 			Item->AbilityClass = *Found;
 		}
-		// else
-		// {
-		// 	UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 보스 블루프린트의 'SkillIDToClassMap' 에 %s 라는 Key값이 아직 없습니다. 해당 Key를 추가하고 보스 스킬을 연결해주세요!"), *RowName.ToString());
-		// }
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("[보스 드랍 에러] 보스 블루프린트의 'SkillIDToClassMap' 에 %s 라는 Key값이 아직 없습니다. 해당 Key를 추가하고 보스 스킬을 연결해주세요!"), *RowName.ToString());
+		}
 	}
 	
 	Destroy();
