@@ -70,7 +70,12 @@ void UHealthComponent::Heal(float Amount)
 			TWeakObjectPtr<UNiagaraComponent> WeakNC(NC);
 			GetWorld()->GetTimerManager().SetTimer(HealEffectTimer, [WeakNC]()
 			{
-				if (WeakNC.IsValid()) WeakNC->DeactivateImmediate();
+				if (WeakNC.IsValid())
+				{
+					WeakNC->DeactivateImmediate();
+					if (AActor* Owner = WeakNC->GetOwner())
+						Owner->Destroy();
+				}
 			}, HealEffectDuration, false);
 		}
 	}
