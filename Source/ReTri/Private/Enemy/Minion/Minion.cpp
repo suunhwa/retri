@@ -100,7 +100,8 @@ float AMinion::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageE
 	if (ActualDamage > 0.0f && FSM != nullptr)
 	{
 		FlashRed();
-				
+		
+		PaperComp->SetActive(false);
 		// === 피격 사운드 랜덤 재생 ===
 		if (HitSounds.Num() > 0)
 		{

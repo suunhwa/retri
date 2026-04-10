@@ -79,7 +79,7 @@ void ANZW_TestPlayer::Interaction()
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(this);
 	
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 42.f, 16, FColor::Red);
+	// DrawDebugSphere(GetWorld(), GetActorLocation(), 42.f, 16, FColor::Red);
 	
 	// 근처에 Interaction Object가 있는지 감지 
 	TArray<AActor*> OutActors;
