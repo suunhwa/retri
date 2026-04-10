@@ -59,25 +59,11 @@ void UHealthComponent::Heal(float Amount)
 
 	if (HealEffect)
 	{
-		UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			this, HealEffect,
 			GetOwner()->GetActorLocation(),
 			GetOwner()->GetActorRotation()
 		);
-		if (NC)
-		{
-			FTimerHandle HealEffectTimer;
-			TWeakObjectPtr<UNiagaraComponent> WeakNC(NC);
-			GetWorld()->GetTimerManager().SetTimer(HealEffectTimer, [WeakNC]()
-			{
-				if (WeakNC.IsValid())
-				{
-					WeakNC->DeactivateImmediate();
-					if (AActor* Owner = WeakNC->GetOwner())
-						Owner->Destroy();
-				}
-			}, HealEffectDuration, false);
-		}
 	}
 	
 	// === GamePlay 저장 ===
