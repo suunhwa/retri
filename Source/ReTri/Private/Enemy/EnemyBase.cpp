@@ -664,17 +664,17 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 		}
 	}
 	
-	DrawDebugBox(
-		World,
-		BoxCenter,
-		BoxExtent,
-		FRotator(0.f, Clone->GetActorRotation().Yaw, 0.f).Quaternion(),
-		FColor::Red,
-		false,
-		1.0f,
-		0,
-		2.0f
-	);
+	// DrawDebugBox(
+	// 	World,
+	// 	BoxCenter,
+	// 	BoxExtent,
+	// 	FRotator(0.f, Clone->GetActorRotation().Yaw, 0.f).Quaternion(),
+	// 	FColor::Red,
+	// 	false,
+	// 	1.0f,
+	// 	0,
+	// 	2.0f
+	// );
 }
 
 // ---------------------------------------- 강화 대쉬
@@ -946,25 +946,25 @@ void AEnemyBase::ExecuteJumpCrossDamage(FVector ImpactLocation)
 		);
 	}
 
-	DrawDebugBox(
-		World,
-		ImpactLocation,
-		FVector(CrossLength * 0.5f, CrossThickness * 0.5f, Height * 0.5f),
-		FColor::Blue,
-		false,
-		2.0f,
-		0,
-		3.0f
-	);
+	// DrawDebugBox(
+	// 	World,
+	// 	ImpactLocation,
+	// 	FVector(CrossLength * 0.5f, CrossThickness * 0.5f, Height * 0.5f),
+	// 	FColor::Blue,
+	// 	false,
+	// 	2.0f,
+	// 	0,
+	// 	3.0f
+	// );
 
-	DrawDebugBox(
-		World,
-		ImpactLocation,
-		FVector(CrossThickness * 0.5f, CrossLength * 0.5f, Height * 0.5f),
-		FColor::Blue,
-		false,
-		2.0f,
-		0,
-		3.0f
-	);
+	// DrawDebugBox(
+	// 	World,
+	// 	ImpactLocation,
+	// 	FVector(CrossThickness * 0.5f, CrossLength * 0.5f, Height * 0.5f),
+	// 	FColor::Blue,
+	// 	false,
+	// 	2.0f,
+	// 	0,
+	// 	3.0f
+	// );
 }
