@@ -167,7 +167,7 @@ void AMinion::OnAttackOverlap(AActor* OtherActor)
 
 void AMinion::DoRagdoll()
 {
-	// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
