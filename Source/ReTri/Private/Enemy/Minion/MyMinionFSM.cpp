@@ -10,18 +10,11 @@
 #include "Kismet/GameplayStatics.h"
 
 class AAIController;
-// Sets default values for this component's properties
 UMyMinionFSM::UMyMinionFSM()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
-
-// Called when the game starts
 void UMyMinionFSM::BeginPlay()
 {	
 	Super::BeginPlay();
@@ -39,13 +32,10 @@ void UMyMinionFSM::BeginPlay()
 }
 
 
-// Called every frame
 void UMyMinionFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	
-
 	switch (_State)
 	{
 	case EMinionState::Idle:
@@ -56,9 +46,6 @@ void UMyMinionFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		break;
 	case EMinionState::Attack:
 		AttackState();
-		break;
-	case EMinionState::Damage:
-		DamageState();
 		break;
 	case EMinionState::Die:
 		DieState();
@@ -86,7 +73,6 @@ void UMyMinionFSM::MoveState()
 	FVector Dir = PlayerTarget->GetActorLocation() - Me->GetActorLocation();
 	
 	float Distance = Dir.Size();
-	//DrawDebugSphere(GetWorld(), Me->GetActorLocation(), AttackRange, 20, FColor::Cyan);
 	
 	if (Distance <= AttackRange)
 	{
@@ -119,18 +105,8 @@ void UMyMinionFSM::AttackState()
 	{
 		Me->PlayMontage(MyStatInfo->MinionAttackMontage);
 	}
-	
-	// float Distance = FVector::Distance(Me->GetActorLocation(), PlayerTarget->GetActorLocation());
-	// if (Distance > AttackRange)
-	// {
-	// 	_State = EMinionState::Move;
-	// }
 }
 
-void UMyMinionFSM::DamageState()
-{
-	
-}
 
 void UMyMinionFSM::DieState()
 {
@@ -149,7 +125,6 @@ void UMyMinionFSM::DieState()
 	}
 	
 	Me->SetLifeSpan(2.0f);
-		
 }
 
 

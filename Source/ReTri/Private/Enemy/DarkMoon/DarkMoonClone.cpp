@@ -4,12 +4,10 @@
 // Sets default values
 
 #include "Enemy/DarkMoon/DarkMoonClone.h"
-
 #include "Components/BoxComponent.h"
 
 ADarkMoonClone::ADarkMoonClone()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	SwordCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordCollision"));
@@ -24,7 +22,6 @@ ADarkMoonClone::ADarkMoonClone()
 	}
 }
 
-// Called when the game starts or when spawned
 void ADarkMoonClone::BeginPlay()
 {
 	Super::BeginPlay();
@@ -34,17 +31,13 @@ void ADarkMoonClone::BeginPlay()
 		TEXT("SwordSocket"));
 	
 	SwordCollision->OnComponentBeginOverlap.AddDynamic(this, &ADarkMoonClone::OnSwordOverlap);
-	
-	
 }
 
-// Called every frame
 void ADarkMoonClone::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-// Called to bind functionality to input
 void ADarkMoonClone::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

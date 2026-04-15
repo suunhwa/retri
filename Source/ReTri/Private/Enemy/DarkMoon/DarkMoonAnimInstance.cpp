@@ -15,5 +15,4 @@ void UDarkMoonAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		Velocity.Z = 0;
 		CurrentSpeed = Velocity.Size();
 	}
-	
 }

@@ -18,10 +18,8 @@ enum class EDarkMoonSkillType : uint8
 {
 	BasicAttack,
 	Dash,
-	Flash,
 	JumpDown,
 	MirrorBlade,
-	PowerDashShadow,
 	PowerDashSword,
 	PowerJumpDown 
 };
@@ -71,14 +69,10 @@ private:
 private:
 	void ExecuteBasicAttack(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	void ExecuteDash(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
-	void ExecuteFlash(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	void ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	void ExecuteMirrorBlade(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	void ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
-	void ExecutePowerDashShadow(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	void ExecutePowerJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage);
 	
 	void ExecutePatternCycle(AEnemyBase* Boss);
-	
-	
 };

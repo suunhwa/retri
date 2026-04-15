@@ -6,9 +6,7 @@
 #include "Enemy/EnemyBase.h"
 #include "Minion.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class RETRI_API AMinion : public AEnemyBase
 {
@@ -44,7 +42,6 @@ public:
 	class UPaperSpriteComponent* PaperComp;
 	
 protected:
-	void CheckDistanceAndMove(float DeltaTime);
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
 public:
@@ -58,11 +55,4 @@ public:
 	// === Hit Sounds (랜덤 재생) ===
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TArray<class USoundBase*> HitSounds;
-
-	
-private:
-	// 맞았을 때 색 변경
-	void FlashRed();
-	FTimerHandle FlashTimer;
-	
 };

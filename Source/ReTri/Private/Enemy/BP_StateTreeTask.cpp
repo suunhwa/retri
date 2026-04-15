@@ -14,7 +14,6 @@
 #include "Enemy/EnemyBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "ReTri/ReTri.h"
 
 UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -25,8 +24,6 @@ UBP_StateTreeTask::UBP_StateTreeTask(const FObjectInitializer& ObjectInitializer
 EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::EnterState(Context, Transition);
-	// UE_LOG(LogTemp, Warning, TEXT("==== Boss Attack Task 시작! ===="));
-	
 	
 	SkillWaitTime = 0.0f;	// 다음 스킬 대기 시간
 	
@@ -38,7 +35,6 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	
 	if (!Boss)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("==== 실패 ===="));
 		if (AAIController* aic = Cast<AAIController>(OwnerActor))
 		{
 			Boss = Cast<AEnemyBase>(aic->GetPawn());
@@ -46,17 +42,13 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	}
 	if (!Boss)
 	{
-		// UE_LOG(LogTemp, Error, TEXT("보스(Pawn)를 찾을 수 없습니다."));
 		return EStateTreeRunStatus::Failed;
 	}
 
 	if (Boss->BossSkills.Num() < 8)
 	{
-		// UE_LOG(LogTemp, Error, TEXT("보스 스킬 부족! (현재: %d개)"), Boss->BossSkills.Num());
 		return EStateTreeRunStatus::Failed;
 	}
-	
-	// ==================================================
 	
 	// 거리 계산
 	float Distance = FVector::Dist(Boss->GetActorLocation(), Player->GetActorLocation());
@@ -65,10 +57,10 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 	float HPRatio = Boss->CurrentHP / Boss->MaxHP;
 	int32 RealPhase = Boss->CurrentPhase;
 	int32 FinalSkillIndex = -1;		// 최종 스킬 인덱스
-	TArray<int32> SkillPool;		// 이번에 쓸 스킬 후보지 / 2, 5 취소
+	TArray<int32> SkillPool;		// 이번에 쓸 스킬 후보지
 	
 	
-	// 체력에 따른 페이즈
+	// === 체력에 따른 페이즈 === 
 	if (HPRatio <= 0.3f)			// 3페이즈
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
@@ -83,22 +75,21 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		true
 		);
 		
-		
 		RealPhase = 3;
-		SkillPool = { 6, 7 };
+		SkillPool = { 4, 5 };
 	}
 	else if (HPRatio <= 0.6f)		// 2페이즈
 	{
 		if (Boss && !Boss->bHasPlayedMirrorBlade)
 		{
-			FinalSkillIndex = 4;
+			FinalSkillIndex = 3;
 			Boss->bHasPlayedMirrorBlade = true;
 			RealPhase = 2;
 		}
 		else
 		{
 			RealPhase = 2;
-			SkillPool = { 0, 1, 1, 3, 3, 6, 6 };
+			SkillPool = { 0, 1, 1, 2, 2, 4, 4 };
 		}
 	}
 	else							// 1페이즈
@@ -107,7 +98,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		if (Distance >= 400.f && Distance <= 1000.f)
 		{
 			// 중거리
-			SkillPool = { 1, 1, 3 }; // 1, 1, 3
+			SkillPool = { 1, 1, 2 };
 		}
 		else if (Distance < 400.f)
 		{
@@ -116,7 +107,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		}
 		else
 		{
-			SkillPool = { 3 };
+			SkillPool = { 2 };
 		}
 	}
 	
@@ -126,7 +117,7 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 		FinalSkillIndex = SkillPool[RandomIndex];
 	}
 	
-	// ================================================== 
+	// === 스킬 인덱스 결정 ===
 	
 	// 결정된 인덱스로 스킬 실행
 	if (Boss->BossSkills.IsValidIndex(FinalSkillIndex))
@@ -139,14 +130,9 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 			FSkillDataTableRow* SkillInfo = SkillDataHandle.GetRow<FSkillDataTableRow>(TEXT(""));
 			EDarkMoonSkillType SelectedSkill = static_cast<EDarkMoonSkillType>(FinalSkillIndex);
 			
-			if (SkillInfo) // && SkillInfo->MontageToPlay)
+			if (SkillInfo)
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("==== [%d페이즈] [%s] 시전 중 (인덱스: %d) ===="), RealPhase, *SkillInfo->SkillName, FinalSkillIndex);
-				
-				// SCREENLOG("==== [%d페이즈] ==== [%s] !!!! ====", RealPhase, *SkillInfo->SkillName);
-				
 				Boss->SetCurrentSkillDamage(SkillInfo->Damage);
-				//Boss ->PlayAnimMontage(SkillInfo->MontageToPlay);
 				
 				if (SelectedSkill == EDarkMoonSkillType::Dash)
 				{
@@ -164,10 +150,6 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 					ExecuteDash(Boss, Player, SkillInfo->MontageToPlay);
 					break;
 				
-				case EDarkMoonSkillType::Flash:
-					ExecuteFlash(Boss, Player, SkillInfo->MontageToPlay);
-					break;
-				
 				case EDarkMoonSkillType::JumpDown:
 					ExecuteJumpDown(Boss, Player, SkillInfo->MontageToPlay);
 					break;
@@ -178,10 +160,6 @@ EStateTreeRunStatus UBP_StateTreeTask::EnterState(FStateTreeExecutionContext& Co
 				
 				case EDarkMoonSkillType::PowerDashSword:
 					ExecutePowerDashSword(Boss, Player, SkillInfo->MontageToPlay);
-					break;
-				
-				case EDarkMoonSkillType::PowerDashShadow:
-					ExecutePowerDashShadow(Boss, Player, SkillInfo->MontageToPlay);
 					break;
 				
 				case EDarkMoonSkillType::PowerJumpDown:
@@ -225,7 +203,6 @@ EStateTreeRunStatus UBP_StateTreeTask::Tick(FStateTreeExecutionContext& Context,
 		
 		if (Boss->GetCurrentMontage() == nullptr)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("공격 끗"))
 			SkillWaitTime = 0.0f;
 			Boss->RotateToTarget(DeltaTime, 3.0f);
 			return EStateTreeRunStatus::Succeeded;
@@ -291,10 +268,6 @@ void UBP_StateTreeTask::ExecuteDash(AEnemyBase* Boss, ACharacter* Player, UAnimM
 	
 }
 
-void UBP_StateTreeTask::ExecuteFlash(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
-{
-}
-
 void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
 {
 	if (!Boss || !Player || !Montage) return;
@@ -324,10 +297,9 @@ void UBP_StateTreeTask::ExecuteJumpDown(AEnemyBase* Boss, ACharacter* Player, UA
     
 	FVector SkyLoc = Boss->GetActorLocation() + FVector(0, 0, 3000.f); 
 	Boss->SetActorLocation(SkyLoc);
-	Boss->SetActorHiddenInGame(true); // 보스 숨기기
+	Boss->SetActorHiddenInGame(true);
 	
-	
-	// 보스야 장판 생성해
+	// 보스 장판 생성
 	Boss->SpawnJumpDecal(LandingPosition, Boss->JumpCircleDecal);
 }
 
@@ -367,9 +339,9 @@ void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
 	const float WaitBeforeProgress = 0.3f;   // 다 등장한 뒤 잠깐 대기
 	const float ProgressDuration = 1.0f;     // 차오르는 시간
 	const float NextCycleDelay = 0.8f;       // 다음 반복까지 텀
-
-	// =========================
-	// 1) 장판 순차 등장
+	
+	
+	// 1. 장판 순차 등장
 	for (int32 i = 0; i < CloneNum; ++i)
 	{
 		const float Delay = i * AppearanceInterval;
@@ -393,8 +365,8 @@ void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
 	// 마지막 장판이 등장하고, 잠깐 쉰 뒤 차오름 시작
 	const float StartProgressTime = (CloneNum - 1) * AppearanceInterval + WaitBeforeProgress;
 
-	// =========================
-	// 2) 동시에 차오름 시작
+	
+	// 2. 동시에 차오름 시작
 	FTimerHandle StartProgressHandle;
 	Boss->GetWorldTimerManager().SetTimer(
 		StartProgressHandle,
@@ -434,9 +406,9 @@ void UBP_StateTreeTask::ExecutePatternCycle(AEnemyBase* Boss)
 		StartProgressTime,
 		false
 	);
-
-	// =========================
-	// 3) 다 차면 동시에 폭발
+	
+	
+	// 3. 다 차면 동시에 폭발
 	const float ExplosionTime = StartProgressTime + ProgressDuration;
 
 	FTimerHandle ExplosionHandle;
@@ -542,11 +514,6 @@ void UBP_StateTreeTask::ExecutePowerDashSword(AEnemyBase* Boss, ACharacter* Play
 	}, 1.5f, false);
 }
 
-void UBP_StateTreeTask::ExecutePowerDashShadow(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
-{
-	
-}
-
 void UBP_StateTreeTask::ExecutePowerJumpDown(AEnemyBase* Boss, ACharacter* Player, UAnimMontage* Montage)
 {
 	if (!Boss || !Player || !Montage) return;
@@ -579,5 +546,3 @@ void UBP_StateTreeTask::ExecutePowerJumpDown(AEnemyBase* Boss, ACharacter* Playe
 
 	Boss->SpawnEnhancedJumpDecal(LandingPosition, Boss->JumpCircleDecal, Boss->JumpCrossDecal);
 }
-
-

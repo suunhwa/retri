@@ -8,9 +8,7 @@
 #include "Components/StateTreeComponent.h"
 #include "EnemyAIController.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class RETRI_API AEnemyAIController : public AAIController
 {
@@ -29,5 +27,4 @@ protected:
 	// StateTree 실행기
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	UStateTreeComponent* MyStateTreeComponent;
-	
 };
