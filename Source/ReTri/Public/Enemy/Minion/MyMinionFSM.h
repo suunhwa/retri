@@ -17,7 +17,6 @@ enum class EMinionState : uint8
 	Idle UMETA(DisplayName = "Idle"),
 	Move UMETA(DisplayName = "Move"),
 	Attack UMETA(DisplayName = "Attack"),
-	Damage UMETA(DisplayName = "Damage"),
 	Die UMETA(DisplayName = "Die")
 };
 
@@ -27,11 +26,9 @@ class RETRI_API UMyMinionFSM : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UMyMinionFSM();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
@@ -57,7 +54,6 @@ public:
 	void IdleState();
 	void MoveState();
 	void AttackState();
-	void DamageState();
 	void DieState();
 	
 public:
@@ -76,5 +72,4 @@ public:
 
 	// Die
 	bool bIsDead = false;
-
 };

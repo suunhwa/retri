@@ -6,15 +6,12 @@
 #include "Runtime/Engine/Classes/Animation/AnimInstance.h"
 #include "DarkMoonAnimInstance.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class RETRI_API UDarkMoonAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
-	
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Anim)
 	float CurrentSpeed = 0;
@@ -22,6 +19,4 @@ public:
 	bool bIsInAir = false;
 	
 	void NativeUpdateAnimation(float DeltaSeconds) override;
-	
-	
 };

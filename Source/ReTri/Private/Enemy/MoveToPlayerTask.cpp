@@ -68,7 +68,6 @@ EStateTreeRunStatus UMoveToPlayerTask::Tick(FStateTreeExecutionContext& Context,
 	
 	if (MyPawn == Player)
 	{
-		// UE_LOG(LogTemp, Error, TEXT("[오류] 보스가 플레이어로 잡힘"));
 		return EStateTreeRunStatus::Failed;
 	}
 	
@@ -82,19 +81,5 @@ EStateTreeRunStatus UMoveToPlayerTask::Tick(FStateTreeExecutionContext& Context,
 		}
 	}
 	
-	
-	// APawn* BossPawn = Cast<APawn>(Context.GetOwner());
-	// ACharacter* Player = UGameplayStatics::GetPlayerCharacter(Context.GetWorld(), 0);
-	//
-	// if (BossPawn && Player)
-	// {
-	// 	Distance = FVector::Dist(BossPawn->GetActorLocation(), Player->GetActorLocation());
-	// 	
-	// 	if (Distance <=200.0f)
-	// 	{
-	// 		return EStateTreeRunStatus::Succeeded;
-	// 	}
-	// }
-	//
 	return EStateTreeRunStatus::Running;
 }

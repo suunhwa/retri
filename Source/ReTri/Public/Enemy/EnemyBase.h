@@ -21,21 +21,17 @@ class RETRI_API AEnemyBase : public ACharacter
 
 
 public:
-	// Sets default values for this character's properties
 	AEnemyBase();
 	
 	FMinionDieDelegate OnMinionDieDelegate;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void Landed(const FHitResult& Hit) override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 public:
@@ -99,10 +95,6 @@ public:
 	class UNiagaraSystem* DeathVFX;
 	
 public:
-	// 스킬 사용 중인지
-	UPROPERTY(BlueprintReadOnly)
-	bool bIsSkillExecuting = false;
-	
 	// (1스킬) 차징 상태인지
 	bool bIsCharging = false;
 	
@@ -110,16 +102,16 @@ public:
 	UPROPERTY()
 	AActor* TargetActor = nullptr;
 	
-	// (3스킬)
+	// (2스킬)
 	bool bIsJumpDownAttacking = false;
 	
 	// 이미 누군가를 때렸는지
 	bool bHasHitTarget = false;
 	
-	// (4스킬)
+	// (3스킬)
 	bool bIsMirrorPatternActive = false;
 	
-	// (7스킬)
+	// (5스킬)
 	bool bIsEnhancedJump = false;
 	
 	// 바라보면서 회전할지 여부
@@ -134,7 +126,7 @@ public:
 	
 
 	// ----------- JumpDown -----------
-	// 에디터에서 원본 머티리얼이나 인스턴스를 할당받는 용도w
+	// 에디터에서 원본 머티리얼이나 인스턴스를 할당받는 용도
 	UPROPERTY(EditAnywhere, Category = Skill)
 	UMaterialInterface* JumpCircleDecal;
 	
@@ -156,9 +148,6 @@ public:
 	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicBoxDecal;
 	
-	//UPROPERTY()
-	//UDecalComponent* BoxDecalComp;
-	
 	UPROPERTY()
 	TArray<AEnemyBase*> ActiveClones; // 분신 관리 배열
 	
@@ -178,7 +167,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = Skill)
 	UMaterialInterface* JumpCrossDecal;
 	
-	// ---------------------- 이펙트
+	// 이펙트
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	UNiagaraSystem* JumpVFX;
 	
@@ -212,7 +201,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	UNiagaraSystem* Phase3VFX;
 	
-	// ---------------------- 효과음
+	// 효과음
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SFX)
 	USoundBase* JumpDownSFX;
 	
@@ -233,7 +222,6 @@ public:
 	class UStateTreeComponent* StateTreeComponent;
 	
 	UFUNCTION()
-	// virtual void OnCapsuleOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 	virtual void OnAttackOverlap(AActor* OtherActor);	// Attack
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override; // 대미지
 	void SetCurrentSkillDamage(float NewDamage) {CurrentSkillDamage = NewDamage;} // 스킬 대미지 설정
@@ -271,5 +259,4 @@ protected:
 	virtual void UpdatePhase() { }
 	
 	void PlayCameraShake();
-	
 };

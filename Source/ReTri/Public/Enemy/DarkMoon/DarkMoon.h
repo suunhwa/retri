@@ -6,22 +6,18 @@
 #include "Enemy/EnemyBase.h"
 #include "DarkMoon.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class RETRI_API ADarkMoon : public AEnemyBase
 {
 	GENERATED_BODY()
 
-	
 public:
 	ADarkMoon();
 	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick( float DeltaTime ) override;
-	
 	
 
 protected:
@@ -38,20 +34,12 @@ private:
 	
 	
 protected:
-	UFUNCTION(BlueprintCallable, category=Collision)
-	//void SetSwordCollisionEnabled(bool bEnabled);
-	
-	
 	void StartBattleEvent();
 	void ReduceBossHP();
 	virtual void UpdatePhase() override;
 	void BossDead();
 	
 public:
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
-						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
-						bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnSwordOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 							   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -66,8 +54,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Skills")
 	TSubclassOf<class AItemBase> ItemClass;
-	// SkillID(DataTable Row Key) → ability class 매핑
-	// BP에서 획득 스킬(Acquired) 목록 추가해야됩니당
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Player|Skills")
 	TMap<FName, TSubclassOf<class UAbilityBase>> SkillIDToClassMap;
 };

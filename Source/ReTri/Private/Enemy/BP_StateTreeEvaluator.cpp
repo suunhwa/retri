@@ -27,8 +27,6 @@ void UBP_StateTreeEvaluator::Tick(FStateTreeExecutionContext& Context, const flo
 		
 		// 거리
 		DistanceToTarget = (A - B).Size();
-		
-		//UE_LOG(LogTemp, Warning, TEXT("타겟과의 거리 : %f"), DistanceToTarget);
 	}
 		
 }

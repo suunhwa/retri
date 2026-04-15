@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Enemy/EnemyBase.h"
-
 #include "AIController.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -16,10 +15,8 @@
 #include "Level/Actors/FloatingUIActor.h"
 
 
-// Sets default values
 AEnemyBase::AEnemyBase()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	DashTrailScene = CreateDefaultSubobject<USceneComponent>(TEXT("DashTrailScene"));
@@ -31,7 +28,6 @@ AEnemyBase::AEnemyBase()
 	DashTrailComp->SetRelativeLocation(FVector::ZeroVector);
 }
 
-// Called when the game starts or when spawned
 void AEnemyBase::BeginPlay()
 {	
 	// 데이터테이블 존재 && 이름 존재
@@ -51,14 +47,11 @@ void AEnemyBase::BeginPlay()
 				GetCharacterMovement()->MaxWalkSpeed = MyStatInfo->MoveSpeed;
 			}
 			
-			// BasicAttack = MyStatInfo->BasicAttackID;
 			BossSkills = MyStatInfo->BossSkillsID;
-			
-			// UE_LOG(LogTemp, Warning, TEXT("성공!! %s의 체력은 %f, 스킬은 %d개"), *EnemyRowName.ToString(), CurrentHP, BossSkills.Num());
 		}
 	}
 	
-	// Begin이 연쇄적으로 일어나서 FSM에 Null로 뜸
+	// Begin이 연쇄적으로 일어나서 FSM에 Null로 뜸 => 지금 실행
 	Super::BeginPlay();
 	
 	FTimerHandle StartTimer;
@@ -73,8 +66,6 @@ void AEnemyBase::BeginPlay()
 			}
 		}
 	}, 0.2f, false);
-	
-	
 }
 
 void AEnemyBase::Landed(const FHitResult& Hit)
@@ -88,7 +79,6 @@ void AEnemyBase::Landed(const FHitResult& Hit)
 		
 		if (bIsEnhancedJump)
 		{
-			
 			// 강화 점프
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 				GetWorld(),
@@ -157,7 +147,6 @@ void AEnemyBase::Landed(const FHitResult& Hit)
 	}
 }
 
-// Called every frame
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -178,11 +167,9 @@ void AEnemyBase::Tick(float DeltaTime)
 	
 }
 
-// Called to bind functionality to input
 void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AEnemyBase::OnAttackOverlap(AActor* OtherActor)
@@ -201,8 +188,6 @@ void AEnemyBase::OnAttackOverlap(AActor* OtherActor)
 		);
 		
 		bHasHitTarget = true;
-
-		// UE_LOG(LogTemp, Warning, TEXT("플레이어에게 %f 데미지를 입혔다!"), CurrentSkillDamage);
 	}
 }
 
@@ -231,9 +216,6 @@ float AEnemyBase::TakeDamage(float DamageAmount, struct FDamageEvent const& Dama
 			DamageText->ShowFloatingUI(FText::FromString(DmgString), FLinearColor(1.0f, 0.612f, 0.057, 1.0f));
 		}
 	}
-	
-	// UE_LOG(LogTemp, Warning, TEXT("%s 적중! 남은 체력: %f"), *EnemyRowName.ToString(), CurrentHP);
-	
 
 	return ActualDamage;
 }
@@ -335,18 +317,11 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 		
 		float UpdateInterval = 0.02f;
 		
-		// FTimerHandle TimerHandle;
-		
 		// 1. 스마트 포인터를 사용하여 타이머 핸들을 생성 (람다 내부에서 자신의 타이머를 올바르게 Clear하기 위함)
 		TSharedPtr<FTimerHandle> TimerHandlePtr = MakeShared<FTimerHandle>();
 		// 2. 타이머 대기 도중 보스가 파괴(사망)될 때 생기는 크래시 방지용 약포인터
 		TWeakObjectPtr<AEnemyBase> WeakThis = this;
 		UWorld* WorldContext = GetWorld(); // 보스가 파괴된 후에도 타이머 관리자에 접근해 타이머를 끄기 위해 미리 캐싱
-		
-		
-		// Progress 업데이트
-		// 람다 캡쳐
-		// GetWorldTimerManager().SetTimer(TimerHandle, [this, LocalDynamicDecal, Progress=0.0f, TimerHandle, Location]() mutable
 		
 		
 		// Progress 업데이트 (TimerHandlePtr 캡처)
@@ -366,7 +341,6 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 			AEnemyBase* Boss = WeakThis.Get();
 			
 			
-			
 			if (!IsValid(LocalDynamicDecal))
 			{
 				Boss->GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
@@ -384,7 +358,6 @@ void AEnemyBase::SpawnJumpDecal(FVector Location, class UMaterialInterface* Deca
 			
 			if (Progress >= 0.5f) // 0.5 크기까지 커지면 
 			{
-				// Progress = 0.0f; // 초기화
 				Boss->GetWorldTimerManager().ClearTimer(*TimerHandlePtr);
 				
 				FVector DownStartLoc = Location + FVector(0.0f, 0.0f, 1500.0f);
@@ -589,7 +562,6 @@ void AEnemyBase::ExecuteJumpDownDamage()
 		false
 		);
 	
-	// DrawDebugSphere(GetWorld(), ImpactLocation, JumpDownDamageRadius, 24, bHit ? FColor::Red : FColor::Green, false, 2.0f);
 }
 
 // ---------------------------------------- 분신검기 대미지
@@ -630,9 +602,7 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 	{
 		if (C) IgnoreActors.Add(C);
 	}
-
-	// TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	// ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel5));
+	
 
 	bool bHit = UKismetSystemLibrary::BoxOverlapActors(
 		World,
@@ -663,18 +633,6 @@ void AEnemyBase::ExecuteMirrorBladeDamage(AEnemyBase* Clone)
 			}
 		}
 	}
-	
-	// DrawDebugBox(
-	// 	World,
-	// 	BoxCenter,
-	// 	BoxExtent,
-	// 	FRotator(0.f, Clone->GetActorRotation().Yaw, 0.f).Quaternion(),
-	// 	FColor::Red,
-	// 	false,
-	// 	1.0f,
-	// 	0,
-	// 	2.0f
-	// );
 }
 
 // ---------------------------------------- 강화 대쉬
@@ -861,16 +819,6 @@ void AEnemyBase::ExecuteEnhancedJumpDownDamage()
 
 	// 십자 대미지 호출
 	ExecuteJumpCrossDamage(ImpactLocation);
-
-	// DrawDebugSphere(
-	// 	World,
-	// 	ImpactLocation,
-	// 	JumpDownDamageRadius,
-	// 	24,
-	// 	FColor::Red,
-	// 	false,
-	// 	2.0f
-	// );
 }
 
 // ---------------------------------------- 강화 점프다운 십자 대미지
@@ -945,26 +893,4 @@ void AEnemyBase::ExecuteJumpCrossDamage(FVector ImpactLocation)
 			nullptr
 		);
 	}
-
-	// DrawDebugBox(
-	// 	World,
-	// 	ImpactLocation,
-	// 	FVector(CrossLength * 0.5f, CrossThickness * 0.5f, Height * 0.5f),
-	// 	FColor::Blue,
-	// 	false,
-	// 	2.0f,
-	// 	0,
-	// 	3.0f
-	// );
-
-	// DrawDebugBox(
-	// 	World,
-	// 	ImpactLocation,
-	// 	FVector(CrossThickness * 0.5f, CrossLength * 0.5f, Height * 0.5f),
-	// 	FColor::Blue,
-	// 	false,
-	// 	2.0f,
-	// 	0,
-	// 	3.0f
-	// );
 }

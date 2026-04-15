@@ -10,11 +10,9 @@
 #include "Enemy/Minion/Minion.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
-#include "ReTri/ReTri.h"
 
 AMinionSpawner::AMinionSpawner()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
@@ -23,7 +21,6 @@ AMinionSpawner::AMinionSpawner()
 	BoxComp->SetGenerateOverlapEvents(true);
 }
 
-// Called when the game starts or when spawned
 void AMinionSpawner::BeginPlay()
 {
 	Super::BeginPlay();
@@ -32,7 +29,6 @@ void AMinionSpawner::BeginPlay()
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), SpawnPointTag, SpawnPoints);
 }
 
-// Called every frame
 void AMinionSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -91,9 +87,7 @@ void AMinionSpawner::AddMinionDeathCount()
 	GI->PlayerPlayData.SetKillEnemy(CurrentDeathCount);
 	
 	if (CurrentDeathCount >= MaxlMinionCount)
-	{
-		// SCREENLOG("전멸.");
-		
+	{		
 		if (auto MapSub = GI->GetSubsystem<UMapSubSystem>())
 		{
 			MapSub->LevelClear();
