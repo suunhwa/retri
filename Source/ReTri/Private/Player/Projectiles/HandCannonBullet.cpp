@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Player/Projectiles/HandCannonBullet.h"
 
 #include "Components/SphereComponent.h"
@@ -12,12 +9,10 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Particles/ParticleSystem.h"
 
-// Sets default values
 AHandCannonBullet::AHandCannonBullet()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	
+
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	CollisionComp->SetSphereRadius(25.f);
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -26,36 +21,35 @@ AHandCannonBullet::AHandCannonBullet()
 	CollisionComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap); // dark moon
 	CollisionComp->SetGenerateOverlapEvents(true);
 	RootComponent = CollisionComp;
-	
+
 	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
 	BodyMesh->SetupAttachment(CollisionComp);
 	BodyMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
+
 	MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MoveComp"));
 	MoveComp->SetUpdatedComponent(CollisionComp);
 	MoveComp->InitialSpeed = 1000.f;
 	MoveComp->MaxSpeed = 1000.f;
-	
+
 	MoveComp->bRotationFollowsVelocity = true;
 	MoveComp->ProjectileGravityScale = 0.f;
 	MoveComp->bSweepCollision = false;
-	
+
 	// trail
 	TrailComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailComp"));
 	TrailComp->SetupAttachment(CollisionComp);
 	TrailComp->bAutoActivate = false;
-	
+
 	InitialLifeSpan = 3.f;
 }
 
-// Called when the game starts or when spawned
 void AHandCannonBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	SpawnLocation = GetActorLocation();
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AHandCannonBullet::OnOverlap);
-	
+
 	if (TrailEffect)
 	{
 		TrailComp->SetTemplate(TrailEffect);
@@ -65,15 +59,17 @@ void AHandCannonBullet::BeginPlay()
 	if (NiagaraTrailEffect)
 	{
 		NiagaraTrailComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			NiagaraTrailEffect, CollisionComp, NAME_None,
-			FVector::ZeroVector, FRotator::ZeroRotator,
-			EAttachLocation::KeepRelativeOffset, true
+			NiagaraTrailEffect,
+			CollisionComp,
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset,
+			true
 		);
 	}
-
 }
 
-// Called every frame
 void AHandCannonBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -93,14 +89,14 @@ void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
                                   const FHitResult& SweepResult)
 {
 	if (!OtherActor || OtherActor == GetOwner()) return;
-	
+
 	// 발사 위치 기준 거리로 근/원거리 판정
 	float distance = FVector::Dist(SpawnLocation, GetActorLocation());
 	bool bIsNear = (distance <= NearRange);
-	
+
 	float Damage = bIsNear ? NearDamage : FarDamage;
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, UDamageType::StaticClass());
-	
+
 	// 근거리 넉백
 	if (bIsNear)
 	{
@@ -111,9 +107,8 @@ void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
 			KnockDir.Normalize();
 			HitChar->LaunchCharacter(KnockDir * KnockBackForce, true, false);
 		}
-		
 	}
-	
+
 	// effects
 	// niagara
 	if (ImpactEffect)
@@ -122,7 +117,9 @@ void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
 	}
 
 	// 히트 스파크 — 맞은 표면 위치 기준
-	const FVector HitPoint = SweepResult.ImpactPoint.IsZero() ? OtherActor->GetActorLocation() : FVector(SweepResult.ImpactPoint);
+	const FVector HitPoint = SweepResult.ImpactPoint.IsZero()
+		                         ? OtherActor->GetActorLocation()
+		                         : FVector(SweepResult.ImpactPoint);
 
 	if (HitSparkEffect)
 	{
@@ -138,7 +135,6 @@ void AHandCannonBullet::OnOverlap(UPrimitiveComponent* OverlappedComp,
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 	}
-	
+
 	Destroy();
 }
-

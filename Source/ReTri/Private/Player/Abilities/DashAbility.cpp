@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "Player/Abilities/DashAbility.h"
+﻿#include "Player/Abilities/DashAbility.h"
 #include "Player/Abilities/DashGhostActor.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -44,8 +42,10 @@ void UDashAbility::Activate(ACharacter* Owner)
 	RechargeHandles.Add(NewHandle);
 	Owner->GetWorldTimerManager().SetTimer(
 		RechargeHandles.Last(),
-		this, &UDashAbility::RestoreCharge,
-		DashRechargeTime, false
+		this,
+		&UDashAbility::RestoreCharge,
+		DashRechargeTime,
+		false
 	);
 
 	if (DashSound)
@@ -68,8 +68,10 @@ void UDashAbility::Activate(ACharacter* Owner)
 		GhostOwner = Owner;
 		Owner->GetWorldTimerManager().SetTimer(
 			GhostSpawnTimer,
-			this, &UDashAbility::SpawnGhost,
-			GhostSpawnInterval, true
+			this,
+			&UDashAbility::SpawnGhost,
+			GhostSpawnInterval,
+			true
 		);
 	}
 }

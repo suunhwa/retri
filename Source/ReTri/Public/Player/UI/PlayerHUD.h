@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -61,7 +59,7 @@ protected:
 	// 스킬바
 	UPROPERTY(meta=(BindWidgetOptional))
 	TObjectPtr<USkillBarUI> SkillBar;
-	
+
 	// 증오 퀘스트 UI
 	UPROPERTY(meta=(BindWidgetOptional))
 	TObjectPtr<UCurseQuestUI> CurseQuestUI;

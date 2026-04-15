@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Player/UI/SkillBarUI.h"
 
 #include "Player/UI/SkillSlotUI.h"
@@ -16,7 +14,7 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 	if (AbilityComp)
 	{
 		AbilityComp->OnSkillSlotChanged.AddDynamic(this, &USkillBarUI::OnSkillSlotChanged);
-	
+
 		// 플레이어 기본공격 카운터 바인딩 (샐러맨더 가루 UI)
 		if (APlayerCharacter* PC = Cast<APlayerCharacter>(AbilityComp->GetOwner()))
 		{
@@ -29,14 +27,17 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 	{
 		SlotDash->InitSlot(
 			EAbilitySlot::Dash,
-			/*bFixed=*/true,
+			/*bFixed=*/
+			true,
 			KeyIcon_Space,
 			AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::Dash) : nullptr,
-			/*OwningBar=*/this
+			/*OwningBar=*/
+			this
 		);
 
 		// 충전 횟수 표시 바인딩
-		if (UDashAbility* Dash = Cast<UDashAbility>(AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::Dash) : nullptr))
+		if (UDashAbility* Dash = Cast<
+			UDashAbility>(AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::Dash) : nullptr))
 		{
 			Dash->OnChargeChanged.AddDynamic(this, &USkillBarUI::OnDashChargeChanged);
 			SlotDash->UpdateStackDisplay(Dash->GetCurrentCharges(), Dash->GetMaxCharges());
@@ -48,10 +49,12 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 	{
 		SlotRMB->InitSlot(
 			EAbilitySlot::TravelerMemory1,
-			/*bFixed=*/false,
+			/*bFixed=*/
+			false,
 			KeyIcon_RMB,
 			AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::TravelerMemory1) : nullptr,
-			/*OwningBar=*/this
+			/*OwningBar=*/
+			this
 		);
 	}
 
@@ -60,10 +63,12 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 	{
 		SlotQ->InitSlot(
 			EAbilitySlot::SkillQ,
-			/*bFixed=*/false,
+			/*bFixed=*/
+			false,
 			KeyIcon_Q,
 			AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::SkillQ) : nullptr,
-			/*OwningBar=*/this
+			/*OwningBar=*/
+			this
 		);
 	}
 
@@ -72,10 +77,12 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 	{
 		SlotE->InitSlot(
 			EAbilitySlot::SkillE,
-			/*bFixed=*/false,
+			/*bFixed=*/
+			false,
 			KeyIcon_E,
 			AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::SkillE) : nullptr,
-			/*OwningBar=*/this
+			/*OwningBar=*/
+			this
 		);
 	}
 
@@ -84,10 +91,12 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 	{
 		SlotR->InitSlot(
 			EAbilitySlot::TravelerMemory2,
-			/*bFixed=*/false,
+			/*bFixed=*/
+			false,
 			KeyIcon_R,
 			AbilityComp ? AbilityComp->GetAbility(EAbilitySlot::TravelerMemory2) : nullptr,
-			/*OwningBar=*/this
+			/*OwningBar=*/
+			this
 		);
 	}
 
@@ -96,10 +105,13 @@ void USkillBarUI::InitSkillBar(UAbilityComponent* InAbilityComp)
 	{
 		SlotLMB->InitSlot(
 			EAbilitySlot::Dash,
-			/*bFixed=*/true,
+			/*bFixed=*/
+			true,
 			KeyIcon_LMB,
-			/*Ability=*/nullptr,
-			/*OwningBar=*/this,
+			/*Ability=*/
+			nullptr,
+			/*OwningBar=*/
+			this,
 			SalamanderIcon
 		);
 	}

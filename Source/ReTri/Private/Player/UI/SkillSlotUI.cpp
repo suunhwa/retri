@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Player/UI/SkillSlotUI.h"
 
 #include "Components/Image.h"
@@ -15,13 +13,16 @@ void USkillSlotUI::NativeConstruct()
 	SetupMaterials();
 }
 
-void USkillSlotUI::InitSlot(EAbilitySlot InSlot, bool bInFixed, UTexture2D* InKeyIcon,
-                             UAbilityBase* InAbility, USkillBarUI* InOwningBar,
-                             UTexture2D* InFallbackIcon)
+void USkillSlotUI::InitSlot(EAbilitySlot InSlot,
+                            bool bInFixed,
+                            UTexture2D* InKeyIcon,
+                            UAbilityBase* InAbility,
+                            USkillBarUI* InOwningBar,
+                            UTexture2D* InFallbackIcon)
 {
-	LinkedSlot   = InSlot;
-	bFixed       = bInFixed;
-	OwningBar    = InOwningBar;
+	LinkedSlot = InSlot;
+	bFixed = bInFixed;
+	OwningBar = InOwningBar;
 	FallbackIcon = InFallbackIcon;
 
 	// 키 아이콘 이미지 설정
@@ -35,10 +36,6 @@ void USkillSlotUI::InitSlot(EAbilitySlot InSlot, bool bInFixed, UTexture2D* InKe
 
 	SetSkill(InAbility);
 }
-
-// ============================================================
-//  SetAbility
-// ============================================================
 
 void USkillSlotUI::SetSkill(UAbilityBase* NewAbility)
 {
@@ -62,12 +59,8 @@ void USkillSlotUI::SetSkill(UAbilityBase* NewAbility)
 	}
 }
 
-// ============================================================
-//  Drag & Drop
-// ============================================================
-
 FReply USkillSlotUI::NativeOnMouseButtonDown(const FGeometry& InGeometry,
-                                              const FPointerEvent& InMouseEvent)
+                                             const FPointerEvent& InMouseEvent)
 {
 	if (bFixed)
 		return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
@@ -81,14 +74,14 @@ FReply USkillSlotUI::NativeOnMouseButtonDown(const FGeometry& InGeometry,
 }
 
 void USkillSlotUI::NativeOnDragDetected(const FGeometry& InGeometry,
-                                         const FPointerEvent& InMouseEvent,
-                                         UDragDropOperation*& OutOperation)
+                                        const FPointerEvent& InMouseEvent,
+                                        UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 	USkillDragDrop* Op = NewObject<USkillDragDrop>(this);
 	Op->SourceSlot = this;
-	Op->Pivot      = EDragPivot::MouseDown;
+	Op->Pivot = EDragPivot::MouseDown;
 
 	if (IconImg)
 	{
@@ -101,8 +94,8 @@ void USkillSlotUI::NativeOnDragDetected(const FGeometry& InGeometry,
 }
 
 bool USkillSlotUI::NativeOnDrop(const FGeometry& InGeometry,
-                                 const FDragDropEvent& InDragDropEvent,
-                                 UDragDropOperation* InOperation)
+                                const FDragDropEvent& InDragDropEvent,
+                                UDragDropOperation* InOperation)
 {
 	USkillDragDrop* SkillOp = Cast<USkillDragDrop>(InOperation);
 	if (!SkillOp || !SkillOp->SourceSlot || SkillOp->SourceSlot == this)
@@ -121,7 +114,7 @@ bool USkillSlotUI::NativeOnDrop(const FGeometry& InGeometry,
 }
 
 void USkillSlotUI::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent,
-                                          UDragDropOperation* InOperation)
+                                         UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
 
@@ -161,13 +154,6 @@ void USkillSlotUI::SetupMaterials()
 			CooldownFillImg->SetBrushFromMaterial(CooldownFillMI);
 		}
 	}
-
-	/*// ---- 테두리 링 MID ----
-	if (BorderImg && MCooldownRadial)
-	{
-		BorderMI = UMaterialInstanceDynamic::Create(MCooldownRadial, this);
-		BorderImg->SetBrushFromMaterial(BorderMI);
-	}*/
 }
 
 void USkillSlotUI::UpdateIconDisplay()
@@ -188,7 +174,7 @@ void USkillSlotUI::UpdateIconDisplay()
 	}
 
 	IconImg->SetVisibility(ESlateVisibility::HitTestInvisible);
-	
+
 	if (IconMI)
 	{
 		IconMI->SetTextureParameterValue(TEXT("IconTexture"), IconTex);
@@ -197,7 +183,6 @@ void USkillSlotUI::UpdateIconDisplay()
 
 void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, float Total)
 {
-	// ---- 라디알 쿨다운 재질 파라미터 갱신 ----
 	// CooldownRatio: 1.0 = 막 발동(완전히 어두운 원), 0.0 = 준비완료(투명)
 	const float Ratio = (bOnCooldown && Total > 0.f) ? FMath::Clamp(1.f - Remaining / Total, 0.f, 1.f) : 0.f;
 
@@ -205,10 +190,6 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 	{
 		CooldownMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
 	}
-	// else
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("CooldownMI is NULL"));
-	// }
 
 	if (CooldownFillImg)
 	{
@@ -227,15 +208,10 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 	// 재질 없으면 Visibility로 폴백
 	if (!CooldownMI && CooldownOverlayImg)
 	{
-		CooldownOverlayImg->SetVisibility(bOnCooldown ? ESlateVisibility::HitTestInvisible
-		                                               : ESlateVisibility::Collapsed);
+		CooldownOverlayImg->SetVisibility(bOnCooldown
+			                                  ? ESlateVisibility::HitTestInvisible
+			                                  : ESlateVisibility::Collapsed);
 	}
-
-	/*// ---- 테두리 쿨다운 링 ----
-	if (BorderMI)
-	{
-		BorderMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
-	}*/
 
 	// ---- 남은 초 텍스트 ----
 	if (CooldownText)
@@ -244,8 +220,8 @@ void USkillSlotUI::UpdateCooldownDisplay(bool bOnCooldown, float Remaining, floa
 		{
 			// 1초 이하면 소수점 1자리, 이상이면 정수
 			const FText TimeText = (Remaining < 1.f)
-				? FText::AsNumber(FMath::RoundToFloat(Remaining * 10.f) / 10.f)
-				: FText::AsNumber(FMath::CeilToInt(Remaining));
+				                       ? FText::AsNumber(FMath::RoundToFloat(Remaining * 10.f) / 10.f)
+				                       : FText::AsNumber(FMath::CeilToInt(Remaining));
 			CooldownText->SetText(TimeText);
 			CooldownText->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
@@ -260,10 +236,9 @@ void USkillSlotUI::UpdateStackDisplay(int32 Current, int32 Max)
 {
 	if (Max <= 0) return;
 
-	// 라디알 오버레이로 스택 채움 표시 (1/4→25%, 2/4→50%, 3/4→75%, 0/4→0%)
+	// 오버레이로 스택 채움 표시 (1/4→25%, 2/4→50%, 3/4→75%, 0/4→0%)
 	const float Ratio = FMath::Clamp(static_cast<float>(Current) / static_cast<float>(Max), 0.f, 1.f);
 
-	// CooldownMI와 동일한 파라미터 사용 (머티리얼 재활용)
 	if (CooldownMI)
 	{
 		CooldownMI->SetScalarParameterValue(TEXT("CooldownRatio"), Ratio);
@@ -283,7 +258,6 @@ void USkillSlotUI::UpdateStackDisplay(int32 Current, int32 Max)
 		}
 	}
 
-	// 텍스트로도 표시 (선택)
 	if (CooldownText)
 	{
 		if (Current > 0)
@@ -301,7 +275,7 @@ void USkillSlotUI::UpdateStackDisplay(int32 Current, int32 Max)
 void USkillSlotUI::UnbindCooldown()
 {
 	if (LinkedSkill &&
-	    LinkedSkill->OnCooldownChanged.IsAlreadyBound(this, &USkillSlotUI::OnCooldownChanged))
+		LinkedSkill->OnCooldownChanged.IsAlreadyBound(this, &USkillSlotUI::OnCooldownChanged))
 	{
 		LinkedSkill->OnCooldownChanged.RemoveDynamic(this, &USkillSlotUI::OnCooldownChanged);
 	}

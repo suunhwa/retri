@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Player/Abilities/Skills/MassCleanse/MassCleanseAoE.h"
 
 #include "NiagaraComponent.h"
@@ -32,9 +30,6 @@ void AMassCleanseAoE::BeginPlay()
 	{
 		CleanseEffect->Activate();
 	}
-	
-	// 디버그: AoE 범위 시각화 
-	// DrawDebugSphere(GetWorld(), GetActorLocation(), HitRadius, 32, FColor::White, false, EffectDuration);
 
 	ApplyHit();
 
@@ -53,8 +48,10 @@ void AMassCleanseAoE::BeginPlay()
 
 	GetWorldTimerManager().SetTimer(
 		LifeTimerHandle,
-		this, &AMassCleanseAoE::FinishEffect,
-		EffectDuration, false
+		this,
+		&AMassCleanseAoE::FinishEffect,
+		EffectDuration,
+		false
 	);
 }
 
@@ -101,9 +98,13 @@ TArray<TWeakObjectPtr<AActor>> AMassCleanseAoE::GetEnemiesInRange() const
 
 	TArray<AActor*> OutActors;
 	UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(), GetActorLocation(), HitRadius,
-		ObjectTypes, AEnemyBase::StaticClass(),
-		IgnoreActors, OutActors
+		GetWorld(),
+		GetActorLocation(),
+		HitRadius,
+		ObjectTypes,
+		AEnemyBase::StaticClass(),
+		IgnoreActors,
+		OutActors
 	);
 
 	for (AActor* Actor : OutActors)

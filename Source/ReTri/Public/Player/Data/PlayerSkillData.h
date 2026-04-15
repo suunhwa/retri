@@ -16,7 +16,7 @@
 UENUM(BlueprintType)
 enum class ESkillType : uint8
 {
-	Active  UMETA(DisplayName = "Active"),
+	Active UMETA(DisplayName = "Active"),
 	Passive UMETA(DisplayName = "Passive"),
 };
 
@@ -24,10 +24,10 @@ enum class ESkillType : uint8
 UENUM(BlueprintType)
 enum class ESkillCategory : uint8
 {
-	Innate   UMETA(DisplayName = "Innate"),    // 기본 공격 등 기본 내장
-	Identity UMETA(DisplayName = "Identity"),  // 정체성 기억 (패시브)
-	Traveler UMETA(DisplayName = "Traveler"),  // 여행자 기억 (고유 스킬)
-	Acquired UMETA(DisplayName = "Acquired"),  // 공용 기억 (획득 스킬)
+	Innate UMETA(DisplayName = "Innate"), // 기본 공격 등 기본 내장
+	Identity UMETA(DisplayName = "Identity"), // 정체성 기억 (패시브)
+	Traveler UMETA(DisplayName = "Traveler"), // 여행자 기억 (고유 스킬)
+	Acquired UMETA(DisplayName = "Acquired"), // 공용 기억 (획득 스킬)
 };
 
 /** 쿨다운 방식 */
@@ -35,8 +35,8 @@ UENUM(BlueprintType)
 enum class ESkillCooldownType : uint8
 {
 	Cooldown UMETA(DisplayName = "Cooldown"), // 일반 쿨다운
-	Charge   UMETA(DisplayName = "Charge"),   // 충전식
-	None     UMETA(DisplayName = "None"),     // 패시브 등 쿨다운 없음
+	Charge UMETA(DisplayName = "Charge"), // 충전식
+	None UMETA(DisplayName = "None"), // 패시브 등 쿨다운 없음
 };
 
 USTRUCT(BlueprintType)
@@ -105,10 +105,10 @@ struct RETRI_API FPlayerSkillData : public FTableRowBase
 	// 0 = 무제한
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxUpgradeLevel = 0;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTexture2D> Icon;
-	
+
 	// 스킬 시전 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAnimMontage> CastMontage;

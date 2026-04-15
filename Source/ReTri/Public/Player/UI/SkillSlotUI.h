@@ -54,7 +54,7 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> CooldownOverlayImg;
 
-	// 내부 채움 오버레이 이미지 (BP에서 없어도 됨)
+	// 내부 채움 오버레이 이미지
 	UPROPERTY(meta=(BindWidgetOptional))
 	TObjectPtr<UImage> CooldownFillImg;
 
@@ -64,7 +64,7 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> KeyImg;
 
-	// 쿨타임 남은 초 텍스트 (선택적 — BP에서 없어도 됨)
+	// 쿨타임 남은 초 텍스트 
 	UPROPERTY(meta=(BindWidgetOptional))
 	TObjectPtr<UTextBlock> CooldownText;
 
@@ -90,7 +90,8 @@ protected:
 	                                  const FPointerEvent& InMouseEvent,
 	                                  UDragDropOperation*& OutOperation) override;
 
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent,
+	virtual bool NativeOnDrop(const FGeometry& InGeometry,
+	                          const FDragDropEvent& InDragDropEvent,
 	                          UDragDropOperation* InOperation) override;
 
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;

@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameAoE.h"
+﻿#include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameAoE.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyBase.h"
@@ -18,8 +15,8 @@ APillarOfFlameAoE::APillarOfFlameAoE()
 	PrimaryActorTick.bCanEverTick = false;
 
 	HitVolume = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitVolume"));
-	HitVolume->SetCapsuleSize(400.f, 200.f); 
-	HitVolume->SetCollisionProfileName(TEXT("AoE")); 
+	HitVolume->SetCapsuleSize(400.f, 200.f);
+	HitVolume->SetCollisionProfileName(TEXT("AoE"));
 	HitVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	HitVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
 	HitVolume->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
@@ -34,11 +31,8 @@ APillarOfFlameAoE::APillarOfFlameAoE()
 void APillarOfFlameAoE::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	HitVolume->SetCapsuleSize(HitRadius, 200.f);
 
-	// 디버그 범위 표시 (주황색, DoTDuration 동안 유지)
-	// DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 200), HitRadius, 32, FColor::Orange, false, DoTDuration);
+	HitVolume->SetCapsuleSize(HitRadius, 200.f);
 
 	// 이펙트 재생
 	if (FireEffect)
@@ -54,15 +48,19 @@ void APillarOfFlameAoE::BeginPlay()
 
 	GetWorldTimerManager().SetTimer(
 		DoTTimerHandle,
-		this, &APillarOfFlameAoE::ApplyDoTTick,
-		DoTTickInterval, true
+		this,
+		&APillarOfFlameAoE::ApplyDoTTick,
+		DoTTickInterval,
+		true
 	);
 
 	// DoT 종료 후 Actor 제거
 	GetWorldTimerManager().SetTimer(
 		LifeTimerHandle,
-		this, &APillarOfFlameAoE::FinishDoT,
-		DoTDuration, false
+		this,
+		&APillarOfFlameAoE::FinishDoT,
+		DoTDuration,
+		false
 	);
 
 	if (ImpactSound)
@@ -100,15 +98,15 @@ void APillarOfFlameAoE::ApplyInitialHit()
 			this,
 			UDamageType::StaticClass()
 		);
-		
-		// UE_LOG(LogTemp, Warning, TEXT("[불기둥] 주문력=%f, ImmediateDamage=%f"), AbilityPower, ImmediateDamage);
-		
+
 		// 불타는 이펙트 붙이기
 		if (BurnEffect)
 		{
 			UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAttached(
 				BurnEffect,
-				Cast<ACharacter>(WeakEnemy.Get()) ? Cast<ACharacter>(WeakEnemy.Get())->GetMesh() : WeakEnemy.Get()->GetRootComponent(),
+				Cast<ACharacter>(WeakEnemy.Get())
+					? Cast<ACharacter>(WeakEnemy.Get())->GetMesh()
+					: WeakEnemy.Get()->GetRootComponent(),
 				NAME_None,
 				FVector::ZeroVector,
 				FRotator::ZeroRotator,
@@ -117,7 +115,7 @@ void APillarOfFlameAoE::ApplyInitialHit()
 			);
 			if (NC) BurnEffectComps.Add(NC);
 		}
-		
+
 		// 경직: 짧은 시간 동안 이동 비활성화
 		if (ACharacter* EnemyChar = Cast<ACharacter>(WeakEnemy.Get()))
 		{
@@ -127,13 +125,16 @@ void APillarOfFlameAoE::ApplyInitialHit()
 
 				FTimerHandle StaggerHandle;
 				TWeakObjectPtr<UCharacterMovementComponent> WeakMoveComp(MoveComp);
-				GetWorldTimerManager().SetTimer(StaggerHandle, FTimerDelegate::CreateLambda([WeakMoveComp]()
-				{
-					if (WeakMoveComp.IsValid())
-					{
-						WeakMoveComp->SetMovementMode(MOVE_Walking);
-					}
-				}), StaggerDuration, false);
+				GetWorldTimerManager().SetTimer(StaggerHandle,
+				                                FTimerDelegate::CreateLambda([WeakMoveComp]()
+				                                {
+					                                if (WeakMoveComp.IsValid())
+					                                {
+						                                WeakMoveComp->SetMovementMode(MOVE_Walking);
+					                                }
+				                                }),
+				                                StaggerDuration,
+				                                false);
 			}
 		}
 	}
@@ -192,9 +193,13 @@ TArray<TWeakObjectPtr<AActor>> APillarOfFlameAoE::GetEnemiesInRange() const
 
 	TArray<AActor*> OutActors;
 	UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(), GetActorLocation(), HitRadius,
-		ObjectTypes, AEnemyBase::StaticClass(),
-		IgnoreActors, OutActors
+		GetWorld(),
+		GetActorLocation(),
+		HitRadius,
+		ObjectTypes,
+		AEnemyBase::StaticClass(),
+		IgnoreActors,
+		OutActors
 	);
 
 	for (AActor* Actor : OutActors)

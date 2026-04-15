@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Player/Projectiles/CoinProjectile.h"
 
 #include "Components/SphereComponent.h"
@@ -51,9 +49,13 @@ void ACoinProjectile::BeginPlay()
 	if (FlightEffect)
 	{
 		FlightEffectComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			FlightEffect, BodyMesh, NAME_None,
-			FVector::ZeroVector, FRotator::ZeroRotator,
-			EAttachLocation::KeepRelativeOffset, true
+			FlightEffect,
+			BodyMesh,
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset,
+			true
 		);
 	}
 
@@ -80,9 +82,12 @@ void ACoinProjectile::Init(float InDamage, AController* InInstigator, FOnCoinExp
 	OnCoinExploded = InCallback;
 }
 
-void ACoinProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	bool bFromSweep, const FHitResult& SweepResult)
+void ACoinProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp,
+                                AActor* OtherActor,
+                                UPrimitiveComponent* OtherComp,
+                                int32 OtherBodyIndex,
+                                bool bFromSweep,
+                                const FHitResult& SweepResult)
 {
 	if (bHasExploded) return;
 	if (!OtherActor || OtherActor == GetOwner()) return;
@@ -108,9 +113,15 @@ void ACoinProjectile::Explode(FVector ExplosionLocation)
 	if (ExplosionEffect)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(), ExplosionEffect, ExplosionLocation,
-			FRotator::ZeroRotator, FVector(1.f), true, true,
-			ENCPoolMethod::None, true
+			GetWorld(),
+			ExplosionEffect,
+			ExplosionLocation,
+			FRotator::ZeroRotator,
+			FVector(1.f),
+			true,
+			true,
+			ENCPoolMethod::None,
+			true
 		);
 	}
 
@@ -139,9 +150,13 @@ void ACoinProjectile::Explode(FVector ExplosionLocation)
 
 	TArray<AActor*> HitActors;
 	UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(), ExplosionLocation, ExplosionRadius,
-		ObjectTypes, AEnemyBase::StaticClass(),
-		IgnoreActors, HitActors
+		GetWorld(),
+		ExplosionLocation,
+		ExplosionRadius,
+		ObjectTypes,
+		AEnemyBase::StaticClass(),
+		IgnoreActors,
+		HitActors
 	);
 
 	for (AActor* Actor : HitActors)
@@ -150,8 +165,10 @@ void ACoinProjectile::Explode(FVector ExplosionLocation)
 
 		// 빛 피해 적용
 		UGameplayStatics::ApplyDamage(
-			Actor, Damage,
-			InstigatorController.Get(), this,
+			Actor,
+			Damage,
+			InstigatorController.Get(),
+			this,
 			UDamageType::StaticClass()
 		);
 
@@ -172,10 +189,13 @@ void ACoinProjectile::Explode(FVector ExplosionLocation)
 			// 기절 해제 타이머
 			FTimerHandle StunTimer;
 			TWeakObjectPtr<AActor> WeakActor(Actor);
-			GetWorld()->GetTimerManager().SetTimer(StunTimer, [this, WeakActor]()
-			{
-				UnstunEnemy(WeakActor);
-			}, StunDuration, false);
+			GetWorld()->GetTimerManager().SetTimer(StunTimer,
+			                                       [this, WeakActor]()
+			                                       {
+				                                       UnstunEnemy(WeakActor);
+			                                       },
+			                                       StunDuration,
+			                                       false);
 		}
 	}
 

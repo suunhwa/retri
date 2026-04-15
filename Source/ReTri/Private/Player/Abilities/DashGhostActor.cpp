@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "Player/Abilities/DashGhostActor.h"
+﻿#include "Player/Abilities/DashGhostActor.h"
 #include "Components/PoseableMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -18,7 +16,6 @@ void ADashGhostActor::Init(USkeletalMeshComponent* SourceMesh)
 	if (!SourceMesh) return;
 
 	// 포즈 스냅샷 복사
-	
 	GhostMesh->SetSkinnedAssetAndUpdate(SourceMesh->GetSkeletalMeshAsset());
 	GhostMesh->SetWorldTransform(SourceMesh->GetComponentTransform());
 	GhostMesh->CopyPoseFromSkeletalComponent(SourceMesh);

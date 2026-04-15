@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Player/Abilities/Skills/MassCleanse/MassCleanseSkill.h"
 
 #include "GameFramework/Character.h"
@@ -61,24 +59,32 @@ void UMassCleanseSkill::Activate(ACharacter* Owner)
 		if (HealNC)
 		{
 			FTimerHandle HealFXTimer;
-			Owner->GetWorldTimerManager().SetTimer(HealFXTimer, [HealNC]()
-			{
-				if (HealNC) HealNC->DeactivateImmediate();
-			}, CastEffectDuration, false);
+			Owner->GetWorldTimerManager().SetTimer(HealFXTimer,
+			                                       [HealNC]()
+			                                       {
+				                                       if (HealNC) HealNC->DeactivateImmediate();
+			                                       },
+			                                       CastEffectDuration,
+			                                       false);
 		}
 	}
 
 	if (CastEffect)
 	{
 		if (UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			Owner->GetWorld(), CastEffect, Owner->GetActorLocation()))
+			Owner->GetWorld(),
+			CastEffect,
+			Owner->GetActorLocation()))
 		{
 			NC->SetAutoDestroy(true);
 			FTimerHandle TimerHandle;
-			Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [NC]()
-			{
-				if (NC) NC->DeactivateImmediate();
-			}, CastEffectDuration, false);
+			Owner->GetWorld()->GetTimerManager().SetTimer(TimerHandle,
+			                                              [NC]()
+			                                              {
+				                                              if (NC) NC->DeactivateImmediate();
+			                                              },
+			                                              CastEffectDuration,
+			                                              false);
 		}
 	}
 

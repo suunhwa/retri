@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -15,10 +13,10 @@ UENUM(BlueprintType)
 enum class EAbilitySlot : uint8
 {
 	Dash,
-	TravelerMemory1,  // 우클릭 고유스킬 (핸드 캐논)
-	SkillQ,           // Q 획득스킬
-	SkillE,           // E 획득스킬
-	TravelerMemory2,  // R 고유스킬 (빠른 손)
+	TravelerMemory1, // 우클릭 고유스킬 (핸드 캐논)
+	SkillQ, // Q 획득스킬
+	SkillE, // E 획득스킬
+	TravelerMemory2, // R 고유스킬 (빠른 손)
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkillSlotChanged, EAbilitySlot, ChangedSlot);
@@ -29,17 +27,15 @@ class RETRI_API UAbilityComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	UAbilityComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-							   FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime,
+	                           ELevelTick TickType,
+	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	UPROPERTY(BlueprintAssignable, Category="Ability")
@@ -75,10 +71,10 @@ private:
 	TSubclassOf<UAbilityBase> DashAbilityClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
-	TSubclassOf<UAbilityBase> TravelerMemory1Class;  // 우클릭 고유스킬
+	TSubclassOf<UAbilityBase> TravelerMemory1Class; // 우클릭 고유스킬
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Slot")
-	TSubclassOf<UAbilityBase> TravelerMemory2Class;  // R 고유스킬
+	TSubclassOf<UAbilityBase> TravelerMemory2Class; // R 고유스킬
 
 	UPROPERTY()
 	TMap<EAbilitySlot, TObjectPtr<UAbilityBase>> Abilities;

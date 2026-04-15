@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Player/PlayerCharacter.h"
 
 #include "GameFramework/SpringArmComponent.h"
@@ -34,10 +31,8 @@
 #include "Player/UI/PlayerHUD.h"
 #include "Level/UI/GameOverUI.h"
 
-// Sets default values
 APlayerCharacter::APlayerCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(TEXT(
@@ -77,8 +72,6 @@ APlayerCharacter::APlayerCharacter()
 	CamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CamComp"));
 	CamComp->SetupAttachment(SpringArmComp);
 	CamComp->SetFieldOfView(70.f);
-
-	// GD = CreateDefaultSubobject<UReTriGameData>(TEXT("GameData"));
 
 	ConstructorHelpers::FObjectFinder<UInputAction> TempMoveInput(
 		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/IA_Move.IA_Move'"));
@@ -135,7 +128,7 @@ APlayerCharacter::APlayerCharacter()
 	{
 		ia_Interaction = TempInteractionInput.Object;
 	}
-	
+
 	ConstructorHelpers::FObjectFinder<UInputAction> TempSalvageInput(
 		TEXT("/Script/EnhancedInput.InputAction'/Game/Player/Inputs/ia_Salvage.ia_Salvage'"));
 	if (TempSalvageInput.Succeeded())
@@ -160,13 +153,10 @@ APlayerCharacter::APlayerCharacter()
 	HPBarComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarComp"));
 	HPBarComp->SetupAttachment(GetMesh());
 	HPBarComp->SetRelativeLocation(FVector(0.f, 0.f, 300.f)); // 머리 위 높이 조절
-	// HPBarComp->SetupAttachment(GetMesh(), TEXT("HP_Bar"));
 	HPBarComp->SetWidgetSpace(EWidgetSpace::Screen); // 항상 카메라 향함
 	HPBarComp->SetDrawSize(FVector2D(100.f, 15.f)); // 크기 조절
-	
 }
 
-// Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -184,6 +174,7 @@ void APlayerCharacter::BeginPlay()
 	// OnDeath 델리게이트 바인딩
 	HealthComp->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
 	StatComp->OnLevelUp.AddDynamic(this, &APlayerCharacter::HandleLevelUp);
+
 	// 메인 메뉴에서는 UI 표시 안 함
 	const bool bIsMainMenu = GetWorld()->GetMapName().Contains(TEXT("Lv_Main"));
 	if (bIsMainMenu)
@@ -203,7 +194,6 @@ void APlayerCharacter::BeginPlay()
 		HPBarComp->InitWidget();
 		if (UHPBar* HPWidget = Cast<UHPBar>(HPBarComp->GetUserWidgetObject()))
 		{
-			// UE_LOG(LogTemp, Warning, TEXT("[HPBar] 위젯 바인딩 성공"));
 			HealthComp->OnHPChanged.AddDynamic(HPWidget, &UHPBar::OnHPChanged);
 			HPWidget->OnHPChanged(HealthComp->GetCurrentHP(), HealthComp->GetMaxHP());
 		}
@@ -235,7 +225,6 @@ void APlayerCharacter::BeginPlay()
 	}
 }
 
-// Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -246,7 +235,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (CurrentTime - LastCombatTime >= CombatExitDelay)
 		{
 			bIsCombat = false;
-			
+
 			// 전투 이탈 시 공격 카운터 초기화 → 패시브 링 사라짐
 			if (AttackCount > 0)
 			{
@@ -255,25 +244,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
-
-	/*// 항상 마우스 커서 방향을 바라봄
-	AReTriPlayerController* PC = Cast<AReTriPlayerController>(Controller);
-	if (PC)
-	{
-		FVector TargetPoint;
-		if (PC->GetMouseWorldPosition(TargetPoint))
-		{
-			FVector Dir = TargetPoint - GetActorLocation();
-			Dir.Z = 0.f;
-			if (!Dir.IsNearlyZero())
-			{
-				SetActorRotation(FRotator(0.f, Dir.Rotation().Yaw, 0.f));
-			}
-		}
-	}*/
 }
 
-// Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -330,8 +302,6 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	if (!bCanAttack) return;
 	EnterCombat();
 
-	// UE_LOG(LogTemp, Warning, TEXT("OnAttack Called"));
-
 	// 클릭한 위치 방향 계산
 	AReTriPlayerController* pc = Cast<AReTriPlayerController>(Controller);
 	if (!pc) return;
@@ -366,22 +336,17 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 
 	// 리셋 전에 브로드캐스트 → 4타째에 100% 표시 후 다음 1타에서 리셋
 	OnAttackCountChanged.Broadcast(AttackCount);
-	
+
 	if (bIsEnhancedShot)
 	{
 		AttackCount = 0;
 	}
 
 	FVector MuzzleLocation = GetMesh()->GetSocketLocation(TEXT("weapon_muzzle"));
-	// UE_LOG(LogTemp, Warning, TEXT("Muzzle: %s"), *MuzzleLocation.ToString());
-	/*FVector Direction = GetActorForwardVector();
-	Direction.Z = 0.f;
-	Direction.Normalize();*/
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = this;
-	// SpawnParams.Instigator = GetInstigator();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ABullet* SpawnedBullet = GetWorld()->SpawnActor<ABullet>(
@@ -399,10 +364,7 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 	if (SpawnedBullet && bIsEnhancedShot)
 	{
 		SpawnedBullet->SetBulletDamage(SpawnedBullet->GetBulletDamage() * EnhancedShotMultiplier);
-		// UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
 		SpawnedBullet->SetBulletDamage(StatComp->GetAttackPower() * EnhancedShotMultiplier);
-		UE_LOG(LogTemp, Warning, TEXT("[Attack] 강화탄 Damage: %.1f"), SpawnedBullet->GetBulletDamage());
-
 
 		if (EnhancedShotCS)
 		{
@@ -442,8 +404,11 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 		if (EnhancedMuzzleParticle)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(
-				GetWorld(), EnhancedMuzzleParticle, MuzzleLocation,
-				Direction.Rotation(), FVector(EnhancedShotEffectScale)
+				GetWorld(),
+				EnhancedMuzzleParticle,
+				MuzzleLocation,
+				Direction.Rotation(),
+				FVector(EnhancedShotEffectScale)
 			);
 		}
 	}
@@ -456,7 +421,6 @@ void APlayerCharacter::OnAttack(const FInputActionValue& inputValue)
 				PC->ClientStartCameraShake(NormalShotCS);
 			}
 		}
-		// UE_LOG(LogTemp, Log, TEXT("[Attack] 일반탄 %d/4. Damage: %.1f"), AttackCount, SpawnedBullet->GetBulletDamage());
 	}
 }
 
@@ -467,28 +431,24 @@ void APlayerCharacter::ResetAttack()
 
 void APlayerCharacter::OnTravelerMemory1(const struct FInputActionValue& inputValue)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("RMB pressed"));
 	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::TravelerMemory1);
 }
 
 void APlayerCharacter::OnSkillQ(const struct FInputActionValue& inputValue)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("Q pressed"));
 	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::SkillQ);
 }
 
 void APlayerCharacter::OnSkillE(const struct FInputActionValue& inputValue)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("E pressed"));
 	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::SkillE);
 }
 
 void APlayerCharacter::OnTravelerMemory2(const struct FInputActionValue& inputValue)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("R pressed"));
 	EnterCombat();
 	AbilityComp->TryActivate(EAbilitySlot::TravelerMemory2);
 }
@@ -506,32 +466,24 @@ float APlayerCharacter::TakeDamage(float DamageAmount,
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	HealthComp->HandleDamage(Damage, EventInstigator);
-	
-	// === Damage UI ===
+
+	// Damage UI
 	if (auto* GI = Cast<UReTriGameInstance>(GetGameInstance()))
 	{
-		// === GamePlay Save ===
 		GI->PlayerPlayData.SetGetDamage(Damage);
-		
+
 		if (GI->FloatingUIActorClass)
 		{
 			AFloatingUIActor* DamageText = GetWorld()->SpawnActor<AFloatingUIActor>(
-				GI->FloatingUIActorClass, 
+				GI->FloatingUIActorClass,
 				GetActorLocation(),
 				FRotator::ZeroRotator
 			);
-				
+
 			FString DmgString = FString::Printf(TEXT("%d"), FMath::RoundToInt(Damage));
 			DamageText->ShowScaleUI(FText::FromString(DmgString), FLinearColor::Red);
 		}
 	}
-
-	// UE_LOG(LogTemp,
-	//        Warning,
-	//        TEXT("[Hit] Damage: %.1f | HP: %.1f / %.1f"),
-	//        Damage,
-	//        HealthComp->GetCurrentHP(),
-	//        HealthComp->GetMaxHP());
 
 	if (!HealthComp->IsDead())
 	{
@@ -539,10 +491,13 @@ float APlayerCharacter::TakeDamage(float DamageAmount,
 		{
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation());
 			bCanPlayHitSound = false;
-			GetWorldTimerManager().SetTimer(HitSoundTimerHandle, [this]()
-			{
-				bCanPlayHitSound = true;
-			}, HitSoundCooldown, false);
+			GetWorldTimerManager().SetTimer(HitSoundTimerHandle,
+			                                [this]()
+			                                {
+				                                bCanPlayHitSound = true;
+			                                },
+			                                HitSoundCooldown,
+			                                false);
 		}
 
 		const float HPRatio = HealthComp->GetCurrentHP() / HealthComp->GetMaxHP();
@@ -573,10 +528,9 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 	{
 		GI->SaveStatSnapshot();
 	}
-	
+
 	if (DeathSound)
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation());
-
 
 	// 입력 차단
 	DisableInput(Cast<APlayerController>(Controller));
@@ -590,28 +544,29 @@ void APlayerCharacter::HandleDeath(AController* Killer)
 
 	// 사망 애니메이션 종료 후 게임 일시정지
 	FTimerHandle DeathPauseHandle;
-	GetWorldTimerManager().SetTimer(DeathPauseHandle, [this]()
-	{
-		UGameplayStatics::SetGamePaused(this, true);
-		
-		// === GameOverUI === 
-		if (GameOverUIClass != nullptr)
-		{
-			GameOverUI = CreateWidget<UGameOverUI>(GetWorld(), GameOverUIClass);
-		}
-		if (GameOverUI != nullptr)
-		{
-			GameOverUI->SetUIData();
-			GameOverUI->AddToViewport(10);
-		}
-		
-	}, DeathAnimDuration, false);
-	
+	GetWorldTimerManager().SetTimer(DeathPauseHandle,
+	                                [this]()
+	                                {
+		                                UGameplayStatics::SetGamePaused(this, true);
+
+		                                // GameOverUI
+		                                if (GameOverUIClass != nullptr)
+		                                {
+			                                GameOverUI = CreateWidget<UGameOverUI>(GetWorld(), GameOverUIClass);
+		                                }
+		                                if (GameOverUI != nullptr)
+		                                {
+			                                GameOverUI->SetUIData();
+			                                GameOverUI->AddToViewport(10);
+		                                }
+	                                },
+	                                DeathAnimDuration,
+	                                false);
 }
 
 void APlayerCharacter::HoverInteractable()
 {
-	// 감지하고자 하는 오브젝트 타입들을 배열에 담기.
+	// 감지하고자 하는 오브젝트 타입들을 배열에 담기
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1)); // Interaction
 
@@ -635,8 +590,6 @@ void APlayerCharacter::Interaction()
 	// 제외할 Actors 
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(this);
-
-	// DrawDebugSphere(GetWorld(), GetActorLocation(), 42.f, 16, FColor::Red);
 
 	// 근처에 Interaction Object가 있는지 감지 
 	TArray<AActor*> OutActors;
@@ -679,37 +632,6 @@ void APlayerCharacter::OnPickUp(const struct FInputActionValue& inputValue)
 			return; // 가장 먼저 찾은 아이템 하나만 처리
 		}
 	}
-	
-	// 감지 안됨
-	/*UE_LOG(LogTemp, Warning, TEXT("[OnPickUp] 키 입력 감지"));
-
-	// 스킬 아이템 픽업 (ECC_GameTraceChannel6 — ItemBase 콜리전 채널)
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel6));
-
-	TArray<AActor*> IgnoreActors;
-	IgnoreActors.Add(this);
-
-	TArray<AActor*> OutActors;
-	UKismetSystemLibrary::SphereOverlapActors(GetWorld(),
-											  GetActorLocation(),
-											  200.f,
-											  ObjectTypes,
-											  AActor::StaticClass(),
-											  IgnoreActors,
-											  OutActors);
-
-	UE_LOG(LogTemp, Warning, TEXT("[OnPickUp] 감지된 액터 수: %d"), OutActors.Num());
-
-	for (AActor* Actor : OutActors)
-	{
-		if (Actor->GetClass()->ImplementsInterface(USkillItemInterface::StaticClass()))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[OnPickUp] 아이템 발견, Acquire 호출: %s"), *Actor->GetName());
-			ISkillItemInterface::Execute_Acquire(Actor);
-			return;
-		}
-	}*/
 }
 
 void APlayerCharacter::OnSalvage(const struct FInputActionValue& inputValue)
@@ -723,7 +645,7 @@ void APlayerCharacter::OnSalvage(const struct FInputActionValue& inputValue)
 		if (FVector::Dist(GetActorLocation(), Actor->GetActorLocation()) <= SalvageRadius)
 		{
 			ISkillItemInterface::Execute_Hold(Actor, this);
-			return; 
+			return;
 		}
 	}
 }
@@ -767,9 +689,13 @@ void APlayerCharacter::HandleLevelUp(int32 NewLevel)
 	if (EffectToPlay)
 	{
 		UNiagaraComponent* NC = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			EffectToPlay, GetMesh(), LevelUpSocketName,
-			FVector::ZeroVector, FRotator::ZeroRotator,
-			EAttachLocation::SnapToTarget, true
+			EffectToPlay,
+			GetMesh(),
+			LevelUpSocketName,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTarget,
+			true
 		);
 
 		if (NC)
@@ -778,13 +704,16 @@ void APlayerCharacter::HandleLevelUp(int32 NewLevel)
 
 			FTimerHandle FadeHandle;
 			TWeakObjectPtr<UNiagaraComponent> WeakNC(NC);
-			GetWorld()->GetTimerManager().SetTimer(FadeHandle, [WeakNC]()
-			{
-				if (WeakNC.IsValid())
-				{
-					WeakNC->DeactivateImmediate();
-				}
-			}, LevelUpEffectDuration, false);
+			GetWorld()->GetTimerManager().SetTimer(FadeHandle,
+			                                       [WeakNC]()
+			                                       {
+				                                       if (WeakNC.IsValid())
+				                                       {
+					                                       WeakNC->DeactivateImmediate();
+				                                       }
+			                                       },
+			                                       LevelUpEffectDuration,
+			                                       false);
 		}
 	}
 }

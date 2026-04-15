@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Player/Components/AbilityComponent.h"
 
 #include "ReTriGameInstance.h"
@@ -10,21 +7,15 @@
 #include "Player/Data/PlayerSkillData.h"
 
 
-// Sets default values for this component's properties
 UAbilityComponent::UAbilityComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
 }
 
-
-// Called when the game starts
 void UAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 
 	// 레벨 이동 시 저장된 슬롯 매핑 복원
@@ -38,40 +29,39 @@ void UAbilityComponent::BeginPlay()
 				if (Pair.Value)
 					RegisterAbility(Slot, Pair.Value);
 			}
-			
+
 			// 대시는 항상 유지 (핸드캐논/퀵트리거는 StartMap에서만 지급, 이후 레벨에서 버리면 복구 안 함)
 			if (!GetAbility(EAbilitySlot::Dash)) RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);
 			return;
 		}
 	}
+
 	// 초기 장착: 대시 + 핸드캐논(RMB) + 빠른손(R) 만 장착. Q/E 슬롯은 빈 상태로 시작
 	RegisterAbility(EAbilitySlot::Dash, DashAbilityClass);
 	RegisterAbility(EAbilitySlot::TravelerMemory1, TravelerMemory1Class);
 	RegisterAbility(EAbilitySlot::TravelerMemory2, TravelerMemory2Class);
+
 	// 레벨 이동 시 복원할 수 있도록 GI에 저장
 	if (GI)
 	{
 		GI->SavedSkillSlots.Add(static_cast<uint8>(EAbilitySlot::TravelerMemory1), TravelerMemory1Class);
 		GI->SavedSkillSlots.Add(static_cast<uint8>(EAbilitySlot::TravelerMemory2), TravelerMemory2Class);
 	}
-	
 }
 
 
-// Called every frame
-void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-									  FActorComponentTickFunction* ThisTickFunction)
+void UAbilityComponent::TickComponent(float DeltaTime,
+                                      ELevelTick TickType,
+                                      FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 bool UAbilityComponent::TryActivate(EAbilitySlot Slot)
 {
 	UAbilityBase* Ability = GetAbility(Slot);
 	if (!Ability) return false;
-	
+
 	ACharacter* OwnerChar = Cast<ACharacter>(GetOwner());
 	return Ability->TryActivate(OwnerChar);
 }
@@ -85,6 +75,7 @@ UAbilityBase* UAbilityComponent::GetAbility(EAbilitySlot Slot) const
 void UAbilityComponent::SetSkill(EAbilitySlot Slot, TSubclassOf<UAbilityBase> AbilityClass)
 {
 	UReTriGameInstance* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
+
 	// 전체 슬롯 매핑 GI에 저장
 	if (GI)
 	{
@@ -103,7 +94,6 @@ bool UAbilityComponent::EquipAcquiredSkill(TSubclassOf<UAbilityBase> AbilityClas
 	{
 		if (Pair.Value && Pair.Value->GetClass() == AbilityClass)
 		{
-			// UE_LOG(LogTemp, Warning, TEXT("[AbilityComponent] 중복 스킬 장착 거부: %s"), *AbilityClass->GetName());
 			return false;
 		}
 	}
@@ -128,7 +118,6 @@ bool UAbilityComponent::EquipAcquiredSkill(TSubclassOf<UAbilityBase> AbilityClas
 	return false;
 }
 
-
 void UAbilityComponent::DropSkill(EAbilitySlot Slot, FVector SpawnLocation)
 {
 	UAbilityBase* Ability = GetAbility(Slot);
@@ -146,7 +135,8 @@ void UAbilityComponent::DropSkill(EAbilitySlot Slot, FVector SpawnLocation)
 			if (SkillDataTable && Ability->DataTableRowName != NAME_None)
 			{
 				if (FPlayerSkillData* Row = SkillDataTable->FindRow<FPlayerSkillData>(
-					Ability->DataTableRowName, TEXT("DropSkill")))
+					Ability->DataTableRowName,
+					TEXT("DropSkill")))
 				{
 					Item->DataInit(*Row);
 				}

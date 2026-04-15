@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Player/UI/HPBar.h"
+﻿#include "Player/UI/HPBar.h"
 
 #include "Components/ProgressBar.h"
 #include "Components/Image.h"

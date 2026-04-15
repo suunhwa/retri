@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Player/Abilities/AbilityBase.h"
@@ -31,11 +29,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<UNiagaraSystem> CastEffect;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	float EffectDuration = 1.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TObjectPtr<USoundBase> CastSound;
 };
-

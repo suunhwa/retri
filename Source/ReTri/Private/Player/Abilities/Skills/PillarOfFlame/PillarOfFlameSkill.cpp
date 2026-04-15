@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Player/Abilities/Skills/PillarOfFlame/PillarOfFlameSkill.h"
 
 #include "GameFramework/Character.h"
@@ -34,7 +32,10 @@ void UPillarOfFlameSkill::Activate(ACharacter* Owner)
 
 	const FTransform SpawnTransform(FRotator::ZeroRotator, TargetPoint);
 	APillarOfFlameAoE* Pillar = Owner->GetWorld()->SpawnActorDeferred<APillarOfFlameAoE>(
-		PillarAoEClass, SpawnTransform, Owner, Owner,
+		PillarAoEClass,
+		SpawnTransform,
+		Owner,
+		Owner,
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
 	if (Pillar)

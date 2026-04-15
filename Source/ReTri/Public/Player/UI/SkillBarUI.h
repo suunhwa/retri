@@ -5,7 +5,6 @@
  * [slot dash
  */
 
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -83,7 +82,7 @@ private:
 	// 콜백
 	UFUNCTION()
 	void OnSkillSlotChanged(EAbilitySlot ChangedSlot);
-	
+
 	UFUNCTION()
 	void OnAttackCountChanged(int32 Count);
 

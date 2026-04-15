@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -30,45 +28,43 @@ class RETRI_API APlayerCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	APlayerCharacter();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+public:
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent,
-		AController* EventInstigator, AActor* DamageCauser) override;
-	
+
+	virtual float TakeDamage(float DamageAmount,
+	                         const FDamageEvent& DamageEvent,
+	                         AController* EventInstigator,
+	                         AActor* DamageCauser) override;
+
 public:
 	// Components
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UCameraComponent> CamComp;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UHealthComponent> HealthComp;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UAbilityComponent> AbilityComp;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UStatComponent> StatComp;
 
-// getter (성소 상호작용)
+	// getter (성소 상호작용)
 public:
 	UFUNCTION(BlueprintPure, Category="Components")
 	UHealthComponent* GetHealthComponent() const { return HealthComp; }
-	
+
 	UAbilityComponent* GetAbilityComponent() const { return AbilityComp; }
 	UStatComponent* GetStatComponent() const { return StatComp; }
 
@@ -76,14 +72,14 @@ private:
 	// Input Bindings
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Movement")
 	TObjectPtr<UInputAction> ia_Move;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Movement")
 	TObjectPtr<UInputAction> ia_Dash;
-	
+
 	// 기본 공격 (mouse left btn)
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Attack")
 	TObjectPtr<UInputAction> ia_Attack;
-	
+
 	// 여행자 기억 1 - 핸드 캐논 (mouse right btn)
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
 	TObjectPtr<UInputAction> ia_TravelerMemory1;
@@ -99,11 +95,11 @@ private:
 	// 여행자 기억 2 - 빠른 손 (R)
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Skills")
 	TObjectPtr<UInputAction> ia_TravelerMemory2;
-	
+
 	// Interaction
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Interaction")
 	TObjectPtr<UInputAction> ia_Interaction;
-	
+
 	// item pick up
 	UPROPERTY(EditDefaultsOnly, Category="Inputs|Interaction")
 	TObjectPtr<UInputAction> ia_Salvage;
@@ -119,10 +115,10 @@ private:
 	// Attack
 	UPROPERTY(EditAnywhere, Category=Attack)
 	TSubclassOf<ABullet> BulletClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
-	
+
 	// 레벨업 이펙트 (1~4레벨)
 	UPROPERTY(EditDefaultsOnly, Category="Effects|LevelUp")
 	TObjectPtr<UNiagaraSystem> LevelUpEffect;
@@ -189,10 +185,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TObjectPtr<UParticleSystem> EnhancedShotParticle;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TObjectPtr<UParticleSystem> EnhancedMuzzleParticle;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	float EnhancedShotEffectScale = 1.f;
 
@@ -203,27 +199,27 @@ private:
 	// 4타 강화탄 카메라 셰이크
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TSubclassOf<UCameraShakeBase> EnhancedShotCS;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> HitMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> DeathMontage;
-	
+
 	// 사망 애니메이션 길이 (초) - 이 시간 후 게임 일시정지
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	float DeathAnimDuration = 1.4f;
-	
+
 public:
 	UPROPERTY(BlueprintAssignable, Category="Combat")
 	FOnAttackCountChanged OnAttackCountChanged;
-	
+
 	UPROPERTY(EditAnywhere, Category="Combat|Left")
 	int32 AttackCount = 0;
-	
+
 	UPROPERTY(BlueprintReadOnly, Category="Combat")
 	bool bIsCombat = false;
-	
+
 	UPROPERTY(EditAnywhere, Category="Combat")
 	float CombatExitDelay = 2.0f;
 
@@ -258,42 +254,37 @@ private:
 	void OnPickUp(const struct FInputActionValue& inputValue);
 	void OnSalvage(const struct FInputActionValue& inputValue);
 	void OnCheatHP(const struct FInputActionValue& inputValue);
-	
+
 private:
 	UFUNCTION()
 	void HandleDeath(AController* Killer);
 
 	UFUNCTION()
 	void HandleLevelUp(int32 NewLevel);
-	
-	/*FVector direction;
-	
-	UPROPERTY(EditAnywhere, Category=PlayerStats)
-	float speed = 600;*/
-	
+
 public:
 	// 마우스로 Interaction Object Hover했을 때 띄울 UI
 	UFUNCTION(BlueprintCallable)
 	void HoverInteractable();
-	
+
 	// F를 눌렀을 때 실행 할 함수
 	UFUNCTION(BlueprintCallable)
 	void Interaction();
-	
+
 	// hp bar
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<UWidgetComponent> HPBarComp;
-	
+
 	// 화면 좌하단 HUD
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<UPlayerHUD> PlayerHUDClass;
-	
+
 	// === GameOverUI === 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class UGameOverUI> GameOverUIClass;
 	UPROPERTY()
 	UGameOverUI* GameOverUI;
-	
+
 	UFUNCTION(Exec)
 	void DebugAddExp(int32 Amount);
 

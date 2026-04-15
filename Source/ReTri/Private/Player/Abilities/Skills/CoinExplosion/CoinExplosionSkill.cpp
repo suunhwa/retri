@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "Player/Abilities/Skills/CoinExplosion/CoinExplosionSkill.h"
+﻿#include "Player/Abilities/Skills/CoinExplosion/CoinExplosionSkill.h"
 
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"

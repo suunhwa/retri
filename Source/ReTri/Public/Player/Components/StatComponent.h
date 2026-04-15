@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -32,8 +30,16 @@ enum class EStatTypes : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChanged, EStatTypes, StatType, float, NewValue);
+
 // CurrentExp, 다음 레벨까지 필요한 누적 경험치, 현재 레벨
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnExpChanged, int32, CurrentExp, int32, RequiredExp, int32, CurrentLevel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnExpChanged,
+                                               int32,
+                                               CurrentExp,
+                                               int32,
+                                               RequiredExp,
+                                               int32,
+                                               CurrentLevel);
+
 // 레벨업 시 브로드캐스트 — 새 레벨 전달
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelUp, int32, NewLevel);
 
@@ -75,20 +81,20 @@ public:
 	// 레벨업 시 호출 — Base만 덮어씀, Added(성소) 보존
 	UFUNCTION(BlueprintCallable, Category="Stats")
 	void LoadStatsForLevel(int32 Level);
-	
+
 	void BroadcastLevelStatsChanged();
 
 	// 해당 레벨 도달에 필요한 누적 경험치 (-1: 테이블 미설정 또는 범위 초과)
 	UFUNCTION(BlueprintPure, Category="Stats")
 	int32 GetRequiredExpForLevel(int32 Level) const;
-	
+
 	// 적 처치 등 외부에서 경험치 추가 시 호출 — 레벨업 자동 처리
 	UFUNCTION(BlueprintCallable, Category="Stats")
 	void AddExp(int32 Amount);
 
 	UFUNCTION(BlueprintPure, Category="Stats")
 	int32 GetCurrentExp() const { return CurrentExp; }
-	
+
 	UFUNCTION(BlueprintPure, Category="Stats")
 	int32 GetTotalExp() const { return TotalExp; }
 
@@ -170,13 +176,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="Stats|Level", meta=(AllowPrivateAccess=true))
 	int32 CurrentLevel = 1;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Level", meta=(AllowPrivateAccess=true))
 	int32 CurrentExp = 0;
 
 	UPROPERTY(VisibleAnywhere, Category="Stats|Level", meta=(AllowPrivateAccess=true))
 	int32 TotalExp = 0;
-	
+
 	// ── Currency: 단순 누적 잔액 ──────────────────────────────────────────
 	UPROPERTY(VisibleAnywhere, Category="Stats|Currency", meta=(AllowPrivateAccess=true))
 	int32 Gold = 0;
@@ -188,86 +194,86 @@ private:
 	// 기본값 
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseMaxHP = 220.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseAttackPower = 43.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseSpellPower = 41.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseAttackSpeed = 1.41f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseCritRate = 0.05f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseCritMultiplier = 2.0f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseMoveSpeed = 520.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseDefense = 0.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseMemoryAcceleration = 0.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseAttackRange = 1500.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseProjectileSpeed = 1200.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	int32 BaseDashCount = 1;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseDashCooldown = 5.f;
-	
+
 	UPROPERTY(EditAnywhere, Category="Stats|Base", meta=(AllowPrivateAccess=true))
 	float BaseBurnDamageBonus = 0.f;
 
 	// ── Added: 성소/강화에서 누적, 레벨업 후에도 유지 ────────────────────
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedMaxHP = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedAttackPower = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedSpellPower = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedAttackSpeed = 1.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedCritRate = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedCritMultiplier = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedMoveSpeed = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedDefense = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedMemoryAcceleration = 1.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedAttackRange = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedProjectileSpeed = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	int32 AddedDashCount = 0;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedDashCooldown = 0.f;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Stats|Added", meta=(AllowPrivateAccess=true))
 	float AddedBurnDamageBonus = 0.f;
 };

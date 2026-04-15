@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -75,6 +73,6 @@ private:
 
 	FTimerHandle LandingTimerHandle;
 
-	/** 띄운 적 목록 (착지 피해에 사용) */
+	// 띄운 적 목록 (착지 피해에 사용)
 	TArray<TWeakObjectPtr<AActor>> LiftedEnemies;
 };

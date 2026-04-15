@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -28,7 +26,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	/** 스킬 발동 전 AbilityPower 주입 */
 	void Init(float InAbilityPower, AController* InInstigator);
 
 private:
@@ -93,7 +90,6 @@ private:
 
 	float DoTDamagePerTick = 0.f;
 
-	/** 현재 범위 내 적 수집 */
+	// 현재 범위 내 적 수집 
 	TArray<TWeakObjectPtr<AActor>> GetEnemiesInRange() const;
 };
-

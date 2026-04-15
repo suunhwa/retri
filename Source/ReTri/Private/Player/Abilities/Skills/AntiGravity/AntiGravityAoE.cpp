@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Player/Abilities/Skills/AntiGravity/AntiGravityAoE.h"
+﻿#include "Player/Abilities/Skills/AntiGravity/AntiGravityAoE.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyBase.h"
@@ -16,7 +13,7 @@ AAntiGravityAoE::AAntiGravityAoE()
 	PrimaryActorTick.bCanEverTick = false;
 
 	HitVolume = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitVolume"));
-	HitVolume->SetCapsuleSize(200.f, 200.f);  
+	HitVolume->SetCapsuleSize(200.f, 200.f);
 	HitVolume->SetCollisionProfileName(TEXT("AoE"));
 	HitVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	HitVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -32,11 +29,8 @@ AAntiGravityAoE::AAntiGravityAoE()
 void AAntiGravityAoE::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	HitVolume->SetCapsuleSize(HitRadius, 200.f);
 
-	// 디버그 범위 표시 (파란색, LiftDuration 동안 유지)
-	// DrawDebugCylinder(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(0, 0, 200), HitRadius, 32, FColor::Blue, false, LiftDuration);
+	HitVolume->SetCapsuleSize(HitRadius, 200.f);
 
 	if (GravityEffect)
 	{
@@ -48,8 +42,10 @@ void AAntiGravityAoE::BeginPlay()
 	// LiftDuration 후 착지 피해
 	GetWorldTimerManager().SetTimer(
 		LandingTimerHandle,
-		this, &AAntiGravityAoE::ApplyLandingDamage,
-		LiftDuration, false
+		this,
+		&AAntiGravityAoE::ApplyLandingDamage,
+		LiftDuration,
+		false
 	);
 
 	// Actor 수명: 착지 이후 약간 여유
@@ -74,9 +70,13 @@ void AAntiGravityAoE::ApplyLift()
 
 	TArray<AActor*> OverlappingActors;
 	UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(), GetActorLocation(), HitRadius,
-		ObjectTypes, AEnemyBase::StaticClass(),
-		IgnoreActors, OverlappingActors
+		GetWorld(),
+		GetActorLocation(),
+		HitRadius,
+		ObjectTypes,
+		AEnemyBase::StaticClass(),
+		IgnoreActors,
+		OverlappingActors
 	);
 
 	for (AActor* Actor : OverlappingActors)
@@ -85,7 +85,7 @@ void AAntiGravityAoE::ApplyLift()
 
 		AEnemyBase* Enemy = Cast<AEnemyBase>(Actor);
 		if (!Enemy || Enemy->bIsBoss) continue;
-		
+
 		ACharacter* EnemyChar = Cast<ACharacter>(Actor);
 		if (!EnemyChar) continue;
 
