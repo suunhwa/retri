@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -22,16 +21,13 @@ class RETRI_API AInteractableBase : public AActor, public IInteractableInterface
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AInteractableBase();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
@@ -52,7 +48,7 @@ public:
 	UFUNCTION()
 	void UIHold();
 	
-//! 변수
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCapsuleComponent* CapsuleComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -62,7 +58,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraComponent* NiagaraComp;
 	
-	//사운드
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
 	USoundBase* OverlapSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
@@ -74,31 +69,24 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EInteractableType InteractableType;
-	//FInteractableData InteractableData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interaction")
 	FName MyRowName;
 	
-	// 상호작용 중인지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
 	bool bIsInteractable = false;
-	// 마우스로 가리키고 있는지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
 	bool bIsHovering = false;
-	// 사용 했는지
 	UPROPERTY(VisibleAnywhere , BlueprintReadWrite)
 	bool bIsUsed = false;
 	
-	// Interaction Object 이름과 상호작용을 띄울 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UWidgetComponent* InteractUI;	
-	// Interaction Object 정보를 띄울 UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UWidgetComponent* InteractInfoUI;
 	
 	float CurDescriptionTime = 0.f;
 	float MaxDescriptionTime = 3.f;
 
-	// === [ Select ] ===
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SelectUI")
 	TSubclassOf<UUserWidget> SelectUIClass;
 
@@ -106,11 +94,10 @@ public:
 	virtual void HideSelectUI() {}
 	
 protected:
-	UPROPERTY() //todo 플레이어 클래스로 바꿔야할수도 
+	UPROPERTY() 
 	APawn* MyPlayer;
 	
 	FString InteractName;
 	FString Description;
 	float Probability;
-	
 };

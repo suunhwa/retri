@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,9 +8,6 @@
 class UMapNode;
 class UMapLineDrawer;
 
-/**
- * 
- */
 UCLASS()
 class RETRI_API UMapUI : public UUserWidget
 {
@@ -21,8 +17,6 @@ protected:
 	virtual void NativeConstruct() override;
 	
 	virtual void NativeDestruct() override;	
-	
-	//virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;	
 	
 public:
 	UPROPERTY(meta=(BindWidget))

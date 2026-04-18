@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,9 +5,6 @@
 #include "Level/Actors/GoodsBase.h"
 #include "GoodsGoldCoin.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class RETRI_API AGoodsGoldCoin : public AGoodsBase
 {

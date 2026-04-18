@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Level/UI/MapUI.h"
@@ -22,10 +21,6 @@ void UMapUI::NativeConstruct()
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 	{
 		PC->SetPause(true);
-		
-		// FInputModeUIOnly InputMode;
-		// InputMode.SetWidgetToFocus(TakeWidget()); // 현재 위젯에 포커스
-		// PC->SetInputMode(InputMode);
 	}
 	
 	auto GI = Cast<UReTriGameInstance>(GetGameInstance());
@@ -33,7 +28,6 @@ void UMapUI::NativeConstruct()
 	auto MapSub = GI->GetSubsystem<UMapSubSystem>();
 	if (!MapSub) return;
 	
-	// 선 그리기 -> 아래 깔리게 하기 위해
 	if (MapCanvas && MapLineClass)
 	{
 		UMapLineDrawer* Line = CreateWidget<UMapLineDrawer>(GetWorld(), MapLineClass);
@@ -44,12 +38,8 @@ void UMapUI::NativeConstruct()
 			{
 				LineSlot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
 				LineSlot->SetOffsets(FMargin(0.0f, 0.0f, 0.0f, 0.0f));
-				LineSlot->SetZOrder(0); // 노드(11)보다 아래에 배치
+				LineSlot->SetZOrder(0);
 			}
-		}
-		else
-		{
-			// JIWONLOG("[UMapUI] 에러: MapLineClass가 할당되지 않음");
 		}
 	}
 	
@@ -65,11 +55,7 @@ void UMapUI::NativeConstruct()
 		
 		FName EnumName = FName(*StaticEnum<EMapNodeType>()->GetNameStringByValue((int64)Data.MapType));
 		FMapUIData* UIData = GI->MapUIData->FindRow<FMapUIData>(EnumName, TEXT("MapNode"));
-		if (!UIData)
-		{
-			// JIWONLOG("[MapUI] UIData를 찾지 못함: %s", *EnumName.ToString());
-			continue;
-		}
+		if (!UIData) continue;
 		
 		FButtonStyle Style;
 		Style.Normal.SetResourceObject(UIData->MapIcon);
@@ -88,13 +74,9 @@ void UMapUI::NativeConstruct()
 		for (auto Name : Data.SpawnInteractableRowNames)
 		{
 			if (Name.Key.IsEqual(TEXT("Sanctuary")))
-			{
 				MapNode->SetSanctuaryVisibility(ESlateVisibility::Visible);
-			}
 			else if (Name.Key.IsEqual(TEXT("Well")))
-			{
 				MapNode->SetWellVisibility(ESlateVisibility::Visible);
-			}
 		}
 
 		if (UCanvasPanelSlot* CanvasSlot = MapCanvas->AddChildToCanvas(MapNode))
@@ -114,9 +96,5 @@ void UMapUI::NativeDestruct()
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 	{
 		PC->SetPause(false);
-		
-		// FInputModeUIOnly InputMode;
-		// InputMode.SetWidgetToFocus(TakeWidget()); // 현재 위젯에 포커스
-		// PC->SetInputMode(InputMode);
 	}
 }

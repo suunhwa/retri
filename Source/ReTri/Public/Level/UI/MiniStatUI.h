@@ -1,5 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
+﻿
 #pragma once
 
 #include "CoreMinimal.h"
@@ -25,7 +24,7 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* CoolTimeText;
 	UPROPERTY(meta=(BindWidget))
-	UTextBlock* CriticalText;	// %
+	UTextBlock* CriticalText;	
 	UPROPERTY(meta=(BindWidget))
-	UTextBlock* FireText;		// %
+	UTextBlock* FireText;		
 };

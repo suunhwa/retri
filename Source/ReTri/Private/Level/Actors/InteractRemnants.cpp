@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Level/Actors/InteractRemnants.h"
@@ -23,7 +22,6 @@ void AInteractRemnants::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// InteractableType = EInteractableType::Remnants;
 }
 
 void AInteractRemnants::Interact_Implementation()
@@ -35,19 +33,12 @@ void AInteractRemnants::Interact_Implementation()
 	if (FoundValue) *FoundValue = true; 
 	SetIsUsed(true);
 	
-	// SCREENLOG("스킬을 랜덤으로 스폰");
-	if (!ItemClass)
-	{
-		// UE_LOG(jiwon, Error, TEXT("ItemClass 설정안됨 ㄷㄷ"));
-		return;
-	}
+	if (!ItemClass) return;
 	
 	auto GI = UGameplayStatics::GetGameInstance(GetWorld());
 	if (!GI) return;
 	auto MapSub = GI->GetSubsystem<UMapSubSystem>();
 	if (!MapSub) return;
-	
-	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 	
 	TArray<FPlayerSkillData*> SkillRandomDatas = MapSub->GetRandomAcquiredItemList();
 	int32 RandomNum = FMath::RandRange(0, SkillRandomDatas.Num()-1);
@@ -60,17 +51,12 @@ void AInteractRemnants::Interact_Implementation()
 	{
 		Item->DataInit(*PickedData);
 
-		// Row 이름으로 AbilityClass 찾아서 설정
 		FName RowName = FName(*PickedData->SkillID);
 		if (TSubclassOf<UAbilityBase>* Found = SkillIDToClassMap.Find(RowName))
 		{
 			Item->AbilityClass = *Found;
 			UGameplayStatics::PlaySound2D(GetWorld(), SelectSound);
 		}
-		// else
-		// {
-		// 	UE_LOG(jiwon, Warning, TEXT("SkillClassMap에 %s 없음"), *PickedData->SkillID);
-		// }
 	}
 	
 	NiagaraComp->Activate();

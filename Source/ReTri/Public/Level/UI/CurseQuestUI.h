@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -19,11 +18,9 @@ protected:
 	virtual void NativeConstruct() override;
 	
 public:
-	// Blur 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UBackgroundBlur> BackBlur;
 	
-	// VerticalBox 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UVerticalBox> QuestVerticalBox;
 	

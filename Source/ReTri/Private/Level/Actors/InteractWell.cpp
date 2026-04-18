@@ -52,29 +52,20 @@ void AInteractWell::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
-	// UE_LOG(jiwon, Warning, TEXT("꿈가루로 스탯 업그레이드 UI"));
-	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
+	if (!WellDataTable) return;
 	
-	if (!WellDataTable)
-	{
-		// UE_LOG(LogTemp, Warning, TEXT("Well Data Table 할당 되지 않음"));
-		return;
-	}
-	
-	// Chaos Data 가져오기
 	TArray<FWellRewardData*> AllWell;
 	WellDataTable->GetAllRows<FWellRewardData>(TEXT("Well::Interact"), AllWell);
 	PickedWellReward.Empty();
 	
-	// 랜덤으로 섞기
 	for (int i = AllWell.Num()-1; i > 0; i--)
 	{
 		int32 R = FMath::RandRange(0, i);
 		AllWell.Swap(i, R);
 	}
 
-	// UI띄우기
 	ShowSelectUI();
+	
 	if (!WellSelectUIInstance) return;
 	
 	for (int i = 0; i < 3; i++)
@@ -96,12 +87,10 @@ void AInteractWell::Interact_Implementation()
 void AInteractWell::OnWellSelected(int32 Index)
 {
 	FWellRewardData* WellRewardData = PickedWellReward[Index];
-	// JIWONLOG("선택된 우물: %s", *WellRewardData->WellRewardNameKR);
 	
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI || !GI->StatComp) return;
 	
-	// 꿈가루 부족할 경우 
 	FString FloatingText = FString::Printf(TEXT("꿈가루 부족!"));
 	FLinearColor FloatingColor = FLinearColor::Red;
 	
@@ -138,37 +127,37 @@ void AInteractWell::OnWellSelected(int32 Index)
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackPower, Val);
 		Args.Add(FMath::TruncToInt(Val));
 		FloatingText = FString::Format(*WellRewardData->WellRewardNameKR, Args); 
-		FloatingColor = FLinearColor(1.0f, 0.1f, 0.1f, 1.f); // Red
+		FloatingColor = FLinearColor(1.0f, 0.1f, 0.1f, 1.f);
 		break;
 	case EWellRewardType::RewardSpellPower:
 		GI->StatComp->ApplyStatModifier(EStatTypes::SpellPower, Val);
 		Args.Add(FMath::TruncToInt(Val));
 		FloatingText = FString::Format(*WellRewardData->WellRewardNameKR, Args); 
-		FloatingColor = FLinearColor(0.1f, 0.5f, 1.0f, 1.f); // Cyan
+		FloatingColor = FLinearColor(0.1f, 0.5f, 1.0f, 1.f); 
 		break;
 	case EWellRewardType::RewardProjectileSpeed:
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackSpeed, Val);
 		Args.Add(FMath::TruncToInt(Val));
 		FloatingText = FString::Format(*WellRewardData->WellRewardNameKR, Args); 
-		FloatingColor = FLinearColor(1.0f, 0.5f, 0.5f, 1.f); // 
+		FloatingColor = FLinearColor(1.0f, 0.5f, 0.5f, 1.f);
 		break;
 	case EWellRewardType::RewardAttackSpeed:
 		GI->StatComp->ApplyStatModifier(EStatTypes::AttackSpeed,  Val / 100.f);
 		Args.Add(FMath::TruncToInt(Val));
 		FloatingText = FString::Format(*WellRewardData->WellRewardNameKR, Args); 
-		FloatingColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.f); // Yellow
+		FloatingColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.f);
 		break;
 	case EWellRewardType::RewardMoveSpeed:
 		GI->StatComp->ApplyStatModifier(EStatTypes::SpellPower, Val);
 		Args.Add(FMath::TruncToInt(Val));
 		FloatingText = FString::Format(*WellRewardData->WellRewardNameKR, Args); 
-		FloatingColor = FLinearColor(0.1f, 1.0f, 0.7f, 1.f); // 
+		FloatingColor = FLinearColor(0.1f, 1.0f, 0.7f, 1.f); 
 		break;
 	case EWellRewardType::RewardMemoryAcceleration:
 		GI->StatComp->ApplyStatModifier(EStatTypes::SpellPower,  Val / 100.f);
 		Args.Add(FMath::TruncToInt(Val));
 		FloatingText = FString::Format(*WellRewardData->WellRewardNameKR, Args); 
-		FloatingColor = FLinearColor(0.1f, 0.7f, 1.0f, 1.f); // 
+		FloatingColor = FLinearColor(0.1f, 0.7f, 1.0f, 1.f); 
 		break;
 	}
 	
@@ -196,30 +185,18 @@ void AInteractWell::ShowSelectUI()
 {
 	Super::ShowSelectUI();
 	
-	if (!SelectUIClass)
-	{
-		/// UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
-		return;
-	}
+	if (!SelectUIClass) return;
 	
-	// 최소한 한 번만 생성, 이후에는 인스턴스 재사용
 	if (!WellSelectUIInstance)
 	{
 		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
 		WellSelectUIInstance = CreateWidget<UWellSelectUI>(PC, SelectUIClass);
 		if (WellSelectUIInstance)
-		{
-			// PIE Undo Buffer Leaks 방지
-			// 위 코드는 위젯을 생성하자마자 
-			// "이 위젯은 실행 취소 기록에 남기지 마! 넌 그냥 게임 플레이 도중에 쓰고 버릴 일회용이야!" 
-			// 라고 플래그(RF_Transactional)를 강제로 지워버리는 역할
 			WellSelectUIInstance->ClearFlags(RF_Transactional);
-		}
 	}
 
 	if (!WellSelectUIInstance) return;
 
-	// 이전 버튼들 정리 
 	WellSelectUIInstance->ClearButtons();
 	if (!WellSelectUIInstance->IsInViewport())
 	{
@@ -233,7 +210,5 @@ void AInteractWell::HideSelectUI()
 	Super::HideSelectUI();
 	
 	if (WellSelectUIInstance->IsInViewport())
-	{
 		WellSelectUIInstance->RemoveFromParent();
-	}
 }

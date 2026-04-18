@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -38,22 +37,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<UStaticMesh> InteractableMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<class AInteractableBase> InteractableClass;
+	TSubclassOf<AInteractableBase> InteractableClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Description;
 };
 
 
 // === [ Chaos Data ] ===
-
 UENUM(BlueprintType)
 enum class EChaosType : uint8
 {
-	Chaos_Health		UMETA(DisplayName="Chaos_Health"),		// 꺾이지 않는 의지
-	Chaos_AttackDamage	UMETA(DisplayName="Chaos_AttackDamage"),  // 거인의 근력
+	Chaos_Health		UMETA(DisplayName="Chaos_Health"),			// 꺾이지 않는 의지
+	Chaos_AttackDamage	UMETA(DisplayName="Chaos_AttackDamage"),	// 거인의 근력
 	Chaos_AbilityPower	UMETA(DisplayName="Chaos_AbilityPower"),	// 무한한 지식
-	Chaos_AttackSpeed	UMETA(DisplayName="Chaos_AttackSpeed"),   // 맹렬한 분노
-	Chaos_MemoryHaste	UMETA(DisplayName="Chaos_MemoryHaste")	// 기민한 정신
+	Chaos_AttackSpeed	UMETA(DisplayName="Chaos_AttackSpeed"),		// 맹렬한 분노
+	Chaos_MemoryHaste	UMETA(DisplayName="Chaos_MemoryHaste")		// 기민한 정신
 };
 
 USTRUCT(BlueprintType)
@@ -76,7 +74,6 @@ public:
 
 
 // === [ Curse Data ] ===
-
 UENUM(BlueprintType)
 enum class ECurseType : uint8
 {
@@ -108,11 +105,11 @@ public:
 UENUM(BlueprintType)
 enum class ERewardType: uint8
 {
-	RewardGold			UMETA(DisplayName="RewardGold"),			// 
-	RewardDreamPowder	UMETA(DisplayName="RewardDreamPowder"),		// 
-	RewardMaxHP			UMETA(DisplayName="RewardMaxHP"),			// 
-	RewardAttackDamage	UMETA(DisplayName="RewardAttackDamage"),	// 
-	RewardMemoryHaste	UMETA(DisplayName="RewardMemoryHaste")		// 
+	RewardGold			UMETA(DisplayName="RewardGold"),			// 골드 보상
+	RewardDreamPowder	UMETA(DisplayName="RewardDreamPowder"),		// 꿈가루 보상
+	RewardMaxHP			UMETA(DisplayName="RewardMaxHP"),			// 최대 체력 보상
+	RewardAttackDamage	UMETA(DisplayName="RewardAttackDamage"),	// 공격력 보상
+	RewardMemoryHaste	UMETA(DisplayName="RewardMemoryHaste")		// 기억 가속 보상
 };
 
 USTRUCT(BlueprintType)
@@ -131,17 +128,16 @@ public:
 
 
 // === [ Well Data ] ===
-
 UENUM(BlueprintType)
 enum class EWellRewardType: uint8
 {
-	RewardMaxHP					UMETA(DisplayName="RewardMaxHP"),				// 
-	RewardAttackPower			UMETA(DisplayName="RewardAttackPower"),			// 
-	RewardSpellPower			UMETA(DisplayName="RewardSpellPower"),			// 
-	RewardProjectileSpeed		UMETA(DisplayName="RewardProjectileSpeed"),		// 
-	RewardAttackSpeed			UMETA(DisplayName="RewardAttackSpeed"),			// 
-	RewardMoveSpeed				UMETA(DisplayName="RewardMoveSpeed"),			// 
-	RewardMemoryAcceleration	UMETA(DisplayName="RewardMoveSpeed"),			// 
+	RewardMaxHP					UMETA(DisplayName="RewardMaxHP"),				// 최대 체력 보상
+	RewardAttackPower			UMETA(DisplayName="RewardAttackPower"),			// 공격력 보상
+	RewardSpellPower			UMETA(DisplayName="RewardSpellPower"),			// 주문력 보상
+	RewardProjectileSpeed		UMETA(DisplayName="RewardProjectileSpeed"),		// 총알 스피드 보상
+	RewardAttackSpeed			UMETA(DisplayName="RewardAttackSpeed"),			// 공격 속도 보상
+	RewardMoveSpeed				UMETA(DisplayName="RewardMoveSpeed"),			// 이동 속도 보상
+	RewardMemoryAcceleration	UMETA(DisplayName="RewardMoveSpeed"),			// 기억 가속 보상
 };
 
 USTRUCT(BlueprintType)
@@ -166,7 +162,6 @@ public:
 
 
 // === [ Map Info ] ===
-
 UENUM(BlueprintType)
 enum class EMapNodeType : uint8
 {
@@ -192,37 +187,27 @@ public:
 	FLinearColor IconColor = FLinearColor::White;
 };
 
-// 맵에 들어갈 오브젝트 및 정보
 USTRUCT(BlueprintType)
 struct FMapNodeData
 {
 	GENERATED_BODY()
 	
 public:
-	// 방 타입
 	UPROPERTY(BlueprintReadWrite)
 	EMapNodeType MapType = EMapNodeType::Start;
 	
-	// 상호작용 기물 배열
 	UPROPERTY(BlueprintReadWrite)
 	TMap<FName, bool> SpawnInteractableRowNames;
 	
-	// 현재 방 번호
 	UPROPERTY(BlueprintReadWrite)
 	int32 MapIndex = 0;
 	
-	// 클리어 여부
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsCleared = false;
 	
-	// 층 수가 높아질수록 위로 올라감 (Y축 감소)
-	// X좌표 : 1층에 3개의 방이 생겼다면 서로 겹치지 않게 화면을 3등분 해 가로축으로 띄워놓음
 	UPROPERTY(BlueprintReadWrite)
 	FVector2D UIPosition;
 	
-	// 양방향 거미줄 맵 : 현재 방과 연결된 다른 방들의 번호 표
-	// 시작 방 (0)에서 1번, 2번 방이 연결되어 있다면 이 배열엔 {1, 2}가 들어가있음.
-	// 반대로 1번방에는 이 방번호가 들어가 있어야함 그래야 돌아갈 수 있음
 	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> ConnectMapIndexs;
 };

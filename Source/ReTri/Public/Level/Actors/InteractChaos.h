@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,9 +6,6 @@
 #include "Level/Data/InteractableData.h"
 #include "InteractChaos.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class RETRI_API AInteractChaos : public AInteractableBase
 {
@@ -18,9 +14,9 @@ class RETRI_API AInteractChaos : public AInteractableBase
 protected:
 	AInteractChaos();
 	
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
 public:	
 	virtual void Interact_Implementation() override;
 	
@@ -35,6 +31,7 @@ public:
 	
 	virtual void ShowSelectUI() override;
 	virtual void HideSelectUI() override;
+	
 private:
 	TArray<FChaosData*> PickedChaoses;
 };

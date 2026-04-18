@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Level/Actors/LootGoldCoinPot.h"
@@ -14,14 +13,9 @@ ALootGoldCoinPot::ALootGoldCoinPot()
 
 void ALootGoldCoinPot::Break()
 {
-	// Destory 함수가 부모한테 있으니까
 	Super::Break();
 
 	UGameplayStatics::PlaySound2D(GetWorld(), BreakSound1);
 	
-	// Spawn Goods!
 	GetWorld()->SpawnActor<AGoodsGoldCoin>(GoodsClass, GetActorLocation(), GetActorRotation());
-	
-	// Effect Play
-	// UE_LOG(jiwon, Warning, TEXT("ALootGoldCoinPot"));
 }

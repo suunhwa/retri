@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -18,7 +17,6 @@ public:
 	void OnInteract(const FString& Name);
 	
 protected:
-	/** Blueprint에서 실행 할 함수 */
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnInteract"))
 	void BP_Interact_UI(const FString& Name);
 	

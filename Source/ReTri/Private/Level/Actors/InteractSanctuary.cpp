@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Level/Actors/InteractSanctuary.h"
@@ -32,14 +31,12 @@ void AInteractSanctuary::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// InteractableType = EInteractableType::Sanctuary;
 }
 
 void AInteractSanctuary::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
-	// if (!MyPlayer) return;
 	
 	auto GI = Cast<UReTriGameInstance>(GetGameInstance());
 
@@ -87,5 +84,4 @@ void AInteractSanctuary::Interact_Implementation()
 	UGameplayStatics::PlaySound2D(GetWorld(), SelectSound);
 	HealStaticMesh->SetVisibility(false);
 	NiagaraComp->Activate();
-	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
 }

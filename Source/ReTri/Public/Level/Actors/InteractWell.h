@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,17 +5,15 @@
 #include "Level/Actors/InteractableBase.h"
 #include "InteractWell.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class RETRI_API AInteractWell : public AInteractableBase
 {
 	GENERATED_BODY()
 	
-protected:
+public:	
 	AInteractWell();
-	// Called when the game starts or when spawned
+	
+protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 

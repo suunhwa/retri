@@ -1,9 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ReTri/ReTri.h"
 #include "ReTriGameData.h"
 #include "Level/Data/InteractableData.h"
 
@@ -58,12 +56,12 @@ class RETRI_API UMapSubSystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 public:
-	// === Infrastructure (UE Overrides) ===
+	// === Infrastructure ===
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 	
 public:
-	// === Configuration (Set by GameInstance) ===
+	// === Configuration ===
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map|Config")
 	UDataTable* MapUIData;
 
@@ -79,7 +77,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Map|Config")
 	TSubclassOf<ALootDreamPowderPillar> DreamPowderClass;
 
-	// === Runtime Data (Managed by Subsystem) ===
+	// === Runtime Data ===
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
 	TArray<FMapNodeData> CurMapDatas;
 	
@@ -95,8 +93,6 @@ public:
 	/** 현재 맵 정보 */
 	UFUNCTION(BlueprintCallable, Category="Map|Helper")
 	FMapNodeData GetCurMapData() { return CurMapDatas[CurMapIndex]; }
-	
-	/** 현재 맵 정보 (원본 직접 참조) */
 	FMapNodeData& GetCurMapDataRef() { return CurMapDatas[CurMapIndex]; }
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map|Runtime")
@@ -126,7 +122,7 @@ public:
 	TArray<FPlayerSkillData*> GetRandomAcquiredItemList();
 	FPlayerSkillData* BossDropItem;
 	
-	// === Level Setting API? ===
+	// === Level Setting API ===
 	/** 사용된 Interactable 저장 */
 	UFUNCTION(BlueprintCallable, Category="Map|State")
 	void SetInteractableUsed(FName InRowName);

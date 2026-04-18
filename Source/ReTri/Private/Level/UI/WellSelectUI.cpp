@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Level/UI/WellSelectUI.h"
@@ -10,12 +9,11 @@ UWellSelectButtonUI* UWellSelectUI::AddButton(FString Description, FString Cost,
 {
 	if (!ButtonClass) 
 	{
-		// UE_LOG(LogTemp, Warning, TEXT("SelectUI: ButtonClass가 설정되지 않았습니다."));
 		return nullptr;
 	}
 	
 	UWellSelectButtonUI* Button = CreateWidget<UWellSelectButtonUI>(this, ButtonClass);
-	Button->ClearFlags(RF_Transactional); // PIE World Leak 방지
+	Button->ClearFlags(RF_Transactional); 
 	
 	Button->ThisIndex = Index;
 	Button->SetTextDescription(Description);

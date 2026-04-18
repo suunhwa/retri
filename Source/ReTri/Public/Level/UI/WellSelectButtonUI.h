@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -21,7 +20,6 @@ protected:
 	virtual void NativeDestruct() override;
 	
 public:
-	// 외부에서 바인딩 할 Delegate
 	UPROPERTY(BlueprintAssignable)
 	FOnWellSelectButtonClicked OnWellSelectClicked;
 
@@ -35,7 +33,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTextCost(FString Info);
 	
-	// 이 버튼이 몇번째인지
 	UPROPERTY(BlueprintReadOnly)
 	int32 ThisIndex;
 	

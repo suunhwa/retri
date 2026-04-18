@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,9 +5,6 @@
 #include "Level/Actors/InteractableBase.h"
 #include "InteractSanctuary.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class RETRI_API AInteractSanctuary : public AInteractableBase
 {
@@ -18,7 +14,6 @@ public:
 	AInteractSanctuary();
 	
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	

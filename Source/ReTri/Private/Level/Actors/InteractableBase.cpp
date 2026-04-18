@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Level/Actors/InteractableBase.h"
@@ -6,10 +5,8 @@
 #include "Level/Data/InteractableData.h"
 #include "Level/UI/InteractableInfoUI.h"
 #include "Level/UI/InteractableUI.h"
-#include "Level/UI/SelectUI.h"
 #include "MapSubSystem.h"
 #include "NiagaraComponent.h"
-#include "Level/Actors/InteractChaos.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/TextBlock.h"
@@ -20,10 +17,8 @@
 #include "PaperSprite.h"
 
 
-// Sets default values
 AInteractableBase::AInteractableBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComp"));
@@ -52,9 +47,8 @@ AInteractableBase::AInteractableBase()
 	
 	InteractUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractUI"));
 	InteractUI->SetupAttachment(CapsuleComp);
-	InteractUI->SetWidgetSpace(EWidgetSpace::World); //! EWidgetSpace::World
+	InteractUI->SetWidgetSpace(EWidgetSpace::World); 
 	InteractUI->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
-	//InteractUI->SetRelativeScale3D(FVector(0.8f, 0.8f, 0.8f));
 	ConstructorHelpers::FClassFinder<UInteractableUI> TempUI(TEXT("/Game/LevelInteraction/01_UI/WBP_InteractableUI.WBP_InteractableUI_C"));
 	if (TempUI.Succeeded()) InteractUI->SetWidgetClass(TempUI.Class);
 	InteractUI->SetVisibility(false);
@@ -76,7 +70,6 @@ AInteractableBase::AInteractableBase()
 	if (TempFaild.Succeeded()) FailedSound = TempFaild.Object;
 }
 
-// Called when the game starts or when spawned
 void AInteractableBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -89,7 +82,6 @@ void AInteractableBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-// Called every frame
 void AInteractableBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -111,15 +103,12 @@ void AInteractableBase::Tick(float DeltaTime)
 void AInteractableBase::DataInit(FName InRowName, FInteractableData RowData)
 {
 	MyRowName = InRowName;
-	//InteractableData = RowData;
 	InteractableType = RowData.InteractableType; 
 	InteractName = RowData.InteractName;
 	Description = RowData.Description;
 	UStaticMesh* LoadMesh = RowData.InteractableMesh.LoadSynchronous();
 	if (LoadMesh)
 		MeshComp->SetStaticMesh(LoadMesh);
-	// else
-	// 	UE_LOG(LogTemp, Warning, TEXT("Load 매시 로드 안됨 왜?"));
 	
 	UInteractableUI* InteractableUI = Cast<UInteractableUI>(InteractUI->GetUserWidgetObject());
 	if (InteractableUI) 
@@ -131,7 +120,7 @@ void AInteractableBase::DataInit(FName InRowName, FInteractableData RowData)
 	FVector Pos = GetActorLocation();
 	SetActorLocation(FVector(Pos.X, Pos.Y, Pos.Z+CapsuleComp->GetScaledCapsuleHalfHeight()));
 	
-	if (bIsUsed)
+	if (bIsUsed) 
 		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
@@ -158,7 +147,6 @@ void AInteractableBase::Hover_Implementation()
 	
 	if (!bIsInteractable) return;
 	
-	//UE_LOG(LogTemp, Warning, TEXT("Hover 했을 때 ?"));
 	CurDescriptionTime = 0;
 }
 
@@ -199,7 +187,6 @@ void AInteractableBase::UIFocus()
 		APlayerCameraManager* CamManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
 		if (CamManager)
 		{
-			// UI 방향을 카메라를 바라볼 수 있도록
 			FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(InteractUI->GetComponentLocation(), CamManager->GetCameraLocation());
 			InteractUI->SetWorldRotation(LookAtRot);
 		}

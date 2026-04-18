@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -14,7 +13,6 @@ class RETRI_API AFloatingUIActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AFloatingUIActor();
 
 	void ShowScaleUI(FText Text, FLinearColor Color);

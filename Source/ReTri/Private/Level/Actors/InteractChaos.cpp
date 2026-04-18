@@ -27,7 +27,6 @@ void AInteractChaos::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//InteractableType = EInteractableType::Chaos;
 }
 
 void AInteractChaos::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -50,30 +49,20 @@ void AInteractChaos::Interact_Implementation()
 {
 	Super::Interact_Implementation();
 	
-	// UE_LOG(jiwon, Warning, TEXT("스탯 선택하는 UI 띄우고 선택하면 해당 스탯 UP!!"));
-	// UE_LOG(jiwon, Warning, TEXT("%s"), *InteractName);
-	
 	SetIsUsed(true);
 	
-	if (!ChaosDataTable)
-	{
-		// UE_LOG(LogTemp, Warning, TEXT("Chaos Data Table 할당 되지 않음"));
-		return;
-	}
+	if (!ChaosDataTable) return;
 	
-	// Chaos Data 가져오기
 	TArray<FChaosData*> AllChaos;
 	ChaosDataTable->GetAllRows<FChaosData>(TEXT("Chaos::Interact"), AllChaos);
 	PickedChaoses.Empty();
 	
-	// 랜덤으로 섞기
 	for (int i = AllChaos.Num()-1; i > 0; i--)
 	{
 		int32 R = FMath::RandRange(0, i);
 		AllChaos.Swap(i, R);
 	}
 
-	// UI띄우기
 	ShowSelectUI();
 	if (!SelectUIInstance) return;
 	
@@ -95,7 +84,6 @@ void AInteractChaos::Interact_Implementation()
 void AInteractChaos::OnChaosSelected(int32 Index)
 {
 	FChaosData* ChaosData = PickedChaoses[Index];
-	// JIWONLOG("선택된 혼돈: %s", *ChaosData->ChaosName);
 	
 	auto* GI = Cast<UReTriGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI || !GI->StatComp) return;
@@ -161,30 +149,18 @@ void AInteractChaos::ShowSelectUI()
 {
 	Super::ShowSelectUI();
 	
-	if (!SelectUIClass)
-	{
-		// UE_LOG(LogTemp, Warning, TEXT("Select UI Class 할당 안됨"));
-		return;
-	}
+	if (!SelectUIClass) return; 
 	
-	// 최소한 한 번만 생성, 이후에는 인스턴스 재사용
 	if (!SelectUIInstance)
 	{
 		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
 		SelectUIInstance = CreateWidget<USelectUI>(PC, SelectUIClass);
 		if (SelectUIInstance)
-		{
-			// PIE Undo Buffer Leaks 방지
-			// 위 코드는 위젯을 생성하자마자 
-			// "이 위젯은 실행 취소 기록에 남기지 마! 넌 그냥 게임 플레이 도중에 쓰고 버릴 일회용이야!" 
-			// 라고 플래그(RF_Transactional)를 강제로 지워버리는 역할
 			SelectUIInstance->ClearFlags(RF_Transactional);
-		}
 	}
 
 	if (!SelectUIInstance) return;
 
-	// 이전 버튼들 정리 
 	SelectUIInstance->ClearButtons();
 	if (!SelectUIInstance->IsInViewport())
 	{
@@ -198,7 +174,5 @@ void AInteractChaos::HideSelectUI()
 	Super::HideSelectUI();
 	
 	if (SelectUIInstance->IsInViewport())
-	{
 		SelectUIInstance->RemoveFromParent();
-	}
 }

@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Level/Actors/LootDreamPowderPillar.h"
@@ -14,14 +13,10 @@ ALootDreamPowderPillar::ALootDreamPowderPillar()
 
 void ALootDreamPowderPillar::Break()
 {
-	// Destory 함수가 부모한테 있으니까
 	Super::Break();
 	
 	UGameplayStatics::PlaySound2D(GetWorld(), BreakSound2);
 	
-	// Spawn Goods!
 	GetWorld()->SpawnActor<AGoodsDreamPowder>(GoodsClass, GetActorLocation(), GetActorRotation());
 	
-	// Effect Play
-	// UE_LOG(jiwon, Warning, TEXT("ALootDreamPowderPillar"));
 }

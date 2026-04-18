@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -21,7 +20,6 @@ protected:
 	virtual void NativeConstruct() override;
 	
 public:
-	// 외부에서 바인딩 할 Delegate
 	UPROPERTY(BlueprintAssignable)
 	FOnSkillSlotClicked OnSlotClicked;
 	

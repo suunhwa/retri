@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,14 +6,11 @@
 #include "Engine/GameInstance.h"
 
 #include "Player/Data/PlayerStatData.h"
-#include "ReTri/ReTri.h"
 #include "ReTriGameInstance.generated.h"
 
 class UStatComponent;
 class UHealthComponent;
-/**
- * 
- */
+
 UCLASS()
 class RETRI_API UReTriGameInstance : public UGameInstance
 {
@@ -23,7 +19,7 @@ class RETRI_API UReTriGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	
-	// =========== Player ===============================================
+	// === Player ===
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
 	FPlayerStatInfo CurPlayerStats;
 	
@@ -50,7 +46,6 @@ public:
 	UPROPERTY()
 	TMap<uint8, UClass*> SavedSkillSlots;
 	
-	// todo Player Stat 부분 정리 필
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Stat")
 	TSubclassOf<class UReTriGameData> GameDataClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Player|Stat")
@@ -77,12 +72,14 @@ public:
 	/** 플레이어 사망 시 SaveStatSnapshot() 호출 → 컴포넌트 값을 GI에 복사 */
 	void SaveStatSnapshot();
 	
-	// =========== Level ===============================================
-	//! 상호작용 데이터
+	void DebugStat() const;
+	
+	// === Level ===
+	/** 상호작용 데이터 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|Interaction")
 	UDataTable* InteractionData;
 
-	//! 절차적 맵 생성 데이터
+	/** 절차적 맵 생성 데이터 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player|NodeMap")
 	UDataTable* MapUIData;
 
@@ -95,9 +92,5 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI|GameOver")
 	FPlayerPlayData PlayerPlayData;
-	// =========== Level ===============================================
 	
-	// void PlayerDeadInit();
-	
-	void DebugStat() const;
 };
